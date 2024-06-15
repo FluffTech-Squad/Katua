@@ -1,0 +1,46 @@
+{
+  "en-US": {
+    "hello": "Hello, World!",
+    "latency": "Pong! 🏓\nLatency is $1ms",
+    "interactionError": "There was an error while executing this command!",
+    "welcome": "Welcome to the server, $1!",
+
+    "noUserAnalyse": "Please provide a user to analyse.",
+    "noMember": "This user is not in the server.",
+    "cannotBots": "Bots cannot be analysed.",
+    "cannotSelf": "I cannot be analysed.",
+    "explanationLabel": "Explanation",
+    "apiStart": "Communicating with the API...",
+    "analysisTitle": "Analysis",
+    "commonGuildsLabel": "Guilds in Common",
+    "joinedAtLabel": "Joined At",
+    "createdAtLabel": "Created Account At",
+    "apiError": "The API returned an error.",
+    "isValid": "This member is safe.",
+    "isNeutral": "This member seems normal.",
+    "isInvalid": "This member seems to be a troll. It can be a false positive.",
+    "askAIExplanation": "Explain very simply why this user is $1?"
+  },
+  "fr": {
+    "hello": "Bonjour, le monde!",
+    "latency": "Pong !🏓\n La latence est de $1ms",
+    "interactionError": "Une erreur s'est produite lors de l'exécution de cette commande!",
+    "welcome": "Bienvenue sur le serveur, $1!",
+
+    "noUserAnalyse": "Veuillez fournir un utilisateur à analyser.",
+    "noMember": "Cet utilisateur n'est pas dans le serveur.",
+    "cannotBots": "Les bots ne peuvent pas être analysés.",
+    "cannotSelf": "Je ne peux pas être analysé.",
+    "explanationLabel": "Explication",
+    "apiStart": "Communication avec l'API...",
+    "analysisTitle": "Analyse",
+    "commonGuildsLabel": "Guildes en Commun",
+    "joinedAtLabel": "Rejoint le",
+    "createdAtLabel": "Compte créé le",
+    "apiError": "L'API a retourné une erreur.",
+    "isValid": "Ce membre est safe.",
+    "isNeutral": "Ce membre semble normal.",
+    "isInvalid": "Ce membre semble être un troll. Cela peut être un faux positif.",
+    "askAIExplanation": "Expliquez très simplement pourquoi cet utilisateur est $1? En français."
+  }
+}
