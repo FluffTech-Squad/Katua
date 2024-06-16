@@ -1,3 +1,11 @@
+/*  _______________      _______________       ______  ___     _________
+    ___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
+    __  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \  __  / 
+    _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
+    /_/      /_/  \__,_/ /_/    /_/    _\__, / /_/  /_/  \____/\__,_/   
+                                       /____/                           
+*/
+
 // Code to run the bot
 // FluffyMod is a AI-powered moderator Discord Bot to analyse joining members' profile to make furry servers safer.
 // Created by: nekomancer0

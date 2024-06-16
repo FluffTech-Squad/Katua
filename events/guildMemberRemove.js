@@ -21,6 +21,8 @@ module.exports =
     let threadIds = threadsFile.split("\n");
 
     for (let thread_id of threadIds) {
+      if (thread_id === "") break;
+
       let threadx = await openai.threads.retrieve(thread_id);
 
       if (

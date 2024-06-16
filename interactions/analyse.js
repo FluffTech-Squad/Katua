@@ -6,6 +6,8 @@ const {
   ButtonBuilder,
   EmbedBuilder,
   ButtonStyle,
+  ChannelType,
+  Locale,
 } = require("discord.js");
 
 const fs = require("fs");
@@ -20,10 +22,14 @@ module.exports =
    * @param {ChatInputCommandInteraction} interaction
    */
   async (interaction) => {
-    const user = interaction.options.getUser("user");
-    const member = interaction.guild.members.cache.get(user.id);
     let sentences =
       langs[interaction.guild.preferredLocale || "en-US"] || langs["en-US"];
+
+    if (interaction.channel.type === ChannelType.DM)
+      return interaction.reply({ content: sentences.noDM, ephemeral: true });
+
+    const user = interaction.options.getUser("user");
+    const member = interaction.guild.members.cache.get(user.id);
 
     if (!user)
       return interaction.reply({
@@ -80,6 +86,17 @@ module.exports =
       components: [actionRow],
     });
 
+    let joinedAt = member.joinedAt;
+    let createdAt = user.createdAt;
+
+    let joinedAtDay = joinedAt.getDate();
+    let joinedAtMonth = joinedAt.getMonth() + 1;
+    let joinedAtYear = joinedAt.getFullYear();
+
+    let createdAtDay = createdAt.getDate();
+    let createdAtMonth = createdAt.getMonth() + 1;
+    let createdAtYear = createdAt.getFullYear();
+
     let embed = new EmbedBuilder()
       .setTitle(sentences.analysisTitle)
       .setAuthor({
@@ -94,12 +111,12 @@ module.exports =
         },
         {
           name: sentences.joinedAtLabel,
-          value: member.joinedAt.toUTCString(),
+          value: `${joinedAtDay}/${joinedAtMonth}/${joinedAtYear}`,
           inline: true,
         },
         {
           name: sentences.createdAtLabel,
-          value: user.createdAt.toUTCString(),
+          value: `${createdAtDay}/${createdAtMonth}/${createdAtYear}`,
           inline: true,
         },
       ])
@@ -168,7 +185,7 @@ module.exports =
         if (!interaction.isButton()) return;
 
         if (interaction.customId === "explanation") {
-          interaction.reply({
+          let msg = await interaction.reply({
             content: sentences.apiStart,
           });
 
@@ -198,7 +215,7 @@ module.exports =
             let message = await openai.threads.messages.create(thread.id, {
               content: sentences.askAIExplanation.replace(
                 "$1",
-                result.toLowerCase()
+                sentences["words"][result.toLowerCase()]
               ),
               role: "user",
             });
@@ -211,12 +228,12 @@ module.exports =
               let messages = await openai.threads.messages.list(run.thread_id);
               let lastMessage = messages.data[0];
 
-              await openai.threads.messages.del(thread.id, message.id);
-              await openai.threads.messages.del(thread.id, lastMessage.id);
-
-              interaction.editReply({
+              msg.edit({
                 content: lastMessage.content[0].text.value,
               });
+
+              await openai.threads.messages.del(thread.id, message.id);
+              await openai.threads.messages.del(thread.id, lastMessage.id);
             }
           } catch (error) {
             console.error(error);

@@ -23,6 +23,42 @@ for (const file of registerFiles) {
     commands.set(name, command.toJSON());
   }
 }
+const { default: axios } = require("axios");
+
+// Request to OpenAI API how many credits are left
+
+async function getCreditsLeft() {
+  return new Promise(async (resolve, reject) => {
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let startDate = "2024-06-01";
+
+    let end_date = `${year}-${month + 1}-01`;
+    let rootCredits = `https://api.openai.com/dashboard/billing/credit_grants?end_date=${end_date}&start_date=${startDate}&project_id=${process.env.OPENAI_PROJECT_ID}`;
+
+    let response = await axios.get(rootCredits, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_SESS}`,
+      },
+    });
+
+    let data = response.data;
+    let grants = data.grants.data;
+    let lastGrant = grants.at(-1);
+
+    let paidBalance = lastGrant.grant_amount;
+    let available = lastGrant.grant_amount - lastGrant.used_amount;
+
+    // Turns them into doubles digits
+    // Example: $1 to $1.00
+
+    paidBalance = paidBalance.toFixed(2);
+    available = available.toFixed(2);
+
+    resolve({ available, paidBalance });
+  });
+}
 
 module.exports =
   /**
@@ -30,7 +66,29 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
-    console.log(`Logged in as ${client.user.tag}`);
+    // Print this commented message when the bot is ready
+    /*  _______________      _______________       ______  ___     _________
+    ___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
+    __  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \  __  / 
+    _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
+    /_/      /_/  \__,_/ /_/    /_/    _\__, / /_/  /_/  \____/\__,_/   
+                                       /____/                           
+    */
+
+    console.log(`_______________      _______________       ______  ___     _________
+___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
+__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
+_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
+/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
+                                       /____/`);
+
+    console.log(`Logged in as ${client.user.username}`);
+
+    let credits = await getCreditsLeft();
+
+    console.log(
+      `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    );
 
     client.user.setPresence({
       status: "dnd",

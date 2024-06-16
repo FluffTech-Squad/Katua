@@ -19,7 +19,61 @@
     "isValid": "This member is safe.",
     "isNeutral": "This member seems normal.",
     "isInvalid": "This member seems to be a troll. It can be a false positive.",
-    "askAIExplanation": "Explain very simply why this user is $1?"
+    "askAIExplanation": "Explain very simply why this user is $1?",
+    "waitReport": "We are generating a report for you. Please wait a moment...",
+    "allClearText": "All Clear! This user is safe.",
+    "neutralText": "Neutral. This user seems normal, but keep an eye on their next interactions.",
+    "suspicionTitle": "A user joined",
+    "invalidTitle": "Suspicious user detected",
+    "notInvalidTitle": "Not suspicious.",
+    "memberReport": "*Some words to say that $1 might be a troll. If any deranged messages, ping moderators.*",
+    "botJoinTitle": "FluffyMod is there to help!",
+    "botJoinText": "Hello! I am FluffyMod, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help`.",
+    "noDM": "This command can only be used in a server.",
+    "helpCommands": {
+      "help": {
+        "title": "Help",
+        "description": "Get help the list of commands.",
+        "usage": "/help",
+        "localeName": "help",
+        "localeDescription": "Get the list of commands."
+      },
+      "analyse": {
+        "title": "Analyse",
+        "description": "Analyse a user to see if they are a troll.",
+        "usage": "/analyse @user",
+        "localeName": "analyse",
+        "localeDescription": "Analyse a suspicious user's profile."
+      },
+      "ping": {
+        "title": "Ping",
+        "description": "Check the bot's latency.",
+        "usage": "/ping",
+        "localeName": "ping",
+        "localeDescription": "Check the bot's latency."
+      },
+      "set-logs": {
+        "title": "Set Log",
+        "description": "Set the log channel for the bot when a user joins the server to be notified and analyse their profile.",
+        "usages": [
+          "/set-logs #channel",
+          "/set-logs #channel prevent-members: true",
+          "/set-logs #channel prevent-members: false",
+          "/set-logs #channel prevent-members: true #public-channel"
+        ],
+        "localeName": "set-log",
+        "localeDescription": "Set the log channel for the bot."
+      }
+    },
+    "setLogsText": "Ok! I've set the logs channel to $1 and $2 the prevent members option. If this option is enabled, members will be notified for potential trolls in $3.",
+    "words": {
+      "invalid": "invalid",
+      "neutral": "neutral",
+      "valid": "valid",
+      "enabled": "enabled",
+      "disabled": "disabled"
+    },
+    "cannotSend": "I don't have the permission to send messages in the $1 channel. Please make sure I have the right permissions."
   },
   "fr": {
     "hello": "Bonjour, le monde!",
@@ -41,6 +95,136 @@
     "isValid": "Ce membre est safe.",
     "isNeutral": "Ce membre semble normal.",
     "isInvalid": "Ce membre semble être un troll. Cela peut être un faux positif.",
-    "askAIExplanation": "Expliquez très simplement pourquoi cet utilisateur est $1? En français."
+    "askAIExplanation": "Expliquez très simplement pourquoi cet utilisateur est $1? En français.",
+    "waitReport": "Nous générons un rapport pour vous. Veuillez patienter un moment...",
+    "allClearText": "Tout est clair! Cet utilisateur est safe.",
+    "neutralText": "Neutre. Cet utilisateur semble normal, mais gardez un œil sur ses prochaines interactions.",
+    "suspicionTitle": "Un utilisateur a rejoint",
+    "invalidTitle": "Utilisateur suspect détecté",
+    "notInvalidTitle": "Pas suspect.",
+    "memberReport": "*Quelques mots pour dire que $1 pourrait être un troll. Si des messages dérangés, mentionnez les modérateurs.*",
+    "botJoinTitle": "FluffyMod est là pour vous aider!",
+    "botJoinText": "Bonjour! Je suis FluffyMod, un bot qui vous aide à modérer votre serveur. Je peux vous aider à analyser les utilisateurs, détecter les trolls, et plus encore. Pour commencer, tapez `/help`.",
+    "noDM": "Cette commande ne peut être utilisée que dans un serveur.",
+    "helpCommands": {
+      "help": {
+        "title": "Aide",
+        "description": "Obtenez de l'aide sur la liste des commandes.",
+        "usage": "/aide",
+        "localeName": "aide",
+        "localeDescription": "Obtenir la liste des commandes."
+      },
+      "analyse": {
+        "title": "Analyser",
+        "description": "Analyser un utilisateur pour voir s'il est un troll.",
+        "usage": "/analyser @user",
+        "localeName": "analyser",
+        "localeDescription": "Analyser le profil d'un utilisateur suspect."
+      },
+      "ping": {
+        "title": "Ping",
+        "description": "Vérifier la latence du bot.",
+        "usage": "/ping",
+        "localeName": "ping",
+        "localeDescription": "Vérifier la latence du bot."
+      },
+      "set-logs": {
+        "title": "Définir le salon de logs",
+        "description": "Définir le salon de logs pour le bot lorsqu'un utilisateur rejoint le serveur pour être notifié et analyser son profil.",
+        "usages": [
+          "/définir-logs #salon",
+          "/définir-logs #salon prevent-members: true",
+          "/définir-logs #salon prevent-members: false",
+          "/définir-logs #salon prevent-members: true #public-channel"
+        ],
+        "localeName": "définir-logs",
+        "localeDescription": "Définir le salon de logs pour le bot."
+      }
+    },
+    "setLogsText": "Ok! J'ai défini le salon de logs sur $1 et $2 l'option prévenir les membres. Si cette option est activée, les membres seront notifiés pour les trolls potentiels dans $3.",
+    "words": {
+      "invalid": "invalide",
+      "neutral": "neutre",
+      "valid": "valide",
+      "enabled": "activé",
+      "disabled": "désactivé"
+    },
+    "cannotSend": "Je n'ai pas la permission d'envoyer des messages dans le salon $1. Veuillez vous assurer que j'ai les bonnes permissions."
+  },
+  "de": {
+    "hello": "Hallo, Welt!",
+    "latency": "Pong! 🏓\nDie Latenz beträgt $1ms",
+    "interactionError": "Beim Ausführen dieses Befehls ist ein Fehler aufgetreten!",
+    "welcome": "Willkommen auf dem Server, $1!",
+
+    "noUserAnalyse": "Bitte geben Sie einen Benutzer an, der analysiert werden soll.",
+    "noMember": "Dieser Benutzer ist nicht im Server.",
+    "cannotBots": "Bots können nicht analysiert werden.",
+    "cannotSelf": "Ich kann nicht analysiert werden.",
+    "explanationLabel": "Erklärung",
+    "apiStart": "Kommunikation mit der API...",
+    "analysisTitle": "Analyse",
+    "commonGuildsLabel": "Gemeinsame Gilden",
+    "joinedAtLabel": "Beigetreten am",
+    "createdAtLabel": "Konto erstellt am",
+    "apiError": "Die API hat einen Fehler zurückgegeben.",
+    "isValid": "Dieses Mitglied ist sicher.",
+    "isNeutral": "Dieses Mitglied scheint normal zu sein.",
+    "isInvalid": "Dieses Mitglied scheint ein Troll zu sein. Es kann sich um einen falschen positiven handeln.",
+    "askAIExplanation": "Erklären Sie sehr einfach, warum dieser Benutzer $1 ist? Auf Deutsch.",
+    "waitReport": "Wir erstellen einen Bericht für Sie. Bitte warten Sie einen Moment...",
+    "allClearText": "Alles klar! Dieser Benutzer ist sicher.",
+    "neutralText": "Neutral. Dieses Mitglied scheint normal zu sein, aber behalten Sie ihre nächsten Interaktionen im Auge.",
+    "suspicionTitle": "Ein Benutzer ist beigetreten",
+    "invalidTitle": "Verdächtiger Benutzer erkannt",
+    "notInvalidTitle": "Nicht verdächtig.",
+    "memberReport": "*Einige Worte, um zu sagen, dass $1 ein Troll sein könnte. Wenn es irgendwelche verrückten Nachrichten gibt, pingt die Moderatoren.*",
+    "botJoinTitle": "FluffyMod ist da, um zu helfen!",
+    "botJoinText": "Hallo! Ich bin FluffyMod, ein Bot, der Ihnen hilft, Ihren Server zu moderieren. Ich kann Ihnen helfen, Benutzer zu analysieren, Trolle zu erkennen und mehr. Um zu beginnen, geben Sie `/help` ein.",
+    "noDM": "Dieser Befehl kann nur in einem Server verwendet werden.",
+    "helpCommands": {
+      "help": {
+        "title": "Hilfe",
+        "description": "Holen Sie sich Hilfe zur Liste der Befehle.",
+        "usage": "/hilfe",
+        "localeName": "hilfe",
+        "localeDescription": "Holen Sie sich die Liste der Befehle."
+      },
+      "analyse": {
+        "title": "Analysieren",
+        "description": "Analysieren Sie einen Benutzer, um zu sehen, ob er ein Troll ist.",
+        "usage": "/analysieren @user",
+        "localeName": "analysieren",
+        "localeDescription": "Analysieren Sie das Profil eines verdächtigen Benutzers."
+      },
+      "ping": {
+        "title": "Ping",
+        "description": "Überprüfen Sie die Latenz des Bots.",
+        "usage": "/ping",
+        "localeName": "ping",
+        "localeDescription": "Überprü fen Sie die Latenz des Bots."
+      },
+      "set-logs": {
+        "title": "Log-Kanal festlegen",
+        "description": "Legen Sie den Log-Kanal für den Bot fest, wenn ein Benutzer dem Server beitritt, um benachrichtigt und sein Profil analysiert zu werden.",
+        "usages": [
+          "/logs-festlegen #kanal",
+          "/logs-festlegen #kanal prevent-members: true",
+          "/logs-festlegen #kanal prevent-members: false",
+          "/logs-festlegen #kanal prevent-members: true #public-channel"
+        ],
+        "localeName": "logs-festlegen",
+        "localeDescription": "Legen Sie den Log-Kanal für den Bot fest."
+      }
+    },
+    "setLogsText": "Ok, ich habe den Log-Raum auf $1 gesetzt und die Option \"Mitglieder benachrichtigen\" $2. Wenn diese Option aktiviert ist, werden Mitglieder über potenzielle Trolle in $3 benachricht.",
+    "words": {
+      "invalid": "ungültig",
+      "neutral": "neutral",
+      "valid": "gültig",
+      "enabled": "aktiviert",
+      "disabled": "deaktiviert"
+    },
+    "cannotSend": "Ich habe nicht die Berechtigung, Nachrichten im $1 -Kanal zu senden. Bitte stellen Sie sicher, dass ich die richtigen Berechtigungen habe."
   }
 }

@@ -22,26 +22,16 @@ function analyser(member) {
 
         let thread = null;
 
-        let i = 0;
         for (let thread_id of threadIds) {
           if (thread_id === "") break;
 
           let threadx = await openai.threads.retrieve(thread_id);
 
           if (
-            threadx.metadata.guild === guild.id &&
-            threadx.metadata.user === member.user.id
+            threadx.metadata.user === member.user.id &&
+            threadx.metadata.guild === guild.id
           ) {
-            if (i > 0) {
-              await openai.threads.del(thread_id);
-
-              let threads = threadIds.filter((id) => id !== thread_id);
-
-              fs.writeFileSync(`${__dirname}/threads.txt`, threads.join("\n"));
-            }
-
             thread = threadx;
-            i++;
           }
         }
 
@@ -78,7 +68,7 @@ function analyser(member) {
         let date = member.user.createdAt;
 
         let year = date.getFullYear();
-        let month = date.getMonth();
+        let month = date.getMonth() + 1;
         let day = date.getDate();
 
         content += `Account creation date: ${day}/${month}/${year} \n`;
@@ -93,8 +83,10 @@ function analyser(member) {
             {
               type: "image_url",
               image_url: {
-                url: member.user.displayAvatarURL({ format: "png" }),
-                detail: "auto",
+                url:
+                  member.displayAvatarURL({ extension: "png" }) ||
+                  member.user.displayAvatarURL({ extension: "png" }),
+                detail: "low",
               },
             },
           ],
@@ -108,9 +100,6 @@ function analyser(member) {
           let messages = await openai.threads.messages.list(run.thread_id);
           let lastMessage = messages.data[0];
 
-          await openai.threads.messages.del(thread.id, message.id);
-          await openai.threads.messages.del(thread.id, lastMessage.id);
-
           resolve(lastMessage.content[0].text.value);
         } else {
           reject(new Error(run.status));
@@ -121,5 +110,13 @@ function analyser(member) {
     }
   );
 }
+
+// "Ask to explain the analysis" function
+
+/**
+ *
+ * @param {import("openai/resources/beta/threads/threads.mjs").Thread} thread
+ */
+function askExplanation(thread) {}
 
 module.exports = analyser;
