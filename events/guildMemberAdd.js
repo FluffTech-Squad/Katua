@@ -1,6 +1,12 @@
 // guildMemberAdd event
 
-const { GuildMember, EmbedBuilder, ChannelType } = require("discord.js");
+const {
+  GuildMember,
+  EmbedBuilder,
+  ChannelType,
+  BaseGuildTextChannel,
+  Collection,
+} = require("discord.js");
 const analyse = require("../analyser");
 const fs = require("fs");
 
@@ -17,6 +23,8 @@ module.exports =
   async (member) => {
     if (member.user.bot) return;
 
+    let botMember = member.guild.members.me;
+
     let guild = member.guild;
     let lang = guild.preferredLocale || "en-US";
     let sentences = langs[lang] || langs["en-US"];
@@ -24,6 +32,9 @@ module.exports =
     try {
       let guildsFolder = fs.readdirSync(__dirname.replace("events", "guilds"));
       let guildFile = guildsFolder.find((file) => file.includes(guild.id));
+
+      if (!guildFile) return;
+
       let guildData = require(`../guilds/${guildFile}`);
 
       let log_channel_id =
@@ -79,13 +90,12 @@ module.exports =
         if (guildData.prevent_members) {
           // Find for the first sendable text channel
 
-          let channels = await guild.channels.fetch();
-
-          let botMember = await guild.members.fetch(interaction.client.user.id);
-
-          channels = channels.filter(
+          /**
+           * @type {Collection<string, BaseGuildTextChannel>}
+           */
+          let channels = (await guild.channels.fetch()).filter(
             (channel) =>
-              channel.type === ChannelType.GuildText &&
+              channel.isTextBased() &&
               channel.permissionsFor(botMember).has("SendMessages")
           );
 
@@ -99,10 +109,16 @@ module.exports =
             );
 
             if (inform_channel && inform_channel.isTextBased()) {
-              channel = inform_channel;
+              inform_channel.send({
+                content: sentences.memberReport.replace("$1", member.user),
+                allowedMentions: { users: [], parse: [] },
+              });
             }
-
-            channel.send(sentences.memberReport);
+          } else {
+            channel.send({
+              content: sentences.memberReport.replace("$1", member.user),
+              allowedMentions: { users: [], parse: [] },
+            });
           }
         }
 
@@ -111,7 +127,7 @@ module.exports =
         message.edit({ embeds: [embed] });
 
         let threadsFile = fs.readFileSync(
-          __dirname.replace("interactions", "threads.txt"),
+          __dirname.replace("events", "threads.txt"),
           "utf-8"
         );
 
@@ -125,8 +141,8 @@ module.exports =
           let threadx = await openai.threads.retrieve(thread_id);
 
           if (
-            threadx.metadata.guild === interaction.guild.id &&
-            threadx.metadata.user === user.id
+            threadx.metadata.guild === member.guild.id &&
+            threadx.metadata.user === member.user.id
           ) {
             thread = threadx;
           }
@@ -151,7 +167,7 @@ module.exports =
           await openai.threads.messages.del(thread.id, messagex.id);
           await openai.threads.messages.del(thread.id, lastMessage.id);
 
-          let response = lastMessage.content[0].text;
+          let response = lastMessage.content[0].text.value;
 
           embed.setDescription(response);
 
@@ -163,7 +179,7 @@ module.exports =
         console.error(error);
 
         embed.setDescription(sentences.apiError);
-        log_channel.send({
+        message.edit({
           embeds: [embed],
         });
       }
