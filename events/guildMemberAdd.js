@@ -10,7 +10,7 @@ const {
 const analyse = require("../analyser");
 const fs = require("fs");
 
-let langs = require("../langs.json");
+let langs = require("../langs.js");
 const { openai } = require("../openai");
 
 // Analysing member profile and determine if it's a troll/anti-furry or not.

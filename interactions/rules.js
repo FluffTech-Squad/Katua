@@ -2,7 +2,7 @@
 
 const { ChannelType, ChatInputCommandInteraction } = require("discord.js");
 const fs = require("fs");
-const langs = require("../langs.json");
+const langs = require("../langs.js");
 /**
  *
  * @param {ChatInputCommandInteraction} interaction

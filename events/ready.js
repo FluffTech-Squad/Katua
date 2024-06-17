@@ -11,7 +11,7 @@ const {
   SlashCommandBuilder,
 } = require("discord.js");
 const { openai, getCreditsLeft } = require("../openai");
-const langs = require("../langs.json");
+const langs = require("../langs.js");
 
 // Clear Threads
 

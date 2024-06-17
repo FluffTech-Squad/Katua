@@ -1,7 +1,7 @@
 {
-  "name": "no-more-anti",
+  "name": "fluffymod",
   "version": "1.0.0",
-  "description": "",
+  "description": "- Analyse joining users' profile to detect if it might be a troll or not. Triggering everytime someone joins your guild (you should config a log channel).",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +16,6 @@
     "dotenv": "^16.4.5",
     "nsfwjs": "^4.1.0",
     "openai": "^4.51.0"
-  }
+  },
+  "devDependencies": {}
 }

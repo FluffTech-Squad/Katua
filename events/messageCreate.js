@@ -10,7 +10,7 @@ const {
 const { openai } = require("../openai");
 const fs = require("fs");
 const analyser = require("../analyser");
-const langs = require("../langs.json");
+const langs = require("../langs.js");
 const isPremium = require("../isPremium");
 const isNSFW = require("../isNSFW");
 

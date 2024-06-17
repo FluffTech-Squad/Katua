@@ -1,0 +1,89 @@
+{
+  "latency": "Pong! 🏓\nLatency is $1ms",
+  "interactionError": "There was an error while executing this command!",
+  "noUserAnalyse": "Please provide a user to analyse.",
+  "noMember": "This user is not in the server.",
+  "cannotBots": "Bots cannot be analysed.",
+  "cannotSelf": "I cannot be analysed.",
+  "explanationLabel": "Explanation",
+  "apiStart": "Communicating with the API...",
+  "analysisTitle": "Analysis",
+  "commonGuildsLabel": "Guilds in Common",
+  "joinedAtLabel": "Joined At",
+  "createdAtLabel": "Created Account At",
+  "apiError": "The API returned an error.",
+  "isValid": "This member is safe.",
+  "isNeutral": "This member seems normal.",
+  "isInvalid": "This member seems to be a troll. It can be a false positive.",
+  "askAIExplanation": "Explain very simply why this user is $1?",
+  "waitReport": "We are generating a report for you. Please wait a moment...",
+  "allClearText": "All Clear! This user is safe.",
+  "neutralText": "Neutral. This user seems normal, but keep an eye on their next interactions.",
+  "suspicionTitle": "A user joined",
+  "invalidTitle": "Suspicious user detected",
+  "notInvalidTitle": "Not suspicious.",
+  "memberReport": "*Some words to say that $1 might be a troll. If any deranged messages, ping moderators.*",
+  "botJoinTitle": "FluffyMod is there to help!",
+  "botJoinText": "Hello! I am FluffyMod, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help`.",
+  "noDM": "This command can only be used in a server.",
+  "helpCommands": {
+    "help": {
+      "title": "Help",
+      "description": "Get help the list of commands.",
+      "usage": "/help",
+      "localeName": "help",
+      "localeDescription": "Get the list of commands."
+    },
+    "analyse": {
+      "title": "Analyse",
+      "description": "Analyse a user to see if they are a troll.",
+      "usage": "/analyse @user",
+      "localeName": "analyse",
+      "localeDescription": "Analyse a suspicious user's profile."
+    },
+    "ping": {
+      "title": "Ping",
+      "description": "Check the bot's latency.",
+      "usage": "/ping",
+      "localeName": "ping",
+      "localeDescription": "Check the bot's latency."
+    },
+    "set-logs": {
+      "title": "Set Log",
+      "description": "Set the log channel for the bot when a user joins the server to be notified and analyse their profile.",
+      "usages": [
+        "/set-logs #channel",
+        "/set-logs #channel prevent-members: true",
+        "/set-logs #channel prevent-members: false",
+        "/set-logs #channel prevent-members: true #public-channel"
+      ],
+      "localeName": "set-log",
+      "localeDescription": "Set the log channel for the bot."
+    },
+    "rules": {
+      "title": "Set server rules",
+      "description": "Enable or disable the server rules for the bot.",
+      "usages": ["/rules nsfw-filter", "/rules word-filter"],
+      "localeName": "rules",
+      "localeDescription": "Enable or disable the server rules for the bot."
+    }
+  },
+  "setLogsText": "Ok! I've set the logs channel to $1 and $2 the prevent members option. If this option is enabled, members will be notified for potential trolls in $3.",
+  "words": {
+    "invalid": "invalid",
+    "neutral": "neutral",
+    "valid": "valid",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "messageDeleted": "Message Deleted"
+  },
+  "cannotSend": "I don't have the permission to send messages in the $1 channel. Please make sure I have the right permissions.",
+  "userSaid": "The user $1 said in the channel $2: \"$3\".",
+  "notPremiumText": "Sorry, we couldn't call the API because this feature is only enabled for premium guilds. If you want to enable it, please contact the bot owner. However, NSFW content detection is free (attachments & profile pictures).",
+  "ruleCommand": {
+    "nsfw-filter-text": "NSFW filter has been $1.",
+    "word-filter-text": "Word filter has been $1."
+  },
+  "nsfwMessage": "Message of $1 has been deleted in the channel $2 because it contains NSFW content.",
+  "nsfwAuthorMessage": "Your message has been deleted in the channel $1 because it contains NSFW content. Please do not send NSFW content in this server. Thank you!"
+}

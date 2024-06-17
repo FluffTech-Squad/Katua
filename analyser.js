@@ -1,7 +1,7 @@
 const { GuildMember, ActivityType } = require("discord.js");
 const fs = require("fs");
 const { openai } = require("./openai.js");
-let langs = require("./langs.json");
+let langs = require("./langs.js");
 /**
  *
  * @param {GuildMember} member

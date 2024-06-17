@@ -1,7 +1,7 @@
 // Event when bot joins a guild
 
 const { Guild, EmbedBuilder } = require("discord.js");
-let langs = require("../langs.json");
+let langs = require("../langs.js");
 
 module.exports =
   /**

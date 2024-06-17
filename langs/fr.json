@@ -1,0 +1,89 @@
+{
+  "latency": "Pong !🏓\n La latence est de $1ms",
+  "interactionError": "Une erreur s'est produite lors de l'exécution de cette commande!",
+  "noUserAnalyse": "Veuillez fournir un utilisateur à analyser.",
+  "noMember": "Cet utilisateur n'est pas dans le serveur.",
+  "cannotBots": "Les bots ne peuvent pas être analysés.",
+  "cannotSelf": "Je ne peux pas être analysé.",
+  "explanationLabel": "Explication",
+  "apiStart": "Communication avec l'API...",
+  "analysisTitle": "Analyse",
+  "commonGuildsLabel": "Guildes en Commun",
+  "joinedAtLabel": "Rejoint le",
+  "createdAtLabel": "Compte créé le",
+  "apiError": "L'API a retourné une erreur.",
+  "isValid": "Ce membre est safe.",
+  "isNeutral": "Ce membre semble normal.",
+  "isInvalid": "Ce membre semble être un troll. Cela peut être un faux positif.",
+  "askAIExplanation": "Expliquez très simplement pourquoi cet utilisateur est $1? En français.",
+  "waitReport": "Nous générons un rapport pour vous. Veuillez patienter un moment...",
+  "allClearText": "Tout est clair! Cet utilisateur est safe.",
+  "neutralText": "Neutre. Cet utilisateur semble normal, mais gardez un œil sur ses prochaines interactions.",
+  "suspicionTitle": "Un utilisateur a rejoint",
+  "invalidTitle": "Utilisateur suspect détecté",
+  "notInvalidTitle": "Pas suspect.",
+  "memberReport": "*Quelques mots pour dire que $1 pourrait être un troll. Si des messages dérangés, mentionnez les modérateurs.*",
+  "botJoinTitle": "FluffyMod est là pour vous aider!",
+  "botJoinText": "Bonjour! Je suis FluffyMod, un bot qui vous aide à modérer votre serveur. Je peux vous aider à analyser les utilisateurs, détecter les trolls, et plus encore. Pour commencer, tapez `/help`.",
+  "noDM": "Cette commande ne peut être utilisée que dans un serveur.",
+  "helpCommands": {
+    "help": {
+      "title": "Aide",
+      "description": "Obtenez de l'aide sur la liste des commandes.",
+      "usage": "/aide",
+      "localeName": "aide",
+      "localeDescription": "Obtenir la liste des commandes."
+    },
+    "analyse": {
+      "title": "Analyser",
+      "description": "Analyser un utilisateur pour voir s'il est un troll.",
+      "usage": "/analyser @user",
+      "localeName": "analyser",
+      "localeDescription": "Analyser le profil d'un utilisateur suspect."
+    },
+    "ping": {
+      "title": "Ping",
+      "description": "Vérifier la latence du bot.",
+      "usage": "/ping",
+      "localeName": "ping",
+      "localeDescription": "Vérifier la latence du bot."
+    },
+    "set-logs": {
+      "title": "Définir le salon de logs",
+      "description": "Définir le salon de logs pour le bot lorsqu'un utilisateur rejoint le serveur pour être notifié et analyser son profil.",
+      "usages": [
+        "/définir-logs #salon",
+        "/définir-logs #salon prevent-members: true",
+        "/définir-logs #salon prevent-members: false",
+        "/définir-logs #salon prevent-members: true #public-channel"
+      ],
+      "localeName": "définir-logs",
+      "localeDescription": "Définir le salon de logs pour le bot."
+    },
+    "rules": {
+      "title": "Définir les règles du serveur",
+      "description": "Activer ou désactiver des règles du serveur pour le bot.",
+      "usages": ["/règles nsfw-filter", "/règles word-filter"],
+      "localeName": "règles",
+      "localeDescription": "Activer ou désactiver des règles du serveur pour le bot."
+    }
+  },
+  "setLogsText": "Ok! J'ai défini le salon de logs sur $1 et $2 l'option prévenir les membres. Si cette option est activée, les membres seront notifiés pour les trolls potentiels dans $3.",
+  "words": {
+    "invalid": "invalide",
+    "neutral": "neutre",
+    "valid": "valide",
+    "enabled": "activé",
+    "disabled": "désactivé",
+    "messageDeleted": "Message Supprimé"
+  },
+  "cannotSend": "Je n'ai pas la permission d'envoyer des messages dans le salon $1. Veuillez vous assurer que j'ai les bonnes permissions.",
+  "userSaid": "L'utilisateur $1 a dit dans le salon $2: \"$3\".",
+  "notPremiumText": "Désolé, nous n'avons pas pu appeler l'API car cette fonctionnalité n'est activée que pour les guildes premium. Si vous souhaitez l'activer, veuillez contacter le propriétaire du bot. Cependant, la détection de contenu NSFW est gratuite (pièces jointes et photos de profil).",
+  "ruleCommand": {
+    "nsfw-filter-text": "Le filtre NSFW a été $1.",
+    "word-filter-text": "Le filtre de mots a été $1."
+  },
+  "nsfwMessage": "Le message de $1 a été supprimé dans le salon $2 car il contient du contenu NSFW.",
+  "nsfwAuthorMessage": "Votre message a été supprimé dans le salon $1 car il contient du contenu NSFW. Veuillez ne pas envoyer de contenu NSFW dans ce serveur. Merci!"
+}

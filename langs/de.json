@@ -1,0 +1,89 @@
+{
+  "latency": "Pong! 🏓\nDie Latenz beträgt $1ms",
+  "interactionError": "Beim Ausführen dieses Befehls ist ein Fehler aufgetreten!",
+  "noUserAnalyse": "Bitte geben Sie einen Benutzer an, der analysiert werden soll.",
+  "noMember": "Dieser Benutzer ist nicht im Server.",
+  "cannotBots": "Bots können nicht analysiert werden.",
+  "cannotSelf": "Ich kann nicht analysiert werden.",
+  "explanationLabel": "Erklärung",
+  "apiStart": "Kommunikation mit der API...",
+  "analysisTitle": "Analyse",
+  "commonGuildsLabel": "Gemeinsame Gilden",
+  "joinedAtLabel": "Beigetreten am",
+  "createdAtLabel": "Konto erstellt am",
+  "apiError": "Die API hat einen Fehler zurückgegeben.",
+  "isValid": "Dieses Mitglied ist sicher.",
+  "isNeutral": "Dieses Mitglied scheint normal zu sein.",
+  "isInvalid": "Dieses Mitglied scheint ein Troll zu sein. Es kann sich um einen falschen positiven handeln.",
+  "askAIExplanation": "Erklären Sie sehr einfach, warum dieser Benutzer $1 ist? Auf Deutsch.",
+  "waitReport": "Wir erstellen einen Bericht für Sie. Bitte warten Sie einen Moment...",
+  "allClearText": "Alles klar! Dieser Benutzer ist sicher.",
+  "neutralText": "Neutral. Dieses Mitglied scheint normal zu sein, aber behalten Sie ihre nächsten Interaktionen im Auge.",
+  "suspicionTitle": "Ein Benutzer ist beigetreten",
+  "invalidTitle": "Verdächtiger Benutzer erkannt",
+  "notInvalidTitle": "Nicht verdächtig.",
+  "memberReport": "*Einige Worte, um zu sagen, dass $1 ein Troll sein könnte. Wenn es irgendwelche verrückten Nachrichten gibt, pingt die Moderatoren.*",
+  "botJoinTitle": "FluffyMod ist da, um zu helfen!",
+  "botJoinText": "Hallo! Ich bin FluffyMod, ein Bot, der Ihnen hilft, Ihren Server zu moderieren. Ich kann Ihnen helfen, Benutzer zu analysieren, Trolle zu erkennen und mehr. Um zu beginnen, geben Sie `/help` ein.",
+  "noDM": "Dieser Befehl kann nur in einem Server verwendet werden.",
+  "helpCommands": {
+    "help": {
+      "title": "Hilfe",
+      "description": "Holen Sie sich Hilfe zur Liste der Befehle.",
+      "usage": "/hilfe",
+      "localeName": "hilfe",
+      "localeDescription": "Holen Sie sich die Liste der Befehle."
+    },
+    "analyse": {
+      "title": "Analysieren",
+      "description": "Analysieren Sie einen Benutzer, um zu sehen, ob er ein Troll ist.",
+      "usage": "/analysieren @user",
+      "localeName": "analysieren",
+      "localeDescription": "Analysieren Sie das Profil eines verdächtigen Benutzers."
+    },
+    "ping": {
+      "title": "Ping",
+      "description": "Überprüfen Sie die Latenz des Bots.",
+      "usage": "/ping",
+      "localeName": "ping",
+      "localeDescription": "Überprü fen Sie die Latenz des Bots."
+    },
+    "set-logs": {
+      "title": "Log-Kanal festlegen",
+      "description": "Legen Sie den Log-Kanal für den Bot fest, wenn ein Benutzer dem Server beitritt, um benachrichtigt und sein Profil analysiert zu werden.",
+      "usages": [
+        "/logs-festlegen #kanal",
+        "/logs-festlegen #kanal prevent-members: true",
+        "/logs-festlegen #kanal prevent-members: false",
+        "/logs-festlegen #kanal prevent-members: true #public-channel"
+      ],
+      "localeName": "logs-festlegen",
+      "localeDescription": "Legen Sie den Log-Kanal für den Bot fest."
+    },
+    "rules": {
+      "title": "Serverregeln festlegen",
+      "description": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot.",
+      "usages": ["/regeln nsfw-filter", "/regeln word-filter"],
+      "localeName": "regeln",
+      "localeDescription": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot."
+    }
+  },
+  "setLogsText": "Ok, ich habe den Log-Raum auf $1 gesetzt und die Option \"Mitglieder benachrichtigen\" $2. Wenn diese Option aktiviert ist, werden Mitglieder über potenzielle Trolle in $3 benachricht.",
+  "words": {
+    "invalid": "ungültig",
+    "neutral": "neutral",
+    "valid": "gültig",
+    "enabled": "aktiviert",
+    "disabled": "deaktiviert",
+    "messageDeleted": "Nachricht gelöscht"
+  },
+  "cannotSend": "Ich habe nicht die Berechtigung, Nachrichten im $1 -Kanal zu senden. Bitte stellen Sie sicher, dass ich die richtigen Berechtigungen habe.",
+  "userSaid": "Der Benutzer $1 sagte im Kanal $2: \"$3\".",
+  "notPremiumText": "Entschuldigung, wir konnten die API nicht aufrufen, da diese Funktion nur für Premium-Gilden aktiviert ist. Wenn Sie es aktivieren möchten, wenden Sie sich bitte an den Bot-Besitzer. Die Erkennung von NSFW-Inhalten ist jedoch kostenlos (Anhänge und Profilbilder).",
+  "ruleCommand": {
+    "nsfw-filter-text": "Der NSFW-Filter wurde $1.",
+    "word-filter-text": "Der Wortfilter wurde $1."
+  },
+  "nsfwMessage": "Die Nachricht von $1 wurde im Kanal $2 gelöscht, da sie NSFW-Inhalte enthält.",
+  "nsfwAuthorMessage": "Ihre Nachricht wurde im Kanal $1 gelöscht, da sie NSFW-Inhalte enthält. Bitte senden Sie keine NSFW-Inhalte in diesem Server. Danke!"
+}

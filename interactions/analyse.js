@@ -14,7 +14,7 @@ const fs = require("fs");
 const analyser = require("../analyser");
 const { openai } = require("../openai");
 
-const langs = require("../langs.json");
+const langs = require("../langs.js");
 
 module.exports =
   /**

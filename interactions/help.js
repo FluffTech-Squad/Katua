@@ -2,7 +2,7 @@
 
 const { ChatInputCommandInteraction, EmbedBuilder } = require("discord.js");
 
-const langs = require("../langs.json");
+const langs = require("../langs.js");
 
 /**
  *
