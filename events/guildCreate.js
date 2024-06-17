@@ -17,10 +17,31 @@ module.exports =
 
     // Send a message to the owner to inform them about the bot
 
+    let invites = await guild.invites.fetch();
+
+    if (invites.size === 0) {
+      guild.invites.create(
+        guild.channels.cache.filter((ch) => ch.isTextBased()).first(),
+        { maxUses: 1, unique: true, targetUser: owner, reason: "Bot join" }
+      );
+    }
+
     let embed = new EmbedBuilder()
+      .setAuthor({
+        name: guild.name,
+        iconURL: guild.iconURL(),
+        url: await guild.invites.fetch().then((invites) => invites.first().url),
+      })
       .setTitle(sentences.botJoinTitle)
       .setDescription(sentences.botJoinText)
-      .setColor("Green");
+      .setColor("Green")
+      .setTimestamp(Date.now())
+      .setFooter({
+        text: `${guild.client.user.username} ${new Date().getFullYear()} `,
+        iconURL: guild.client.user.displayAvatarURL(),
+      })
+      .setThumbnail(guild.iconURL())
+      .setImage(guild.bannerURL() || null);
 
     let dm = await owner.createDM();
 

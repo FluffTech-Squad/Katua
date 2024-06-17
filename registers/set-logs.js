@@ -1,11 +1,8 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
   ChannelType,
   PermissionsBitField,
 } = require("discord.js");
-
-const langs = require("../langs.json");
 
 let slashCommand = new SlashCommandBuilder()
   .setDescription("Set the logs channel for the server.")
@@ -34,18 +31,5 @@ let slashCommand = new SlashCommandBuilder()
       .setRequired(false)
   )
   .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild);
-
-let locales = Object.keys(langs);
-
-for (let locale of locales) {
-  slashCommand.setNameLocalization(
-    locale,
-    langs[locale]["helpCommands"]["set-logs"]["localeName"]
-  );
-  slashCommand.setDescriptionLocalization(
-    locale,
-    langs[locale]["helpCommands"]["set-logs"]["localeDescription"]
-  );
-}
 
 module.exports = slashCommand;

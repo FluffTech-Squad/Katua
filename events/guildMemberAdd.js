@@ -48,6 +48,17 @@ module.exports =
 
       if (!log_channel.isTextBased()) return;
 
+      let joinedAt = member.joinedAt;
+      let createdAt = member.user.createdAt;
+
+      let joinedAtDay = joinedAt.getDate();
+      let joinedAtMonth = joinedAt.getMonth() + 1;
+      let joinedAtYear = joinedAt.getFullYear();
+
+      let createdAtDay = createdAt.getDate();
+      let createdAtMonth = createdAt.getMonth() + 1;
+      let createdAtYear = createdAt.getFullYear();
+
       let embed = new EmbedBuilder()
         .setTitle(sentences.suspicionTitle)
         .setAuthor({
@@ -55,10 +66,43 @@ module.exports =
           iconURL: member.user.displayAvatarURL(),
         })
         .setDescription(sentences.waitReport)
-        .setImage(member.user.displayAvatarURL())
-        .setColor("Grey");
+        .addFields([
+          {
+            name: sentences.commonGuildsLabel,
+            value: guilds.size.toString(),
+            inline: true,
+          },
+          {
+            name: sentences.joinedAtLabel,
+            value: `${joinedAtDay}/${joinedAtMonth}/${joinedAtYear}`,
+            inline: true,
+          },
+          {
+            name: sentences.createdAtLabel,
+            value: `${createdAtDay}/${createdAtMonth}/${createdAtYear}`,
+            inline: true,
+          },
+        ])
+        .setTimestamp(Date.now())
+        .setFooter({
+          text: `${
+            interaction.client.user.username
+          } ${new Date().getFullYear()} `,
+          iconURL: interaction.client.user.displayAvatarURL(),
+        })
+        .setThumbnail(member.user.displayAvatarURL())
+        .setColor("Grey")
+        .setImage(member.user.bannerURL() || null);
 
       let message = await log_channel.send({ embeds: [embed] });
+
+      if (!(await isPremium(message.guild))) {
+        embed.setDescription(sentences.notPremiumText).setColor("Gold");
+
+        message.edit({ embeds: [embed] });
+
+        return;
+      }
 
       let result = (await analyse(member)).toLowerCase();
 
@@ -148,40 +192,26 @@ module.exports =
           }
         }
 
-        let messagex = await openai.threads.messages.create(thread.id, {
-          content: sentences.askAIExplanation.replace(
-            "$1",
-            result.toLowerCase()
-          ),
-          role: "user",
-        });
+        if (thread) {
+          try {
+            let explanation = await analyse.askExplanation(thread, lang);
 
-        let run = await openai.threads.runs.createAndPoll(thread.id, {
-          assistant_id: process.env.OPENAI_ASSISTANT_ID,
-        });
+            embed.setDescription(explanation);
 
-        if (run.status === "completed") {
-          let messages = await openai.threads.messages.list(run.thread_id);
-          let lastMessage = messages.data[0];
+            message.edit({
+              embeds: [embed],
+            });
+          } catch (error) {
+            console.error(error);
 
-          await openai.threads.messages.del(thread.id, messagex.id);
-          await openai.threads.messages.del(thread.id, lastMessage.id);
-
-          let response = lastMessage.content[0].text.value;
-
-          embed.setDescription(response);
-
-          message.edit({
-            embeds: [embed],
-          });
+            embed.setDescription(sentences.apiError);
+            message.edit({
+              embeds: [embed],
+            });
+          }
         }
       } catch (error) {
         console.error(error);
-
-        embed.setDescription(sentences.apiError);
-        message.edit({
-          embeds: [embed],
-        });
       }
     } catch (error) {
       console.error(error);

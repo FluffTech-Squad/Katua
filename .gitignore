@@ -3,3 +3,5 @@ node_modules/
 package-lock.json
 threads.txt
 guilds/*.json
+guilds/rules/*.json
+premium_guilds.txt

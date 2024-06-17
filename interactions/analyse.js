@@ -22,8 +22,8 @@ module.exports =
    * @param {ChatInputCommandInteraction} interaction
    */
   async (interaction) => {
-    let sentences =
-      langs[interaction.guild.preferredLocale || "en-US"] || langs["en-US"];
+    let lang = interaction.guild.preferredLocale || "en-US";
+    let sentences = langs[lang] || langs["en-US"];
 
     if (interaction.channel.type === ChannelType.DM)
       return interaction.reply({ content: sentences.noDM, ephemeral: true });
@@ -42,15 +42,6 @@ module.exports =
         content: sentences.noMember,
         ephemeral: true,
       });
-
-    // // Check if the user is the bot
-
-    // if (interaction.client.user.id === user.id) {
-    //   return interaction.reply({
-    //     content: sentences.cannotSelf,
-    //     ephemeral: true,
-    //   });
-    // }
 
     // Check if the user is a bot
     if (user.bot) {
@@ -101,8 +92,9 @@ module.exports =
       .setTitle(sentences.analysisTitle)
       .setAuthor({
         name: user.username,
-        iconURL: user.displayAvatarURL({ dynamic: true }),
+        iconURL: user.displayAvatarURL(),
       })
+      .setDescription(sentences.apiStart)
       .addFields([
         {
           name: sentences.commonGuildsLabel,
@@ -121,7 +113,15 @@ module.exports =
         },
       ])
       .setTimestamp(interaction.createdTimestamp)
-      .setThumbnail(user.displayAvatarURL({ dynamic: true }));
+      .setFooter({
+        text: `${
+          interaction.client.user.username
+        } ${new Date().getFullYear()} `,
+        iconURL: interaction.client.user.displayAvatarURL(),
+      })
+      .setThumbnail(user.displayAvatarURL())
+      .setColor("Grey")
+      .setImage(member.user.bannerURL() || null);
 
     try {
       let result = await analyser(member);
@@ -212,35 +212,25 @@ module.exports =
               }
             }
 
-            let message = await openai.threads.messages.create(thread.id, {
-              content: sentences.askAIExplanation.replace(
-                "$1",
-                sentences["words"][result.toLowerCase()]
-              ),
-              role: "user",
-            });
+            if (thread) {
+              try {
+                let expanation = await analyser.askExplanation(thread, lang);
+                msg.edit({
+                  content: expanation,
+                });
+              } catch (error) {
+                console.error(error);
 
-            let run = await openai.threads.runs.createAndPoll(thread.id, {
-              assistant_id: process.env.OPENAI_ASSISTANT_ID,
-            });
-
-            if (run.status === "completed") {
-              let messages = await openai.threads.messages.list(run.thread_id);
-              let lastMessage = messages.data[0];
-
-              msg.edit({
-                content: lastMessage.content[0].text.value,
-              });
-
-              await openai.threads.messages.del(thread.id, message.id);
-              await openai.threads.messages.del(thread.id, lastMessage.id);
+                msg.edit({
+                  content: sentences.apiError,
+                });
+              }
             }
           } catch (error) {
             console.error(error);
 
-            interaction.editReply({
+            msg.edit({
               content: sentences.apiError,
-              ephemeral: true,
             });
           }
         }

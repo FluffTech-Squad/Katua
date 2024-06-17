@@ -3,8 +3,36 @@
 // Loading commands' datas
 const fs = require("fs");
 
-const { REST, Routes, Client, ActivityType } = require("discord.js");
+const {
+  REST,
+  Routes,
+  Client,
+  ActivityType,
+  SlashCommandBuilder,
+} = require("discord.js");
+const { openai, getCreditsLeft } = require("../openai");
+const langs = require("../langs.json");
 
+// Clear Threads
+
+async function clearThreads() {
+  let threadFilePath = __dirname.replace("events", "threads.txt");
+  let threadsFile = fs.readFileSync(threadFilePath, "utf-8");
+
+  let threadIds = threadsFile.split("\n");
+
+  for (let thread_id of threadIds) {
+    if (thread_id === "") break;
+
+    await openai.threads.del(thread_id);
+  }
+
+  fs.writeFileSync(threadFilePath, "");
+}
+
+/**
+ * @type {Map<string, import("discord.js").RESTPostAPIChatInputApplicationCommandsJSONBody>}
+ */
 let commands = new Map();
 
 const registerFiles = fs
@@ -12,6 +40,9 @@ const registerFiles = fs
   .filter((file) => file.endsWith(".js"));
 
 for (const file of registerFiles) {
+  /**
+   * @type {SlashCommandBuilder | undefined}
+   */
   const command = require(`../registers/${file}`);
   let name = file.split(".")[0];
 
@@ -20,44 +51,23 @@ for (const file of registerFiles) {
   } else {
     command.setName(name);
 
+    // Set locales name and description
+
+    let locales = Object.keys(langs);
+
+    for (let locale of locales) {
+      command.setNameLocalization(
+        locale,
+        langs[locale]["helpCommands"][name]["localeName"]
+      );
+      command.setDescriptionLocalization(
+        locale,
+        langs[locale]["helpCommands"][name]["localeDescription"]
+      );
+    }
+
     commands.set(name, command.toJSON());
   }
-}
-const { default: axios } = require("axios");
-
-// Request to OpenAI API how many credits are left
-
-async function getCreditsLeft() {
-  return new Promise(async (resolve, reject) => {
-    let date = new Date();
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let startDate = "2024-06-01";
-
-    let end_date = `${year}-${month + 1}-01`;
-    let rootCredits = `https://api.openai.com/dashboard/billing/credit_grants?end_date=${end_date}&start_date=${startDate}&project_id=${process.env.OPENAI_PROJECT_ID}`;
-
-    let response = await axios.get(rootCredits, {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_SESS}`,
-      },
-    });
-
-    let data = response.data;
-    let grants = data.grants.data;
-    let lastGrant = grants.at(-1);
-
-    let paidBalance = lastGrant.grant_amount;
-    let available = lastGrant.grant_amount - lastGrant.used_amount;
-
-    // Turns them into doubles digits
-    // Example: $1 to $1.00
-
-    paidBalance = paidBalance.toFixed(2);
-    available = available.toFixed(2);
-
-    resolve({ available, paidBalance });
-  });
 }
 
 module.exports =
@@ -66,6 +76,8 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
+    // await clearThreads();
+
     // Print this commented message when the bot is ready
     /*  _______________      _______________       ______  ___     _________
     ___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /

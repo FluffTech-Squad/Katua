@@ -3,6 +3,7 @@
 const { PartialGuildMember } = require("discord.js");
 const { openai } = require("../openai.js");
 const fs = require("fs");
+const isPremium = require("../isPremium.js");
 
 // Deleting member profile file.
 
@@ -12,6 +13,8 @@ module.exports =
    * @param {PartialGuildMember} member
    */
   async (member) => {
+    if (!(await isPremium(guild))) return;
+
     let guild = member.guild;
 
     let threadsFile = fs.readFileSync(
