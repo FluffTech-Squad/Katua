@@ -1,8 +1,9 @@
 // Event when bot joins a guild
 
-const { Guild, EmbedBuilder } = require("discord.js");
+const { Guild, EmbedBuilder, ActivityType } = require("discord.js");
 let langs = require("../langs.js");
-
+const fs = require("fs");
+const isPremium = require("../isPremium.js");
 module.exports =
   /**
    *
@@ -17,20 +18,20 @@ module.exports =
 
     // Send a message to the owner to inform them about the bot
 
-    let invites = await guild.invites.fetch();
+    // let invites = await guild.invites.fetch();
 
-    if (invites.size === 0) {
-      guild.invites.create(
-        guild.channels.cache.filter((ch) => ch.isTextBased()).first(),
-        { maxUses: 1, unique: true, targetUser: owner, reason: "Bot join" }
-      );
-    }
+    // if (invites.size === 0) {
+    //   guild.invites.create(
+    //     guild.channels.cache.filter((ch) => ch.isTextBased()).first(),
+    //     { maxUses: 1, unique: true, targetUser: owner, reason: "Bot join" }
+    //   );
+    // }
 
     let embed = new EmbedBuilder()
       .setAuthor({
         name: guild.name,
         iconURL: guild.iconURL(),
-        url: await guild.invites.fetch().then((invites) => invites.first().url),
+        // url: await guild.invites.fetch().then((invites) => invites.first().url),
       })
       .setTitle(sentences.botJoinTitle)
       .setDescription(sentences.botJoinText)
@@ -45,8 +46,43 @@ module.exports =
 
     let dm = await owner.createDM();
 
+    if (await isPremium(guild)) {
+      embed.setDescription(
+        embed.data.description +
+          "\n" +
+          sentences.premiumWhitelistJoin.replace("$1", guild.name)
+      );
+
+      console.log("Premium guild joined: ", guild.name, `(${guild.id})`);
+    } else {
+      console.log("Guild joined: ", guild.name, `(${guild.id})`);
+    }
+
     try {
       await dm.send({ embeds: [embed] });
+
+      // Setup config for the guild
+
+      let guildsFolder = __dirname.replace("events", "guilds");
+
+      if (!fs.existsSync(guildsFolder)) fs.mkdirSync(guildsFolder);
+
+      let guildFilePath = `${guildsFolder}/${guild.id}.json`;
+
+      let guildsRulesFolder = `${guildsFolder}/rules`;
+
+      if (!fs.existsSync(guildsRulesFolder)) fs.mkdirSync(guildsRulesFolder);
+
+      let guildRulesFile = `${guildsRulesFolder}/${guild.id}.json`;
+
+      fs.writeFileSync(guildFilePath, JSON.stringify({}));
+      fs.writeFileSync(
+        guildRulesFile,
+        JSON.stringify({
+          "nsfw-filter": true,
+          "word-filter": false,
+        })
+      );
     } catch (e) {
       console.log("Can't send a message to the owner.");
 

@@ -85,5 +85,6 @@
     "word-filter-text": "Der Wortfilter wurde $1."
   },
   "nsfwMessage": "Die Nachricht von $1 wurde im Kanal $2 gelöscht, da sie NSFW-Inhalte enthält.",
-  "nsfwAuthorMessage": "Ihre Nachricht wurde im Kanal $1 gelöscht, da sie NSFW-Inhalte enthält. Bitte senden Sie keine NSFW-Inhalte in diesem Server. Danke!"
+  "nsfwAuthorMessage": "Ihre Nachricht wurde im Kanal $1 gelöscht, da sie NSFW-Inhalte enthält. Bitte senden Sie keine NSFW-Inhalte in diesem Server. Danke!",
+  "premiumWhitelistJoin": "Was für ein Glück! Ihr Server $1 ist bereits für die Premium-Funktionen whitelisted worden. Die Trollerkennung ist auf Ihrem Server aktiviert. Viel Spaß! 🎉"
 }

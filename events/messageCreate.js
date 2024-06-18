@@ -74,7 +74,106 @@ async function findGuildDatas(guild) {
  */
 module.exports = async (message) => {
   if (message.author.bot) return;
+
+  let supportGuildId = process.env.SUPPORT_GUILD_ID;
+  let supportChannelId = process.env.SUPPORT_CHANNEL_ID;
+
+  let supportGuild = await message.client.guilds.fetch(supportGuildId);
+  let supportChannelCategory = await supportGuild.channels.fetch(
+    supportChannelId
+  );
+
+  let supportLogChannelId = process.env.SUPPORT_LOG_CHANNEL_ID;
+  let supportLogChannel = await supportGuild.channels.fetch(
+    supportLogChannelId
+  );
+
+  let supportGuildOwner = await supportGuild.fetchOwner();
+
+  if (message.channel.type === ChannelType.DM) {
+    // This is for users to ask for support or premium feature request
+
+    if (supportChannelCategory.type === ChannelType.GuildCategory) {
+      let userChannel = supportChannelCategory.children.cache.find(
+        (ch) => ch.name === message.author.id
+      );
+
+      let embed = new EmbedBuilder()
+        .setAuthor({
+          name: message.author.username,
+          iconURL: message.author.displayAvatarURL(),
+        })
+        .setTitle("Message")
+        .setDescription(message.content)
+        .setColor("Blue");
+
+      if (!userChannel) {
+        let embedFirstTime = new EmbedBuilder()
+          .setAuthor({
+            name: supportGuildOwner.user.username,
+            iconURL: supportGuildOwner.user.displayAvatarURL(),
+          })
+          .setTitle("Support Ticket")
+          .setDescription("Please wait for a staff member to assist you.")
+          .setColor("Blue");
+
+        message.channel.send({ embeds: [embedFirstTime] });
+
+        userChannel = await supportChannelCategory.children.create({
+          name: message.author.id,
+          type: ChannelType.GuildText,
+        });
+
+        supportLogChannel.send(
+          `${supportGuildOwner.user}, ${message.author} initiated a support ticket. ${userChannel} was created.`
+        );
+
+        userChannel.send({
+          embeds: [embed],
+          files: message.attachments.map((a) => ({
+            attachment: a,
+          })),
+        });
+      } else {
+        userChannel.send({
+          embeds: [embed],
+          files: message.attachments.map((a) => ({
+            attachment: a,
+          })),
+        });
+      }
+    }
+  }
+
   if (message.channel.type === ChannelType.DM) return;
+
+  if (supportChannelCategory.type === ChannelType.GuildCategory) {
+    let userChannel = supportChannelCategory.children.cache.find(
+      (ch) => ch.name === message.author.id
+    );
+
+    if (userChannel.id === message.channel.id) {
+      let embed = new EmbedBuilder()
+        .setAuthor({
+          name: message.author.username,
+          iconURL: message.author.displayAvatarURL(),
+        })
+        .setTitle("Response")
+        .setDescription(message.content)
+        .setColor("Blue");
+
+      let userNeedingHelp = await message.client.users.fetch(userChannel.name);
+
+      userNeedingHelp.send({
+        embeds: [embed],
+        files: message.attachments.map((a) => ({
+          attachment: a,
+        })),
+      });
+
+      return;
+    }
+  }
 
   let { logChannel, guildRulesData: rulesData } = await findGuildDatas(
     message.guild

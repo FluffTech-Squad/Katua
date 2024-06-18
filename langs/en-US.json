@@ -85,5 +85,6 @@
     "word-filter-text": "Word filter has been $1."
   },
   "nsfwMessage": "Message of $1 has been deleted in the channel $2 because it contains NSFW content.",
-  "nsfwAuthorMessage": "Your message has been deleted in the channel $1 because it contains NSFW content. Please do not send NSFW content in this server. Thank you!"
+  "nsfwAuthorMessage": "Your message has been deleted in the channel $1 because it contains NSFW content. Please do not send NSFW content in this server. Thank you!",
+  "premiumWhitelistJoin": "What a luck! Your server $1 has already been whitelisted for the premium features. Troll detection is activated in your server. Enjoy! 🎉"
 }

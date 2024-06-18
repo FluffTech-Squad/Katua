@@ -23,7 +23,9 @@ const client = new Discord.Client({
     "GuildMembers",
     "MessageContent",
     "GuildPresences",
+    "DirectMessages",
   ],
+  partials: [Discord.Partials.Channel],
 });
 
 // Use dotenv to hide the token
@@ -37,12 +39,15 @@ const fs = require("fs");
 
 const eventFiles = fs
   .readdirSync("./events")
-  .filter((file) => file.endsWith(".js"));
+  .filter((file) => file.endsWith(".js"))
+  .reverse();
 
 for (const file of eventFiles) {
   const event = require(`./events/${file}`);
 
   let name = file.split(".")[0];
+
+  console.log(`Event ${name} loaded.`);
 
   client.on(name, event);
 }

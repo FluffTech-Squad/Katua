@@ -100,6 +100,10 @@ function analyser(member) {
           let messages = await openai.threads.messages.list(run.thread_id);
           let lastMessage = messages.data[0];
 
+          await openai.threads.messages.update(thread.id, lastMessage.id, {
+            metadata: "analysis",
+          });
+
           resolve(lastMessage.content[0].text.value);
         } else {
           reject(new Error(run.status));
@@ -155,7 +159,7 @@ function askExplanation(thread, lang) {
       let messages = await openai.threads.messages.list(run.thread_id);
       let lastMessage = messages.data[0];
 
-      await openai.threads.messages.update(thread.id, message.id, {
+      await openai.threads.messages.update(thread.id, lastMessage.id, {
         metadata: "explanation",
       });
 

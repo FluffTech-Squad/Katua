@@ -85,5 +85,6 @@
     "word-filter-text": "Le filtre de mots a été $1."
   },
   "nsfwMessage": "Le message de $1 a été supprimé dans le salon $2 car il contient du contenu NSFW.",
-  "nsfwAuthorMessage": "Votre message a été supprimé dans le salon $1 car il contient du contenu NSFW. Veuillez ne pas envoyer de contenu NSFW dans ce serveur. Merci!"
+  "nsfwAuthorMessage": "Votre message a été supprimé dans le salon $1 car il contient du contenu NSFW. Veuillez ne pas envoyer de contenu NSFW dans ce serveur. Merci!",
+  "premiumWhitelistJoin": "Quelle chance ! Votre serveur $1 a déjà été inscrit sur la liste blanche pour les fonctionnalités premium. La détection des trolls est activée sur votre serveur. Profitez-en ! 🎉"
 }
