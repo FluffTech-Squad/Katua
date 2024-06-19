@@ -172,7 +172,7 @@ module.exports =
       let cmds = [];
 
       for (let [name, command] of commands) {
-        let lang = newGuild.preferredLocale || "en-US";
+        let lang = guild.preferredLocale || "en-US";
         let lg = langs[lang];
         let c = command
           .setNameLocalization(lang, lg.helpCommands[name].localeName)
