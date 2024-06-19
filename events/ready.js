@@ -59,6 +59,13 @@ for (const file of registerFiles) {
   }
 }
 
+console.log(`_______________      _______________       ______  ___     _________
+___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
+__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
+_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
+/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
+                                   /____/`);
+
 module.exports =
   /**
    *
@@ -67,22 +74,6 @@ module.exports =
   async (client) => {
     // await clearThreads();
 
-    // Print this commented message when the bot is ready
-    /*  _______________      _______________       ______  ___     _________
-    ___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
-    __  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \  __  / 
-    _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
-    /_/      /_/  \__,_/ /_/    /_/    _\__, / /_/  /_/  \____/\__,_/   
-                                       /____/                           
-    */
-
-    console.log(`_______________      _______________       ______  ___     _________
-___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
-__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
-_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
-/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
-                                       /____/`);
-
     console.log(`Logged in as ${client.user.username}`);
 
     let credits = await getCreditsLeft();
@@ -90,6 +81,15 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
     console.log(
       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
     );
+
+    let guilds = await client.guilds.fetch();
+    let guildsText = "Guilds: \n";
+
+    for (let [id, guild] of guilds) {
+      guildsText += `- ${guild.name} (${id}) \n`;
+    }
+
+    console.log(guildsText);
 
     let presenceIndex = 0;
 
