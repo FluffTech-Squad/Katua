@@ -3,6 +3,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
+  .setName("rules")
   .setDescription("Enable or disable a server rule for the bot.")
   .addSubcommand((sc) =>
     sc

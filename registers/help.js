@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-module.exports = new SlashCommandBuilder().setDescription(
-  "Get list of commands."
-);
+module.exports = new SlashCommandBuilder()
+  .setName("help")
+  .setDescription("Get list of commands.");

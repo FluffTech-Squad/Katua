@@ -15,12 +15,14 @@ const {
   getCreditsLeft,
   clearThreads,
   getThreadList,
+  getMemberThread,
+  isMemberValid,
 } = require("../utils/openai.js");
 const langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium.js");
 
 /**
- * @type {Map<string, import("discord.js").RESTPostAPIChatInputApplicationCommandsJSONBody>}
+ * @type {Map<string, SlashCommandBuilder>}
  */
 let commands = new Map();
 
@@ -32,30 +34,15 @@ for (const file of registerFiles) {
   /**
    * @type {SlashCommandBuilder | undefined}
    */
-  const command = require(`../registers/${file}`);
+  let command = require(`../registers/${file}`);
   let name = file.split(".")[0];
 
   if (!command) {
     console.log(`${name} command doesn't have data.`);
   } else {
-    command.setName(name);
-
     // Set locales name and description
 
-    let locales = Object.keys(langs);
-
-    for (let locale of locales) {
-      command.setNameLocalization(
-        locale,
-        langs[locale]["helpCommands"][name]["localeName"]
-      );
-      command.setDescriptionLocalization(
-        locale,
-        langs[locale]["helpCommands"][name]["localeDescription"]
-      );
-    }
-
-    commands.set(name, command.toJSON());
+    commands.set(command.name, command);
   }
 }
 
@@ -181,6 +168,37 @@ module.exports =
 
     const rest = new REST().setToken(client.token);
 
+    async function updateCommands(guild) {
+      let cmds = [];
+
+      for (let [name, command] of commands) {
+        let lang = newGuild.preferredLocale || "en-US";
+        let lg = langs[lang];
+        let c = command
+          .setNameLocalization(lang, lg.helpCommands[name].localeName)
+          .setDescriptionLocalization(
+            lang,
+            lg.helpCommands[name].localeDescription
+          );
+
+        cmds.push(c.toJSON());
+      }
+
+      await rest.put(
+        Routes.applicationGuildCommands(client.user.id, guild.id),
+        {
+          body: [],
+        }
+      );
+
+      await rest.put(
+        Routes.applicationGuildCommands(client.user.id, guild.id),
+        {
+          body: cmds,
+        }
+      );
+    }
+
     (async () => {
       try {
         console.log("Loading slash commands...");
@@ -191,81 +209,36 @@ module.exports =
           console.log(`Loading /${name} command...`);
         }
 
-        let data = await rest.put(Routes.applicationCommands(client.user.id), {
-          body: arrayCommands.map((command) => command[1]),
+        let guilds = await client.guilds.fetch();
+
+        await rest.put(Routes.applicationCommands(client.user.id), {
+          body: [],
         });
+
+        for (let [id, guild] of guilds) {
+          let fetchedGuild = await guild.fetch();
+          await updateCommands(fetchedGuild);
+        }
 
         if (arrayCommands.length === 0) {
           console.log("No slash commands to load.");
-        } else {
-          for (const command of data) {
-            console.log(`/${command.name} command loaded successfully.`);
-          }
         }
       } catch (error) {
         console.error(error);
       }
     })();
 
-    client.on("guildBanAdd", async (ban) => {
-      let banCountFile = fs.readFileSync(
-        __dirname.replace("events", "ban_count.txt"),
-        "utf-8"
-      );
+    client.on("guildUpdate", async (oldGuild, newGuild) => {
+      // Check if the guild locale changed
 
-      let threadsFile = fs.readFileSync(
-        __dirname.replace("events", "threads.txt"),
-        "utf-8"
-      );
-      let threadIds = threadsFile.split("\n");
-      let thread = null;
-
-      for (let thread_id of threadIds) {
-        if (thread_id === "") break;
-
-        let threadx = await openai.threads.retrieve(thread_id);
-
-        if (
-          threadx.metadata.guild === ban.guild.id &&
-          threadx.metadata.user === ban.user.id
-        ) {
-          thread = threadx;
-
-          await openai.threads.del(thread_id);
-
-          let threads = threadIds.filter((id) => id !== thread_id);
-
-          fs.writeFileSync(
-            __dirname.replace("events", "threads.txt"),
-            threads.join("\n")
-          );
-        }
-
-        let messages = await openai.threads.messages.list(thread.id);
-        let ok = false;
-
-        for (let msg of messages.data) {
-          if (msg.role === "assistant") {
-            if (msg.metadata === "analysis") {
-              if (
-                msg.content[0].text.value === "invalid" ||
-                msg.content[0].text.value === "neutral"
-              ) {
-                if (!ok) {
-                  let banCount = parseInt(banCountFile);
-                  banCount++;
-
-                  fs.writeFileSync(
-                    __dirname.replace("events", "ban_count.txt"),
-                    banCount.toString()
-                  );
-
-                  ok = true;
-                }
-              }
-            }
-          }
-        }
+      if (oldGuild.preferredLocale !== newGuild.preferredLocale) {
+        // Update the slash commands locale name and description
+        await updateCommands(newGuild);
       }
+    });
+
+    client.on("guildCreate", async (guild) => {
+      // Update the slash commands locale name and description
+      await updateCommands(guild);
     });
   };

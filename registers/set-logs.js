@@ -5,6 +5,7 @@ const {
 } = require("discord.js");
 
 let slashCommand = new SlashCommandBuilder()
+  .setName("set-logs")
   .setDescription("Set the logs channel for the server.")
   .addChannelOption((option) =>
     option
