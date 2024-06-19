@@ -1,9 +1,10 @@
 // Event when bot joins a guild
 
-const { Guild, EmbedBuilder, ActivityType } = require("discord.js");
-let langs = require("../langs.js");
+const { Guild, EmbedBuilder } = require("discord.js");
+let langs = require("../utils/langs.js");
 const fs = require("fs");
-const isPremium = require("../isPremium.js");
+const isPremium = require("../utils/isPremium.js");
+
 module.exports =
   /**
    *
@@ -60,29 +61,6 @@ module.exports =
 
     try {
       await dm.send({ embeds: [embed] });
-
-      // Setup config for the guild
-
-      let guildsFolder = __dirname.replace("events", "guilds");
-
-      if (!fs.existsSync(guildsFolder)) fs.mkdirSync(guildsFolder);
-
-      let guildFilePath = `${guildsFolder}/${guild.id}.json`;
-
-      let guildsRulesFolder = `${guildsFolder}/rules`;
-
-      if (!fs.existsSync(guildsRulesFolder)) fs.mkdirSync(guildsRulesFolder);
-
-      let guildRulesFile = `${guildsRulesFolder}/${guild.id}.json`;
-
-      fs.writeFileSync(guildFilePath, JSON.stringify({}));
-      fs.writeFileSync(
-        guildRulesFile,
-        JSON.stringify({
-          "nsfw-filter": true,
-          "word-filter": false,
-        })
-      );
     } catch (e) {
       console.log("Can't send a message to the owner.");
 
@@ -92,4 +70,27 @@ module.exports =
         await systemChannel.send({ embeds: [embed] });
       }
     }
+
+    // Setup config for the guild
+
+    let guildsFolder = __dirname.replace("events", "guilds");
+
+    if (!fs.existsSync(guildsFolder)) fs.mkdirSync(guildsFolder);
+
+    let guildFilePath = `${guildsFolder}/${guild.id}.json`;
+
+    let guildsRulesFolder = `${guildsFolder}/rules`;
+
+    if (!fs.existsSync(guildsRulesFolder)) fs.mkdirSync(guildsRulesFolder);
+
+    let guildRulesFile = `${guildsRulesFolder}/${guild.id}.json`;
+
+    fs.writeFileSync(guildFilePath, JSON.stringify({}));
+    fs.writeFileSync(
+      guildRulesFile,
+      JSON.stringify({
+        "nsfw-filter": true,
+        "word-filter": false,
+      })
+    );
   };

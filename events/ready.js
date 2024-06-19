@@ -10,26 +10,14 @@ const {
   ActivityType,
   SlashCommandBuilder,
 } = require("discord.js");
-const { openai, getCreditsLeft } = require("../openai");
-const langs = require("../langs.js");
-const isPremium = require("../isPremium.js");
-
-// Clear Threads
-
-async function clearThreads() {
-  let threadFilePath = __dirname.replace("events", "threads.txt");
-  let threadsFile = fs.readFileSync(threadFilePath, "utf-8");
-
-  let threadIds = threadsFile.split("\n");
-
-  for (let thread_id of threadIds) {
-    if (thread_id === "") break;
-
-    await openai.threads.del(thread_id);
-  }
-
-  fs.writeFileSync(threadFilePath, "");
-}
+const {
+  openai,
+  getCreditsLeft,
+  clearThreads,
+  getThreadList,
+} = require("../utils/openai.js");
+const langs = require("../utils/langs.js");
+const isPremium = require("../utils/isPremium.js");
 
 /**
  * @type {Map<string, import("discord.js").RESTPostAPIChatInputApplicationCommandsJSONBody>}
@@ -107,21 +95,21 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
 
     // Update credits, 5 requests per min rate limit
 
-    setInterval(async () => {
-      let newCredits = await getCreditsLeft();
+    // setInterval(async () => {
+    //   let newCredits = await getCreditsLeft();
 
-      if (
-        !(
-          credits.available === newCredits.available &&
-          credits.paidBalance === credits.paidBalance
-        )
-      ) {
-        credits = newCredits;
-        console.log(
-          `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-        );
-      }
-    }, 30000);
+    //   if (
+    //     !(
+    //       credits.available === newCredits.available &&
+    //       credits.paidBalance === credits.paidBalance
+    //     )
+    //   ) {
+    //     credits = newCredits;
+    //     console.log(
+    //       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    //     );
+    //   }
+    // }, 30000);
 
     // Update Presence Function
     async function updatePresence() {

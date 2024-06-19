@@ -2,7 +2,7 @@
 
 const { Guild } = require("discord.js");
 const fs = require("fs");
-const isPremium = require("../isPremium");
+const isPremium = require("../utils/isPremium");
 
 module.exports =
   /**

@@ -3,14 +3,12 @@
 const { Guild } = require("discord.js");
 const fs = require("fs");
 
+let premiumFilePath = __dirname.replace("utils", "premium_guilds.txt");
 /**
  * @param {Guild} guild
  */
 async function isPremium(guild) {
-  let premiumGuildsFile = fs.readFileSync(
-    `${__dirname}/premium_guilds.txt`,
-    "utf-8"
-  );
+  let premiumGuildsFile = fs.readFileSync(premiumFilePath, "utf-8");
   let premiumGuilds = premiumGuildsFile.split("\n");
 
   // Get guild Ids, the lines finishes with a \r except the last one, remove them
@@ -23,10 +21,7 @@ async function isPremium(guild) {
 }
 
 async function isPremiumID(guild_id) {
-  let premiumGuildsFile = fs.readFileSync(
-    `${__dirname}/premium_guilds.txt`,
-    "utf-8"
-  );
+  let premiumGuildsFile = fs.readFileSync(premiumFilePath, "utf-8");
   let premiumGuilds = premiumGuildsFile.split("\n");
 
   // Get guild Ids, the lines finishes with a \r except the last one, remove them

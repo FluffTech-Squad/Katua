@@ -1,13 +1,12 @@
 // guildMemberRemove event
 
-const {
-  PartialGuildMember,
-  AuditLogEvent,
-  ActivityType,
-} = require("discord.js");
-const { openai } = require("../openai.js");
+const { PartialGuildMember } = require("discord.js");
 const fs = require("fs");
-const isPremium = require("../isPremium.js");
+const {
+  openai,
+  getMemberThread,
+  isMemberValid,
+} = require("../utils/openai.js");
 
 // Deleting member profile file.
 
@@ -19,70 +18,30 @@ module.exports =
   async (member) => {
     if (member.id === member.client.user.id) return;
 
-    if (!(await isPremium(guild))) return;
+    // if (!(await isPremium(guild))) return;
 
     let guild = member.guild;
 
-    let threadsFile = fs.readFileSync(
-      __dirname.replace("events", "threads.txt"),
-      "utf-8"
-    );
-    let threadIds = threadsFile.split("\n");
-    let thread = null;
-    let messages = null;
+    let thread = await getMemberThread(guild.id, member.user.id);
 
-    for (let thread_id of threadIds) {
-      if (thread_id === "") break;
+    if (thread) {
+      let isValid = await isMemberValid(thread);
 
-      let threadx = await openai.threads.retrieve(thread_id);
+      if (!isValid) {
+        let banCountFile = fs.readFileSync(
+          __dirname.replace("events", "ban_count.txt"),
+          "utf-8"
+        );
 
-      if (
-        threadx.metadata.guild === guild.id &&
-        threadx.metadata.user === member.user.id
-      ) {
-        thread = threadx;
-        messages = await openai.threads.messages.list(thread.id);
-
-        await openai.threads.del(thread_id);
-
-        let threads = threadIds.filter((id) => id !== thread_id);
+        let banCount = parseInt(banCountFile);
+        banCount++;
 
         fs.writeFileSync(
-          __dirname.replace("events", "threads.txt"),
-          threads.join("\n")
+          __dirname.replace("events", "ban_count.txt"),
+          banCount.toString()
         );
       }
-    }
 
-    if (thread && messages) {
-      let ok = false;
-
-      for (let msg of messages.data) {
-        if (msg.role === "assistant") {
-          if (msg.metadata === "analysis") {
-            if (
-              msg.content[0].text.value === "invalid" ||
-              msg.content[0].text.value === "neutral"
-            ) {
-              if (!ok) {
-                let banCountFile = fs.readFileSync(
-                  __dirname.replace("events", "ban_count.txt"),
-                  "utf-8"
-                );
-
-                let banCount = parseInt(banCountFile);
-                banCount++;
-
-                fs.writeFileSync(
-                  __dirname.replace("events", "ban_count.txt"),
-                  banCount.toString()
-                );
-              }
-
-              ok = true;
-            }
-          }
-        }
-      }
+      await openai.threads.del(thread.id);
     }
   };

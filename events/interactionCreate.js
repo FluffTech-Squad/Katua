@@ -3,7 +3,7 @@
 // Loading commands' functions
 
 const fs = require("fs");
-const langs = require("../langs.js");
+const langs = require("../utils/langs.js");
 const { Interaction } = require("discord.js");
 let commands = new Map();
 

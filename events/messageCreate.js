@@ -1,73 +1,18 @@
 // messageCreate event
 
 const {
-  EmbedBuilder,
-  Message,
-  ChannelType,
-  Guild,
-  BaseGuildTextChannel,
-} = require("discord.js");
-const { openai } = require("../openai");
-const fs = require("fs");
-const analyser = require("../analyser");
-const langs = require("../langs.js");
-const isPremium = require("../isPremium");
-const isNSFW = require("../isNSFW");
+  openai,
+  getThreadList,
+  getMemberThread,
+  isMemberValid,
+} = require("../utils/openai");
+const analyser = require("../utils/analyser");
+const langs = require("../utils/langs.js");
+const isPremium = require("../utils/isPremium");
+const isNSFW = require("../utils/isNSFW");
+const findGuildDatas = require("../utils/findGuildDatas.js");
 
-/**
- *
- * @param {Guild} guild
- */
-async function findGuildDatas(guild) {
-  // Get guild rules settings
-
-  /**
-   * @type {{logChannel:BaseGuildTextChannel  | null;
-   * guildRulesData: {[key:string]:boolean}
-   * }}
-   */
-  let retObj = {
-    logChannel: null,
-  };
-
-  let guildsFolder = __dirname.replace("events", "guilds");
-
-  if (!fs.existsSync(guildsFolder)) {
-    fs.mkdirSync(guildsFolder);
-  }
-
-  let guildsRulesFolder = guildsFolder + "/rules";
-  let guildFilePath = guildsFolder + `/${guild.id}.json`;
-
-  if (!fs.existsSync(guildsRulesFolder)) {
-    fs.mkdirSync(guildsRulesFolder);
-  }
-
-  let guildRulesFile = guildsRulesFolder + `/${guild.id}.json`;
-
-  if (!fs.existsSync(guildRulesFile)) {
-    fs.writeFileSync(guildRulesFile, JSON.stringify({}));
-  }
-
-  if (fs.existsSync(guildFilePath)) {
-    let guildData = JSON.parse(fs.readFileSync(guildFilePath, "utf-8"));
-
-    if (guildData.log_channel_id) {
-      /**
-       * @type {import("discord.js").GuildTextBasedChannel}
-       */
-      let ch = await guild.channels.fetch(guildData.log_channel_id);
-
-      retObj.logChannel = ch;
-    }
-  }
-
-  let guildRulesData = JSON.parse(fs.readFileSync(guildRulesFile, "utf-8"));
-
-  retObj.guildRulesData = guildRulesData;
-
-  return retObj;
-}
+const { EmbedBuilder, Message, ChannelType } = require("discord.js");
 
 /**
  * @param {Message} message
@@ -152,7 +97,7 @@ module.exports = async (message) => {
       (ch) => ch.name === message.author.id
     );
 
-    if (userChannel.id === message.channel.id) {
+    if (userChannel && userChannel.id === message.channel.id) {
       let embed = new EmbedBuilder()
         .setAuthor({
           name: message.author.username,
@@ -226,40 +171,26 @@ module.exports = async (message) => {
 
   let lastTwoMessages = await message.channel.messages.fetch({ limit: 2 });
 
-  let botMember = message.guild.members.me;
-
-  let threadsFile = __dirname.replace("events", "threads.txt");
-
   let thread = null;
   let valid = false;
 
+  /**
+   *
+   * @returns {Promise<import("openai/resources/beta/threads/threads.mjs").Thread>}
+   */
   async function findThread() {
-    let threadIds = fs.readFileSync(threadsFile, "utf-8").split("\n");
+    let thr = await getMemberThread(message.guild.id, message.author.id);
 
-    for (let thread_id of threadIds) {
-      if (thread_id === "") break;
-
-      let threadx = await openai.threads.retrieve(thread_id);
-
-      if (!threadx) break;
-
-      if (
-        threadx.metadata.guild === message.guild.id &&
-        threadx.metadata.user === message.author.id
-      ) {
-        thread = threadx;
-
-        let messages = await openai.threads.messages.list(thread.id);
-        let lastMessage = messages.data[0].content[0].text;
-
-        valid = lastMessage.value === "valid";
-
-        break;
-      }
+    if (!thr) {
+      await analyser(message.member);
+      thr = await getMemberThread(message.guild.id, message.author.id);
     }
+
+    return thr;
   }
 
-  await findThread();
+  thread = await findThread();
+  valid = await isMemberValid(thread);
 
   let embed = new EmbedBuilder()
     .setTitle(sentences.words.messageDeleted)
@@ -280,10 +211,6 @@ module.exports = async (message) => {
       message.member.permissions.has("Administrator")
     )
       return;
-    else if (!thread) {
-      await analyser(message.member);
-      await findThread();
-    }
 
     // Listen to messages and analyze them
     // Check if the message contains insults
@@ -328,12 +255,12 @@ module.exports = async (message) => {
 
     if (run.status === "completed") {
       let messages = await openai.threads.messages.list(run.thread_id);
-      let lastMessage = messages.data[0].content[0].text;
+      let lastMessage = messages.data[0];
 
       await openai.threads.messages.del(thread.id, apiMsg.id);
       await openai.threads.messages.del(thread.id, lastMessage.id);
 
-      if (lastMessage.value === "unsafe") {
+      if (lastMessage.content[0].text.value === "unsafe") {
         message.delete();
 
         if (logChannel) logChannel.send({ embeds: [embed] });

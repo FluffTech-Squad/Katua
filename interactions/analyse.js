@@ -7,14 +7,12 @@ const {
   EmbedBuilder,
   ButtonStyle,
   ChannelType,
-  Locale,
 } = require("discord.js");
 
-const fs = require("fs");
-const analyser = require("../analyser");
-const { openai } = require("../openai");
+const analyser = require("../utils/analyser");
+const { getMemberThread } = require("../utils/openai");
 
-const langs = require("../langs.js");
+const langs = require("../utils/langs.js");
 
 module.exports =
   /**
@@ -190,31 +188,16 @@ module.exports =
           });
 
           try {
-            let threadsFile = fs.readFileSync(
-              __dirname.replace("interactions", "threads.txt"),
-              "utf-8"
-            );
-
-            let threadIds = threadsFile.split("\n");
-
-            let thread = null;
-
-            for (let thread_id of threadIds) {
-              if (thread_id === "") break;
-
-              let threadx = await openai.threads.retrieve(thread_id);
-
-              if (
-                threadx.metadata.guild === interaction.guild.id &&
-                threadx.metadata.user === user.id
-              ) {
-                thread = threadx;
-              }
-            }
+            let thread = await getMemberThread(interaction.guild.id, user.id);
 
             if (thread) {
               try {
-                let expanation = await analyser.askExplanation(thread, lang);
+                let expanation = await analyser.askExplanation(
+                  thread,
+                  lang,
+                  result.toLowerCase()
+                );
+
                 msg.edit({
                   content: expanation,
                 });

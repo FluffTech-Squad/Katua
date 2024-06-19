@@ -6,7 +6,7 @@ const {
   BaseGuildTextChannel,
 } = require("discord.js");
 const fs = require("fs");
-const langs = require("../langs.js");
+const langs = require("../utils/langs.js");
 
 module.exports =
   /**

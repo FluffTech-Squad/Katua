@@ -1,6 +1,6 @@
 const { ChatInputCommandInteraction } = require("discord.js");
 
-let langs = require("../langs.js");
+let langs = require("../utils/langs.js");
 
 module.exports =
   /**

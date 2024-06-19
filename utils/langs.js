@@ -1,5 +1,5 @@
 const fs = require("fs");
-let langsFolder = "./langs";
+let langsFolder = process.cwd() + "/langs";
 
 let files = fs.readdirSync(langsFolder);
 

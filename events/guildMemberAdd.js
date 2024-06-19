@@ -3,15 +3,15 @@
 const {
   GuildMember,
   EmbedBuilder,
-  ChannelType,
   BaseGuildTextChannel,
   Collection,
 } = require("discord.js");
-const analyse = require("../analyser");
-const fs = require("fs");
 
-let langs = require("../langs.js");
-const { openai } = require("../openai");
+const analyse = require("../utils/analyser");
+const fs = require("fs");
+const langs = require("../utils/langs");
+const { openai, getMemberThread } = require("../utils/openai");
+const findGuildDatas = require("../utils/findGuildDatas");
 
 // Analysing member profile and determine if it's a troll/anti-furry or not.
 
@@ -30,23 +30,10 @@ module.exports =
     let sentences = langs[lang] || langs["en-US"];
 
     try {
-      let guildsFolder = fs.readdirSync(__dirname.replace("events", "guilds"));
-      let guildFile = guildsFolder.find((file) => file.includes(guild.id));
+      let guildData = await findGuildDatas(guild);
+      let log_channel = guildData.logChannel;
 
-      if (!guildFile) return;
-
-      let guildData = require(`../guilds/${guildFile}`);
-
-      let log_channel_id =
-        guildData && guildData.log_channel_id ? guildData.log_channel_id : null;
-
-      if (log_channel_id === null) return;
-
-      let log_channel = await guild.channels.fetch(log_channel_id);
-
-      if (log_channel === null) return;
-
-      if (!log_channel.isTextBased()) return;
+      if (log_channel === null || !log_channel.isTextBased()) return;
 
       let joinedAt = member.joinedAt;
       let createdAt = member.user.createdAt;
@@ -170,31 +157,15 @@ module.exports =
 
         message.edit({ embeds: [embed] });
 
-        let threadsFile = fs.readFileSync(
-          __dirname.replace("events", "threads.txt"),
-          "utf-8"
-        );
-
-        let threadIds = threadsFile.split("\n");
-
-        let thread = null;
-
-        for (let thread_id of threadIds) {
-          if (thread_id === "") break;
-
-          let threadx = await openai.threads.retrieve(thread_id);
-
-          if (
-            threadx.metadata.guild === member.guild.id &&
-            threadx.metadata.user === member.user.id
-          ) {
-            thread = threadx;
-          }
-        }
+        let thread = await getMemberThread(guild.id, member.user.id);
 
         if (thread) {
           try {
-            let explanation = await analyse.askExplanation(thread, lang);
+            let explanation = await analyse.askExplanation(
+              thread,
+              lang,
+              "invalid"
+            );
 
             embed.setDescription(explanation);
 

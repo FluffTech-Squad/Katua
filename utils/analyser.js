@@ -1,6 +1,5 @@
 const { GuildMember, ActivityType } = require("discord.js");
-const fs = require("fs");
-const { openai } = require("./openai.js");
+const { openai, getMemberThread } = require("./openai.js");
 let langs = require("./langs.js");
 /**
  *
@@ -17,35 +16,17 @@ function analyser(member) {
       let guild = member.guild;
 
       try {
-        let threadsFile = fs.readFileSync(`${__dirname}/threads.txt`, "utf-8");
-        let threadIds = threadsFile.split("\n");
-
-        let thread = null;
-
-        for (let thread_id of threadIds) {
-          if (thread_id === "") break;
-
-          let threadx = await openai.threads.retrieve(thread_id);
-
-          if (
-            threadx.metadata.user === member.user.id &&
-            threadx.metadata.guild === guild.id
-          ) {
-            thread = threadx;
-          }
-        }
+        let thread = await getMemberThread(guild.id, member.user.id);
 
         if (!thread) {
           thread = await openai.threads.create({
             metadata: { guild: guild.id, user: member.user.id },
           });
-
-          fs.appendFileSync(`${__dirname}/threads.txt`, `${thread.id}\n`);
         }
 
         let content = "";
 
-        content += `Displayname: ${member.displayName}\n`;
+        content += `Displayname: ${member.user.displayName}\n`;
         content += `Username: ${member.user.username}\n`;
         content += `Presence Status: ${
           member.presence && member.presence.status
@@ -101,7 +82,7 @@ function analyser(member) {
           let lastMessage = messages.data[0];
 
           await openai.threads.messages.update(thread.id, lastMessage.id, {
-            metadata: "analysis",
+            metadata: { type: "analysis" },
           });
 
           resolve(lastMessage.content[0].text.value);
@@ -121,9 +102,10 @@ function analyser(member) {
  *
  * @param {import("openai/resources/beta/threads/threads.mjs").Thread} thread
  * @param {string} lang
+ * @param {"valid" | "invalid" | "neutral"} state
  * @returns {Promise<string>}
  */
-function askExplanation(thread, lang) {
+function askExplanation(thread, lang, state) {
   let sentences = langs[lang];
 
   return new Promise(async (resolve, reject) => {
@@ -133,7 +115,11 @@ function askExplanation(thread, lang) {
     let messages = await openai.threads.messages.list(thread.id);
     let lastMessage = messages.data[0];
 
-    if (lastMessage.metadata === "explanation") {
+    if (
+      lastMessage.metadata &&
+      lastMessage.metadata.type &&
+      lastMessage.metadata.type === "explanation"
+    ) {
       alreadyAsked = true;
       explanation = lastMessage.content[0].text.value;
     }
@@ -146,7 +132,7 @@ function askExplanation(thread, lang) {
     let message = await openai.threads.messages.create(thread.id, {
       content: sentences.askAIExplanation.replace(
         "$1",
-        sentences["words"][result.toLowerCase()]
+        sentences["words"][state.toLowerCase()]
       ),
       role: "user",
     });
@@ -160,7 +146,7 @@ function askExplanation(thread, lang) {
       let lastMessage = messages.data[0];
 
       await openai.threads.messages.update(thread.id, lastMessage.id, {
-        metadata: "explanation",
+        metadata: { type: "explanation" },
       });
 
       resolve(lastMessage.content[0].text.value);
