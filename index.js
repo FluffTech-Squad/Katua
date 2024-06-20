@@ -10,6 +10,34 @@
 // FluffyMod is a AI-powered moderator Discord Bot to analyse joining members' profile to make furry servers safer.
 // Created by: nekomancer0
 
+const fs = require("fs");
+const AdmZip = require("adm-zip");
+
+// Create a log file per date
+let date = new Date();
+// Format the date for full date and time
+
+let formattedDate = `${date.getFullYear()}-${
+  date.getMonth() + 1
+}-${date.getDate()}_${date.getHours()}h${date.getMinutes()}m${date.getSeconds()}s`;
+
+let logsFolder = `${__dirname}/logs`;
+let logFilePath = `${logsFolder}/${formattedDate}.log`;
+
+process.stdout.write = (function (write) {
+  return function (string, encoding, fd) {
+    write.apply(process.stdout, arguments);
+
+    let writeStream = fs.createWriteStream(logFilePath, {
+      flags: "a",
+    });
+
+    writeStream.write(string);
+
+    writeStream.end();
+  };
+})(process.stdout.write);
+
 // Importing the discord.js module
 
 const Discord = require("discord.js");
@@ -34,23 +62,7 @@ require("dotenv").config();
 require("./utils/mongodb.js");
 
 const token = process.env.TOKEN;
-const fs = require("fs");
 
-// Load events
-
-const eventFiles = fs
-  .readdirSync("./events")
-  .filter((file) => file.endsWith(".js"))
-  .reverse();
-
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-
-  let name = file.split(".")[0];
-
-  console.log(`Event ${name} loaded.`);
-
-  client.on(name, event);
-}
+client.on("ready", require("./events/ready.js"));
 
 client.login(token);

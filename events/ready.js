@@ -1,6 +1,3 @@
-// ready event
-
-// Loading commands' datas
 const fs = require("fs");
 
 const {
@@ -41,13 +38,6 @@ for (const file of registerFiles) {
   }
 }
 
-console.log(`_______________      _______________       ______  ___     _________
-___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
-__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
-_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
-/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
-                                   /____/`);
-
 module.exports =
   /**
    *
@@ -56,13 +46,7 @@ module.exports =
   async (client) => {
     // await clearThreads();
 
-    console.log(`Logged in as ${client.user.username}`);
-
     let credits = await getCreditsLeft();
-
-    console.log(
-      `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    );
 
     let guilds = await client.guilds.fetch();
     let guildsText = "Guilds: \n";
@@ -112,25 +96,34 @@ module.exports =
       // Fetch guilds not having premium
 
       let nonPremiumGuildsCount = guilds.size - premiumGuildsCount;
+      let lastJoinedGuild = guilds.last();
 
       let presences = [
         {
           name: `${guilds.size} guild${guilds.size > 1 ? "s" : ""} | /help`,
           state: `${banCount} trolls removed with human confirmation`,
           type: ActivityType.Watching,
+          ms: 11000,
         },
         {
           name: `Global credits: $${credits.available} / $${credits.paidBalance}`,
-          type: ActivityType.Watching,
+          type: ActivityType.Custom,
+          ms: 9000,
         },
         {
-          name: `${premiumGuildsCount}/${nonPremiumGuildsCount} premium guild${
+          name: `${premiumGuildsCount} / ${nonPremiumGuildsCount} premium guild${
             guilds.size > 1 ? "s" : ""
           }`,
-          type: ActivityType.Watching,
+          type: ActivityType.Custom,
         },
         {
-          name: `DM ${client.user.username} for support.`,
+          name: `Get support by DMing me!`,
+          state: `Issues? Bugs? Suggestions? Or Premium requests?`,
+          type: ActivityType.Watching,
+          ms: 11000,
+        },
+        {
+          name: `Last invite: ${lastJoinedGuild.name}. Enjoy!`,
           type: ActivityType.Custom,
         },
       ];
@@ -140,20 +133,20 @@ module.exports =
         activities: [presences[presenceIndex]],
       });
 
-      return presences.length - 1;
+      return presences;
     }
 
-    let presencesIndexes = await updatePresence();
+    let presences = await updatePresence();
 
     setInterval(async () => {
-      presencesIndexes = await updatePresence();
+      presences = await updatePresence();
 
-      if (presencesIndexes === presenceIndex) {
+      if (presences.length - 1 === presenceIndex) {
         presenceIndex = 0;
       } else {
         presenceIndex++;
       }
-    }, 9000);
+    }, presences[presenceIndex].ms || 6000);
 
     const rest = new REST().setToken(client.token);
 
@@ -181,10 +174,20 @@ module.exports =
       );
     }
 
+    console.clear();
+    console.log(`_______________      _______________       ______  ___     _________
+___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
+__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
+_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
+/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
+                                    /____/`);
+    console.log(`Logged in as ${client.user.username}`);
+    console.log(
+      `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    );
+
     (async () => {
       try {
-        console.log("Loading slash commands...");
-
         let arrayCommands = Array.from(commands);
 
         for (const [name, command] of arrayCommands) {
@@ -209,6 +212,26 @@ module.exports =
         console.error(error);
       }
     })();
+
+    const fs = require("fs");
+
+    // Load events
+
+    const eventFiles = fs
+      .readdirSync(__dirname)
+      .filter((file) => file.endsWith(".js"));
+
+    for (const file of eventFiles) {
+      if (file === "ready.js") break;
+
+      const event = require(`./${file}`);
+
+      let name = file.split(".")[0];
+
+      console.log(`Event ${name} loaded.`);
+
+      client.on(name, event);
+    }
 
     client.on("guildUpdate", async (oldGuild, newGuild) => {
       // Check if the guild locale changed
