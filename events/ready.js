@@ -111,7 +111,7 @@ module.exports =
           ms: 9000,
         },
         {
-          name: `${premiumGuildsCount} / ${nonPremiumGuildsCount} premium guild${
+          name: `${premiumGuildsCount} / ${guilds.size} premium guild${
             guilds.size > 1 ? "s" : ""
           }`,
           type: ActivityType.Custom,
