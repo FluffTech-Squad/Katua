@@ -115,28 +115,23 @@ module.exports =
 
       let presences = [
         {
-          name: `${guilds.size} server${guilds.size > 1 ? "s" : ""} | /help`,
-          state: `${banCount} trolls removed in total.`,
+          name: `${guilds.size} guild${guilds.size > 1 ? "s" : ""} | /help`,
+          state: `${banCount} trolls removed with human confirmation`,
           type: ActivityType.Watching,
         },
         {
-          name: `${guilds.size} server${guilds.size > 1 ? "s" : ""} | /help`,
-          state: `Global credits: $${credits.available} / $${credits.paidBalance}`,
+          name: `Global credits: $${credits.available} / $${credits.paidBalance}`,
           type: ActivityType.Watching,
         },
         {
-          name: `${guilds.size} server${guilds.size > 1 ? "s" : ""} | /help`,
-          state: `${premiumGuildsCount} premium server${
-            premiumGuildsCount > 1 ? "s" : ""
-          } | ${nonPremiumGuildsCount} non-premium server${
-            nonPremiumGuildsCount > 1 ? "s" : ""
+          name: `${premiumGuildsCount}/${nonPremiumGuildsCount} premium guild${
+            guilds.size > 1 ? "s" : ""
           }`,
           type: ActivityType.Watching,
         },
         {
-          name: `DM me for support.`,
-          state: `${banCount} trolls removed in total.`,
-          type: ActivityType.Watching,
+          name: `DM ${client.user.username} for support.`,
+          type: ActivityType.Custom,
         },
       ];
 
@@ -158,7 +153,7 @@ module.exports =
       } else {
         presenceIndex++;
       }
-    }, 11000);
+    }, 9000);
 
     const rest = new REST().setToken(client.token);
 
@@ -227,5 +222,21 @@ module.exports =
     client.on("guildCreate", async (guild) => {
       // Update the slash commands locale name and description
       await updateCommands(guild);
+
+      // Set a presence to say thank you the user (guild) for adding the bot
+
+      guild.client.user.setPresence({
+        status: "online",
+        activities: [
+          {
+            name: `Thank you for adding me to ${guild.name}!`,
+            type: ActivityType.Custom,
+          },
+        ],
+      });
+
+      setTimeout(async () => {
+        await updatePresence();
+      }, 1000);
     });
   };
