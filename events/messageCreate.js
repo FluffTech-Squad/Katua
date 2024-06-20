@@ -10,9 +10,9 @@ const analyser = require("../utils/analyser");
 const langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium");
 const isNSFW = require("../utils/isNSFW");
-const findGuildDatas = require("../utils/findGuildDatas.js");
 
 const { EmbedBuilder, Message, ChannelType } = require("discord.js");
+const { collections } = require("../utils/mongodb.js");
 
 /**
  * @param {Message} message
@@ -120,9 +120,21 @@ module.exports = async (message) => {
     }
   }
 
-  let { logChannel, guildRulesData: rulesData } = await findGuildDatas(
-    message.guild
-  );
+  let rulesData = await collections.guildRules.findOne({
+    guild_id: message.guild.id,
+  });
+
+  if (!rulesData) {
+    await collections.guildRules.insertOne({
+      guild_id: message.guild.id,
+      nsfwFilter: true,
+      wordFilter: false,
+    });
+
+    rulesData = await collections.guildRules.findOne({
+      guild_id: message.guild.id,
+    });
+  }
 
   let lang = message.guild.preferredLocale || "en-US";
   let sentences = langs[lang];

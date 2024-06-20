@@ -8,10 +8,10 @@ const {
 } = require("discord.js");
 
 const analyse = require("../utils/analyser");
-const fs = require("fs");
 const langs = require("../utils/langs");
-const { openai, getMemberThread } = require("../utils/openai");
-const findGuildDatas = require("../utils/findGuildDatas");
+const { getMemberThread } = require("../utils/openai");
+const { collections } = require("../utils/mongodb");
+const isPremium = require("../utils/isPremium");
 
 // Analysing member profile and determine if it's a troll/anti-furry or not.
 
@@ -30,10 +30,13 @@ module.exports =
     let sentences = langs[lang] || langs["en-US"];
 
     try {
-      let guildData = await findGuildDatas(guild);
-      let log_channel = guildData.logChannel;
+      let dbGuild = await collections.guilds.findOne({ guild_id: guild.id });
 
-      if (log_channel === null || !log_channel.isTextBased()) return;
+      if (!dbGuild) return;
+
+      if (!dbGuild.log_channel_id) return;
+      let log_channel = await guild.channels.fetch(dbGuild.log_channel_id);
+      if (!log_channel || !log_channel.isTextBased()) return;
 
       let joinedAt = member.joinedAt;
       let createdAt = member.user.createdAt;
@@ -45,6 +48,12 @@ module.exports =
       let createdAtDay = createdAt.getDate();
       let createdAtMonth = createdAt.getMonth() + 1;
       let createdAtYear = createdAt.getFullYear();
+
+      let memberBans = await collections.bans
+        .find({
+          user_id: member.user.id,
+        })
+        .toArray();
 
       let embed = new EmbedBuilder()
         .setTitle(sentences.suspicionTitle)
@@ -67,6 +76,11 @@ module.exports =
           {
             name: sentences.createdAtLabel,
             value: `${createdAtDay}/${createdAtMonth}/${createdAtYear}`,
+            inline: true,
+          },
+          {
+            name: "Total of kicks and bans in other servers",
+            value: memberBans.length.toString(),
             inline: true,
           },
         ])
@@ -117,72 +131,68 @@ module.exports =
 
       if (result !== "invalid") return;
 
-      try {
-        if (guildData.prevent_members) {
-          // Find for the first sendable text channel
+      if (dbGuild.prevent_members) {
+        // Find for the first sendable text channel
 
-          /**
-           * @type {Collection<string, BaseGuildTextChannel>}
-           */
-          let channels = (await guild.channels.fetch()).filter(
-            (channel) =>
-              channel.isTextBased() &&
-              channel.permissionsFor(botMember).has("SendMessages")
+        /**
+         * @type {Collection<string, BaseGuildTextChannel>}
+         */
+        let channels = (await guild.channels.fetch()).filter(
+          (channel) =>
+            channel.isTextBased() &&
+            channel.permissionsFor(botMember).has("SendMessages")
+        );
+
+        let firstChannel = channels.first();
+
+        let channel = guild.systemChannel || firstChannel;
+
+        if (dbGuild.inform_members_channel_id) {
+          let inform_channel = await guild.channels.fetch(
+            dbGuild.inform_members_channel_id
           );
 
-          let firstChannel = channels.first();
-
-          let channel = guild.systemChannel || firstChannel;
-
-          if (guildData.inform_members_channel_id) {
-            let inform_channel = await guild.channels.fetch(
-              guildData.inform_members_channel_id
-            );
-
-            if (inform_channel && inform_channel.isTextBased()) {
-              inform_channel.send({
-                content: sentences.memberReport.replace("$1", member.user),
-                allowedMentions: { users: [], parse: [] },
-              });
-            }
-          } else {
-            channel.send({
+          if (inform_channel && inform_channel.isTextBased()) {
+            inform_channel.send({
               content: sentences.memberReport.replace("$1", member.user),
               allowedMentions: { users: [], parse: [] },
             });
           }
+        } else {
+          channel.send({
+            content: sentences.memberReport.replace("$1", member.user),
+            allowedMentions: { users: [], parse: [] },
+          });
         }
+      }
 
-        embed.setColor("Red").setTitle(sentences.invalidTitle);
+      embed.setColor("Red").setTitle(sentences.invalidTitle);
 
-        message.edit({ embeds: [embed] });
+      message.edit({ embeds: [embed] });
 
-        let thread = await getMemberThread(guild.id, member.user.id);
+      let thread = await getMemberThread(guild.id, member.user.id);
 
-        if (thread) {
-          try {
-            let explanation = await analyse.askExplanation(
-              thread,
-              lang,
-              "invalid"
-            );
+      if (thread) {
+        try {
+          let explanation = await analyse.askExplanation(
+            thread,
+            lang,
+            "invalid"
+          );
 
-            embed.setDescription(explanation);
+          embed.setDescription(explanation);
 
-            message.edit({
-              embeds: [embed],
-            });
-          } catch (error) {
-            console.error(error);
+          message.edit({
+            embeds: [embed],
+          });
+        } catch (error) {
+          console.error(error);
 
-            embed.setDescription(sentences.apiError);
-            message.edit({
-              embeds: [embed],
-            });
-          }
+          embed.setDescription(sentences.apiError);
+          message.edit({
+            embeds: [embed],
+          });
         }
-      } catch (error) {
-        console.error(error);
       }
     } catch (error) {
       console.error(error);

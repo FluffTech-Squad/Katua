@@ -31,6 +31,7 @@ const client = new Discord.Client({
 // Use dotenv to hide the token
 
 require("dotenv").config();
+require("./utils/mongodb.js");
 
 const token = process.env.TOKEN;
 const fs = require("fs");

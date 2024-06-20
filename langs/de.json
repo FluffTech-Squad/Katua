@@ -66,6 +66,24 @@
       "usages": ["/regeln nsfw-filter", "/regeln word-filter"],
       "localeName": "regeln",
       "localeDescription": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot."
+    },
+    "detector-prompt": {
+      "title": "Detector Prompt",
+      "description": "Manage the detector prompt to detect unsafe contents in the server.",
+      "usages": [
+        "/detector-prompt set",
+        "/detector-prompt reset",
+        "/detector-prompt show"
+      ],
+      "localeName": "detector-prompt",
+      "localeDescription": "Manage the detector prompt to detect unsafe contents in the server."
+    },
+    "userinfo": {
+      "title": "Benutzerinfo",
+      "description": "Zeigen Sie Informationen über einen Benutzer an.",
+      "usage": "/benutzerinfo @user",
+      "localeName": "benutzerinfo",
+      "localeDescription": "Zeigen Sie Informationen über einen Benutzer an."
     }
   },
   "setLogsText": "Ok, ich habe den Log-Raum auf $1 gesetzt und die Option \"Mitglieder benachrichtigen\" $2. Wenn diese Option aktiviert ist, werden Mitglieder über potenzielle Trolle in $3 benachricht.",

@@ -1,13 +1,14 @@
 // Rules slash command to set rules in a guild for the bot to perform moderation actions.
 
 const { ChannelType, ChatInputCommandInteraction } = require("discord.js");
-const fs = require("fs");
+
 const langs = require("../utils/langs.js");
+const { collections } = require("../utils/mongodb.js");
 /**
  *
  * @param {ChatInputCommandInteraction} interaction
  */
-module.exports = (interaction) => {
+module.exports = async (interaction) => {
   // Get the guild
   let guild = interaction.guild;
 
@@ -15,49 +16,56 @@ module.exports = (interaction) => {
   let lang = guild.preferredLocale || "en-US";
 
   let sentences = langs[lang];
-
   // Get the guild rules settings
 
-  let guildRulesPath = `./guilds/rules/${guild.id}.json`;
+  let dbGuildRules = await collections.guildRules.findOne({
+    guild_id: guild.id,
+  });
 
-  let guildRulesData = {
-    wordFilter: true,
-    nsfwFilter: true,
-  };
-
-  if (fs.existsSync(guildRulesPath)) {
-    guildRulesData = JSON.parse(fs.readFileSync(guildRulesPath, "utf-8"));
-  }
-
-  function save() {
-    fs.writeFileSync(guildRulesPath, JSON.stringify(guildRulesData));
-  }
-
-  if (!fs.existsSync(guildRulesPath)) save();
   let rule = interaction.options.getSubcommand();
 
-  if (rule === "nsfw-filter") {
-    guildRulesData.nsfwFilter = !guildRulesData.nsfwFilter;
+  if (!dbGuildRules) {
+    await collections.guildRules.insertOne({
+      guild_id: guild.id,
+      nsfwFilter: false,
+      wordFilter: false,
+    });
 
-    save();
+    dbGuildRules = await collections.guildRules.findOne({ guild_id: guild.id });
+  }
+
+  if (rule === "nsfw-filter") {
+    let data = dbGuildRules;
+
+    data.nsfwFilter = !data.nsfwFilter;
+
+    await collections.guildRules.updateOne(
+      { guild_id: guild.id },
+      { $set: { nsfwFilter: data.nsfwFilter } }
+    );
 
     interaction.reply(
       sentences.ruleCommand["nsfw-filter-text"].replace(
         "$1",
-        guildRulesData.nsfwFilter
+        data.nsfwFilter
           ? sentences.words["enabled"]
           : sentences.words["disabled"]
       )
     );
   } else if (rule === "word-filter") {
-    guildRulesData.wordFilter = !guildRulesData.wordFilter;
+    let data = dbGuildRules;
 
-    save();
+    data.wordFilter = !data.wordFilter;
+
+    await collections.guildRules.updateOne(
+      { guild_id: guild.id },
+      { $set: { wordFilter: data.wordFilter } }
+    );
 
     interaction.reply(
       sentences.ruleCommand["word-filter-text"].replace(
         "$1",
-        guildRulesData.wordFilter
+        data.wordFilter
           ? sentences.words["enabled"]
           : sentences.words["disabled"]
       )

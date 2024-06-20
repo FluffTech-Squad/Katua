@@ -5,8 +5,8 @@ const {
   ChannelType,
   BaseGuildTextChannel,
 } = require("discord.js");
-const fs = require("fs");
 const langs = require("../utils/langs.js");
+const { collections } = require("../utils/mongodb.js");
 
 module.exports =
   /**
@@ -23,50 +23,67 @@ module.exports =
 
     let langData = langs[lang];
 
-    let logsChannel = interaction.options.getChannel("channel", true);
+    let logsChannel = interaction.options.getChannel("channel", true, [
+      ChannelType.GuildText,
+    ]);
+
     let informMembersChannel =
-      interaction.options.getChannel("public-channel") || null;
+      interaction.options.getChannel("public-channel", false, [
+        ChannelType.GuildText,
+      ]) || null;
+
+    let preventMembers = interaction.options.getString("prevent-members");
 
     // Tell if the bot don't have the permission to send messages in the channel
 
-    if (logsChannel.isTextBased()) {
-      if (!logsChannel.permissionsFor(botMember).has("SendMessages")) {
+    if (!logsChannel.permissionsFor(botMember).has("SendMessages")) {
+      return interaction.reply({
+        content: langData.cannotSend.replace("$1", logsChannel),
+        ephemeral: true,
+      });
+    }
+
+    if (informMembersChannel !== null || informMembersChannel !== undefined) {
+      if (!informMembersChannel.permissionsFor(botMember).has("SendMessages")) {
         return interaction.reply({
-          content: langData.cannotSend.replace("$1", logsChannel),
+          content: langData.cannotSend.replace("$1", informMembersChannel),
           ephemeral: true,
         });
       }
     }
 
-    if (informMembersChannel !== null && informMembersChannel !== undefined) {
-      if (informMembersChannel instanceof BaseGuildTextChannel) {
-        if (
-          !informMembersChannel.permissionsFor(botMember).has("SendMessages")
-        ) {
-          return interaction.reply({
-            content: langData.cannotSend.replace("$1", informMembersChannel),
-            ephemeral: true,
-          });
-        }
-      }
-    }
+    let dbGuild = await collections.guilds.findOne({ guild_id: guild.id });
 
-    let preventMembers =
-      interaction.options.getString("prevent-members") || "false";
-
-    let guildsFolder = __dirname.replace("interactions", "guilds");
-    let guildFilePath = `${guildsFolder}/${guild.id}.json`;
-
-    fs.writeFileSync(
-      guildFilePath,
-      JSON.stringify({
+    if (!dbGuild) {
+      await collections.guilds.insertOne({
+        guild_id: guild.id,
         log_channel_id: logsChannel.id,
         prevent_members: preventMembers === "true" ? true : false,
         inform_members_channel_id: informMembersChannel
           ? informMembersChannel.id
           : null,
-      })
-    );
+      });
+
+      dbGuild = await collections.guilds.findOne({ guild_id: guild.id });
+    } else {
+      await collections.guilds.updateOne(
+        { guild_id: guild.id },
+        {
+          $set: {
+            log_channel_id: logsChannel.id,
+            prevent_members:
+              preventMembers === null
+                ? preventMembers
+                : preventMembers === "true"
+                ? true
+                : false,
+            inform_members_channel_id: informMembersChannel
+              ? informMembersChannel.id
+              : null,
+          },
+        }
+      );
+    }
 
     // Find for the first sendable text channel
 

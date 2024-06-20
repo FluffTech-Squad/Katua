@@ -2,8 +2,8 @@
 
 const { Guild, EmbedBuilder } = require("discord.js");
 let langs = require("../utils/langs.js");
-const fs = require("fs");
 const isPremium = require("../utils/isPremium.js");
+const { collections } = require("../utils/mongodb.js");
 
 module.exports =
   /**
@@ -19,20 +19,10 @@ module.exports =
 
     // Send a message to the owner to inform them about the bot
 
-    // let invites = await guild.invites.fetch();
-
-    // if (invites.size === 0) {
-    //   guild.invites.create(
-    //     guild.channels.cache.filter((ch) => ch.isTextBased()).first(),
-    //     { maxUses: 1, unique: true, targetUser: owner, reason: "Bot join" }
-    //   );
-    // }
-
     let embed = new EmbedBuilder()
       .setAuthor({
         name: guild.name,
         iconURL: guild.iconURL(),
-        // url: await guild.invites.fetch().then((invites) => invites.first().url),
       })
       .setTitle(sentences.botJoinTitle)
       .setDescription(sentences.botJoinText)
@@ -73,24 +63,15 @@ module.exports =
 
     // Setup config for the guild
 
-    let guildsFolder = __dirname.replace("events", "guilds");
-
-    if (!fs.existsSync(guildsFolder)) fs.mkdirSync(guildsFolder);
-
-    let guildFilePath = `${guildsFolder}/${guild.id}.json`;
-
-    let guildsRulesFolder = `${guildsFolder}/rules`;
-
-    if (!fs.existsSync(guildsRulesFolder)) fs.mkdirSync(guildsRulesFolder);
-
-    let guildRulesFile = `${guildsRulesFolder}/${guild.id}.json`;
-
-    fs.writeFileSync(guildFilePath, JSON.stringify({}));
-    fs.writeFileSync(
-      guildRulesFile,
-      JSON.stringify({
+    await collections.guilds.insertOne({
+      guild_id: guild.id,
+      assistant: process.env.OPENAI_ASSISTANT_ID,
+    });
+    await collections.guildRules.insertOne({
+      guild_id: guild.id,
+      rules: {
         "nsfw-filter": true,
         "word-filter": false,
-      })
-    );
+      },
+    });
   };

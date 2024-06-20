@@ -13,13 +13,14 @@ const analyser = require("../utils/analyser");
 const { getMemberThread } = require("../utils/openai");
 
 const langs = require("../utils/langs.js");
+const { collections } = require("../utils/mongodb.js");
 
 module.exports =
   /**
    *
    * @param {ChatInputCommandInteraction} interaction
    */
-  async (interaction) => {
+  async (interaction, execute = false) => {
     let lang = interaction.guild.preferredLocale || "en-US";
     let sentences = langs[lang] || langs["en-US"];
 
@@ -30,19 +31,19 @@ module.exports =
     const member = interaction.guild.members.cache.get(user.id);
 
     if (!user)
-      return interaction.reply({
+      return interaction[execute ? "editReply" : "reply"]({
         content: sentences.noUserAnalyse,
         ephemeral: true,
       });
 
     if (!member)
-      return interaction.reply({
+      return interaction[execute ? "editReply" : "reply"]({
         content: sentences.noMember,
         ephemeral: true,
       });
 
     // Check if the user is a bot
-    if (user.bot) {
+    if (!execute && user.bot) {
       return interaction.reply({
         content: sentences.cannotBots,
         ephemeral: true,
@@ -70,7 +71,7 @@ module.exports =
 
     let actionRow = new ActionRowBuilder().addComponents(explanationButton);
 
-    let message = await interaction.reply({
+    let message = await interaction[execute ? "editReply" : "reply"]({
       content: sentences.apiStart,
       components: [actionRow],
     });
@@ -85,6 +86,12 @@ module.exports =
     let createdAtDay = createdAt.getDate();
     let createdAtMonth = createdAt.getMonth() + 1;
     let createdAtYear = createdAt.getFullYear();
+
+    let memberBans = await collections.bans
+      .find({
+        user_id: member.user.id,
+      })
+      .toArray();
 
     let embed = new EmbedBuilder()
       .setTitle(sentences.analysisTitle)
@@ -109,12 +116,16 @@ module.exports =
           value: `${createdAtDay}/${createdAtMonth}/${createdAtYear}`,
           inline: true,
         },
+        {
+          name: "Total of kicks and bans in other guilds",
+          value: memberBans.length.toString(),
+        },
       ])
       .setTimestamp(interaction.createdTimestamp)
       .setFooter({
         text: `${
           interaction.client.user.username
-        } ${new Date().getFullYear()} `,
+        } - ${new Date().getFullYear()} `,
         iconURL: interaction.client.user.displayAvatarURL(),
       })
       .setThumbnail(user.displayAvatarURL())

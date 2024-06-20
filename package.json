@@ -14,8 +14,8 @@
     "canvas": "^2.11.2",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
+    "mongodb": "^6.7.0",
     "nsfwjs": "^4.1.0",
     "openai": "^4.51.0"
-  },
-  "devDependencies": {}
+  }
 }

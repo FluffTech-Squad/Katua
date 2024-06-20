@@ -66,6 +66,24 @@
       "usages": ["/règles nsfw-filter", "/règles word-filter"],
       "localeName": "règles",
       "localeDescription": "Activer ou désactiver des règles du serveur pour le bot."
+    },
+    "detector-prompt": {
+      "title": "Prompt du détecteur",
+      "description": "Définir le message de prompt pour le détecteur de trolls.",
+      "usage": [
+        "/prompt-détecteur set",
+        "/prompt-détecteur reset",
+        "/prompt-détecteur show"
+      ],
+      "localeName": "prompt-détecteur",
+      "localeDescription": "Définir le message de prompt pour le détecteur de trolls."
+    },
+    "userinfo": {
+      "title": "Informations sur l'utilisateur",
+      "description": "Obtenir des informations sur un utilisateur.",
+      "usage": "/infos @user",
+      "localeName": "infos",
+      "localeDescription": "Obtenir des informations sur un utilisateur."
     }
   },
   "setLogsText": "Ok! J'ai défini le salon de logs sur $1 et $2 l'option prévenir les membres. Si cette option est activée, les membres seront notifiés pour les trolls potentiels dans $3.",

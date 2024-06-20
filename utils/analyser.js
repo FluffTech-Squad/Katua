@@ -1,6 +1,8 @@
 const { GuildMember, ActivityType } = require("discord.js");
 const { openai, getMemberThread } = require("./openai.js");
 let langs = require("./langs.js");
+const getBase64ImageURL = require("./getBase64ImageURL.js");
+
 /**
  *
  * @param {GuildMember} member
@@ -22,6 +24,39 @@ function analyser(member) {
           thread = await openai.threads.create({
             metadata: { guild: guild.id, user: member.user.id },
           });
+        } else {
+          let messages = await openai.threads.messages.list(thread.id);
+
+          for (let message of messages.data) {
+            if (
+              message.metadata &&
+              message.metadata.type &&
+              message.metadata.type === "analysis"
+            ) {
+              // Verify if the user didn't change the profile picture or username
+
+              let changed = false;
+              let { username, user_id, avatar_url } = message.metadata;
+
+              if (username && user_id && avatar_url) {
+                if (username !== member.user.username) changed = true;
+                if (user_id !== member.user.id) changed = true; // This is not necessary lol
+                if (
+                  avatar_url !== member.displayAvatarURL({ extension: "png" })
+                )
+                  changed = true;
+
+                let base64Avatar = await getBase64ImageURL(avatar_url);
+                let base64AvatarMessage = await getBase64ImageURL(avatar_url);
+
+                if (base64Avatar !== base64AvatarMessage) changed = true;
+
+                if (!changed) {
+                  return resolve(message.content[0].text.value);
+                }
+              }
+            }
+          }
         }
 
         let content = "";
@@ -71,6 +106,14 @@ function analyser(member) {
               },
             },
           ],
+          metadata: {
+            type: "user_info",
+            username: member.user.username,
+            user_id: member.user.id,
+            avatar_url:
+              member.displayAvatarURL({ extension: "png" }) ||
+              member.user.displayAvatarURL({ extension: "png" }),
+          },
         });
 
         let run = await openai.threads.runs.createAndPoll(thread.id, {
@@ -82,7 +125,14 @@ function analyser(member) {
           let lastMessage = messages.data[0];
 
           await openai.threads.messages.update(thread.id, lastMessage.id, {
-            metadata: { type: "analysis" },
+            metadata: {
+              type: "analysis",
+              username: member.user.username,
+              user_id: member.user.id,
+              avatar_url:
+                member.displayAvatarURL({ extension: "png" }) ||
+                member.user.displayAvatarURL({ extension: "png" }),
+            },
           });
 
           resolve(lastMessage.content[0].text.value);

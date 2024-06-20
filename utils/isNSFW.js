@@ -22,7 +22,6 @@ async function isNSFW(url) {
 
   if (predictions[0].className === "Neutral") itIs = false;
   if (predictions[0].className === "Drawing") itIs = false;
-  if (predictions[0].className === "Sexy") itIs = false;
 
   return itIs;
 }

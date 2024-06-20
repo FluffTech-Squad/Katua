@@ -36,7 +36,11 @@ module.exports =
     let now = Date.now();
     let command = commands.get(interaction.commandName);
 
-    if (!command) return;
+    if (!command)
+      return interaction.reply({
+        content: langs[lang].interactionError,
+        ephemeral: true,
+      });
 
     try {
       await command(interaction, now);

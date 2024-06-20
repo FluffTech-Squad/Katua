@@ -10,16 +10,11 @@ const {
   ActivityType,
   SlashCommandBuilder,
 } = require("discord.js");
-const {
-  openai,
-  getCreditsLeft,
-  clearThreads,
-  getThreadList,
-  getMemberThread,
-  isMemberValid,
-} = require("../utils/openai.js");
+
+const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
 const langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium.js");
+const { collections } = require("../utils/mongodb.js");
 
 /**
  * @type {Map<string, SlashCommandBuilder>}
@@ -82,29 +77,28 @@ module.exports =
 
     // Update credits, 5 requests per min rate limit
 
-    // setInterval(async () => {
-    //   let newCredits = await getCreditsLeft();
+    setInterval(async () => {
+      let newCredits = await getCreditsLeft();
 
-    //   if (
-    //     !(
-    //       credits.available === newCredits.available &&
-    //       credits.paidBalance === credits.paidBalance
-    //     )
-    //   ) {
-    //     credits = newCredits;
-    //     console.log(
-    //       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    //     );
-    //   }
-    // }, 30000);
+      if (
+        !(
+          credits.available === newCredits.available &&
+          credits.paidBalance === credits.paidBalance
+        )
+      ) {
+        credits = newCredits;
+        console.log(
+          `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+        );
+      }
+    }, 70000);
 
     // Update Presence Function
     async function updatePresence() {
       let guilds = await client.guilds.fetch();
-      let banCountFile = fs.readFileSync(
-        __dirname.replace("events", "ban_count.txt"),
-        "utf-8"
-      );
+
+      let bans = await collections.bans.find({}).toArray();
+      let banCount = bans.length;
 
       // Fetch guilds having premium
       let premiumGuildsCount = 0;
@@ -122,7 +116,7 @@ module.exports =
       let presences = [
         {
           name: `${guilds.size} server${guilds.size > 1 ? "s" : ""} | /help`,
-          state: `${banCountFile} trolls removed in total.`,
+          state: `${banCount} trolls removed in total.`,
           type: ActivityType.Watching,
         },
         {
@@ -141,7 +135,7 @@ module.exports =
         },
         {
           name: `DM me for support.`,
-          state: `${banCountFile} trolls removed in total.`,
+          state: `${banCount} trolls removed in total.`,
           type: ActivityType.Watching,
         },
       ];
@@ -187,13 +181,6 @@ module.exports =
       await rest.put(
         Routes.applicationGuildCommands(client.user.id, guild.id),
         {
-          body: [],
-        }
-      );
-
-      await rest.put(
-        Routes.applicationGuildCommands(client.user.id, guild.id),
-        {
           body: cmds,
         }
       );
@@ -206,14 +193,14 @@ module.exports =
         let arrayCommands = Array.from(commands);
 
         for (const [name, command] of arrayCommands) {
-          console.log(`Loading /${name} command...`);
+          console.log(`Command load: /${name} command.`);
         }
 
         let guilds = await client.guilds.fetch();
 
-        await rest.put(Routes.applicationCommands(client.user.id), {
-          body: [],
-        });
+        // await rest.put(Routes.applicationCommands(client.user.id), {
+        //   body: [],
+        // });
 
         for (let [id, guild] of guilds) {
           let fetchedGuild = await guild.fetch();

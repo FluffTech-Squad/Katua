@@ -1,8 +1,8 @@
 // Event when the bot leaves a guild
 
 const { Guild } = require("discord.js");
-const fs = require("fs");
 const isPremium = require("../utils/isPremium");
+const { collections } = require("../utils/mongodb");
 
 module.exports =
   /**
@@ -11,19 +11,6 @@ module.exports =
   async (guild) => {
     console.log("Guild left: ", guild.name, `(${guild.id})`);
 
-    if (!(await isPremium(guild))) return;
-
-    let guildsFolder = __dirname.replace("events", "guilds");
-    let guildFilePath = `${guildsFolder}/${guild.id}.json`;
-
-    let guildsRulesFolder = `${guildsFolder}/rules`;
-    let guildRulesFile = `${guildsRulesFolder}/${guild.id}.json`;
-
-    if (fs.existsSync(guildFilePath)) {
-      fs.rmSync(guildFilePath);
-    }
-
-    if (fs.existsSync(guildRulesFile)) {
-      fs.rmSync(guildRulesFile);
-    }
+    await collections.guilds.deleteOne({ guild_id: guild.id });
+    await collections.guildRules.deleteOne({ guild_id: guild.id });
   };
