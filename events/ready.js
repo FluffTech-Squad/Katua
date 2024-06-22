@@ -1,7 +1,6 @@
 const fs = require("fs");
 
 const {
-  REST,
   Routes,
   Client,
   ActivityType,
@@ -12,6 +11,9 @@ const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
 const langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium.js");
 const { collections } = require("../utils/mongodb.js");
+const rest = require("../utils/rest.js");
+
+const serverHandler = require("../app/server.js");
 
 /**
  * @type {Map<string, SlashCommandBuilder>}
@@ -44,18 +46,18 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
+    await serverHandler(client);
     // await clearThreads();
 
     let credits = await getCreditsLeft();
 
     let guilds = await client.guilds.fetch();
+
     let guildsText = "Guilds: \n";
 
     for (let [id, guild] of guilds) {
       guildsText += `- ${guild.name} (${id}) \n`;
     }
-
-    console.log(guildsText);
 
     let presenceIndex = 0;
 
@@ -93,22 +95,34 @@ module.exports =
         }
       }
 
-      // Fetch guilds not having premium
+      // Determine which guild the bot joined lastly
 
-      let nonPremiumGuildsCount = guilds.size - premiumGuildsCount;
-      let lastJoinedGuild = guilds.last();
+      let lastJoinedGuildDoc = (await collections.guilds.find().toArray()).at(
+        -1
+      );
+
+      let lastJoinedGuild = await client.guilds.fetch(
+        lastJoinedGuildDoc.guild_id
+      );
 
       let presences = [
         {
           name: `${guilds.size} guild${guilds.size > 1 ? "s" : ""} | /help`,
           state: `${banCount} trolls removed with human confirmation`,
           type: ActivityType.Watching,
-          ms: 11000,
+          ms: 15000,
         },
         {
           name: `Global credits: $${credits.available} / $${credits.paidBalance}`,
           type: ActivityType.Custom,
-          ms: 9000,
+          ms: 4000,
+        },
+        {
+          name: `Last invite: ${
+            lastJoinedGuild ? lastJoinedGuild.name : "None"
+          }. Enjoy!`,
+          type: ActivityType.Custom,
+          ms: 3000,
         },
         {
           name: `${premiumGuildsCount} / ${guilds.size} premium guild${
@@ -117,14 +131,16 @@ module.exports =
           type: ActivityType.Custom,
         },
         {
-          name: `Get support by DMing me!`,
-          state: `Issues? Bugs? Suggestions? Or Premium requests?`,
+          name: `support: DM me!`,
+          state: `Issues? Suggestions?`,
           type: ActivityType.Watching,
-          ms: 11000,
+          ms: 1000,
         },
         {
-          name: `Last invite: ${lastJoinedGuild.name}. Enjoy!`,
-          type: ActivityType.Custom,
+          name: `support: DM me!`,
+          state: `Questions? Premium Request?`,
+          type: ActivityType.Watching,
+          ms: 1000,
         },
       ];
 
@@ -148,14 +164,12 @@ module.exports =
       }
     }, presences[presenceIndex].ms || 6000);
 
-    const rest = new REST().setToken(client.token);
-
     async function updateCommands(guild) {
       let cmds = [];
 
       for (let [name, command] of commands) {
         let lang = guild.preferredLocale || "en-US";
-        let lg = langs[lang];
+        let lg = langs[lang] || langs["en-US"];
         let c = command
           .setNameLocalization(lang, lg.helpCommands[name].localeName)
           .setDescriptionLocalization(
@@ -174,7 +188,6 @@ module.exports =
       );
     }
 
-    console.clear();
     console.log(`_______________      _______________       ______  ___     _________
 ___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
 __  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
@@ -182,6 +195,7 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
 /_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
                                     /____/`);
     console.log(`Logged in as ${client.user.username}`);
+    console.log(guildsText);
     console.log(
       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
     );
@@ -247,6 +261,8 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
       await updateCommands(guild);
 
       // Set a presence to say thank you the user (guild) for adding the bot
+
+      guilds = await client.guilds.fetch();
 
       guild.client.user.setPresence({
         status: "online",

@@ -1,6 +1,5 @@
 const { GuildBan } = require("discord.js");
 const { getMemberThread, isMemberValid } = require("../utils/openai");
-const fs = require("fs");
 const { collections } = require("../utils/mongodb");
 
 /**

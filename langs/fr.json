@@ -93,7 +93,11 @@
     "valid": "valide",
     "enabled": "activé",
     "disabled": "désactivé",
-    "messageDeleted": "Message Supprimé"
+    "messageDeleted": "Message Supprimé",
+    "defaultSettings": "Paramètres par défaut",
+    "language": "Langue",
+    "continue": "Continuer",
+    "cancel": "Annuler"
   },
   "cannotSend": "Je n'ai pas la permission d'envoyer des messages dans le salon $1. Veuillez vous assurer que j'ai les bonnes permissions.",
   "userSaid": "L'utilisateur $1 a dit dans le salon $2: \"$3\".",
@@ -104,5 +108,7 @@
   },
   "nsfwMessage": "Le message de $1 a été supprimé dans le salon $2 car il contient du contenu NSFW.",
   "nsfwAuthorMessage": "Votre message a été supprimé dans le salon $1 car il contient du contenu NSFW. Veuillez ne pas envoyer de contenu NSFW dans ce serveur. Merci!",
-  "premiumWhitelistJoin": "Quelle chance ! Votre serveur $1 a déjà été inscrit sur la liste blanche pour les fonctionnalités premium. La détection des trolls est activée sur votre serveur. Profitez-en ! 🎉"
+  "premiumWhitelistJoin": "Quelle chance ! Votre serveur $1 a déjà été inscrit sur la liste blanche pour les fonctionnalités premium. La détection des trolls est activée sur votre serveur. Profitez-en ! 🎉",
+  "setupTitle": "Voulez vous configurer FluffyMod ?",
+  "setupBotConfirmLabel": "Oui, configurer le bot"
 }

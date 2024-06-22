@@ -43,6 +43,10 @@ module.exports =
       });
 
     try {
+      console.log(
+        `${interaction.user.username} (${interaction.user.id}) ran ${interaction.commandName}; Guild: ${interaction.guild.name} (${interaction.guild.id})`
+      );
+
       await command(interaction, now);
     } catch (error) {
       console.error(error);

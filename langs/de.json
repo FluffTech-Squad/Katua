@@ -93,7 +93,11 @@
     "valid": "gültig",
     "enabled": "aktiviert",
     "disabled": "deaktiviert",
-    "messageDeleted": "Nachricht gelöscht"
+    "messageDeleted": "Nachricht gelöscht",
+    "defaultSettings": "Standard-Einstellungen",
+    "language": "Sprache",
+    "continue": "Fortsetzen",
+    "cancel": "Abbrechen"
   },
   "cannotSend": "Ich habe nicht die Berechtigung, Nachrichten im $1 -Kanal zu senden. Bitte stellen Sie sicher, dass ich die richtigen Berechtigungen habe.",
   "userSaid": "Der Benutzer $1 sagte im Kanal $2: \"$3\".",
@@ -104,5 +108,7 @@
   },
   "nsfwMessage": "Die Nachricht von $1 wurde im Kanal $2 gelöscht, da sie NSFW-Inhalte enthält.",
   "nsfwAuthorMessage": "Ihre Nachricht wurde im Kanal $1 gelöscht, da sie NSFW-Inhalte enthält. Bitte senden Sie keine NSFW-Inhalte in diesem Server. Danke!",
-  "premiumWhitelistJoin": "Was für ein Glück! Ihr Server $1 ist bereits für die Premium-Funktionen whitelisted worden. Die Trollerkennung ist auf Ihrem Server aktiviert. Viel Spaß! 🎉"
+  "premiumWhitelistJoin": "Was für ein Glück! Ihr Server $1 ist bereits für die Premium-Funktionen whitelisted worden. Die Trollerkennung ist auf Ihrem Server aktiviert. Viel Spaß! 🎉",
+  "setupTitle": "Möchten Sie FluffyMod einrichten?",
+  "setupBotConfirmLabel": "Ja, den Bot einrichten"
 }

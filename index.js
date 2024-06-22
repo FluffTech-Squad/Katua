@@ -10,8 +10,9 @@
 // FluffyMod is a AI-powered moderator Discord Bot to analyse joining members' profile to make furry servers safer.
 // Created by: nekomancer0
 
+console.clear();
+
 const fs = require("fs");
-const AdmZip = require("adm-zip");
 
 // Create a log file per date
 let date = new Date();
@@ -24,6 +25,7 @@ let formattedDate = `${date.getFullYear()}-${
 let logsFolder = `${__dirname}/logs`;
 let logFilePath = `${logsFolder}/${formattedDate}.log`;
 
+// Write the log file
 process.stdout.write = (function (write) {
   return function (string, encoding, fd) {
     write.apply(process.stdout, arguments);
@@ -37,6 +39,22 @@ process.stdout.write = (function (write) {
     writeStream.end();
   };
 })(process.stdout.write);
+
+// Do the same for the error output
+
+process.stderr.write = (function (write) {
+  return function (string, encoding, fd) {
+    write.apply(process.stderr, arguments);
+
+    let writeStream = fs.createWriteStream(logFilePath, {
+      flags: "a",
+    });
+
+    writeStream.write(string);
+
+    writeStream.end();
+  };
+})(process.stderr.write);
 
 // Importing the discord.js module
 
@@ -61,7 +79,7 @@ const client = new Discord.Client({
 require("dotenv").config();
 require("./utils/mongodb.js");
 
-const token = process.env.TOKEN;
+let token = require("./utils/token.js");
 
 client.on("ready", require("./events/ready.js"));
 

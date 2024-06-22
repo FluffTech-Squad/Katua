@@ -93,7 +93,11 @@
     "valid": "valid",
     "enabled": "enabled",
     "disabled": "disabled",
-    "messageDeleted": "Message Deleted"
+    "messageDeleted": "Message Deleted",
+    "defaultSettings": "Default settings",
+    "language": "Language",
+    "continue": "Continue",
+    "cancel": "Cancel"
   },
   "cannotSend": "I don't have the permission to send messages in the $1 channel. Please make sure I have the right permissions.",
   "userSaid": "The user $1 said in the channel $2: \"$3\".",
@@ -104,5 +108,7 @@
   },
   "nsfwMessage": "Message of $1 has been deleted in the channel $2 because it contains NSFW content.",
   "nsfwAuthorMessage": "Your message has been deleted in the channel $1 because it contains NSFW content. Please do not send NSFW content in this server. Thank you!",
-  "premiumWhitelistJoin": "What a luck! Your server $1 has already been whitelisted for the premium features. Troll detection is activated in your server. Enjoy! 🎉"
+  "premiumWhitelistJoin": "What a luck! Your server $1 has already been whitelisted for the premium features. Troll detection is activated in your server. Enjoy! 🎉",
+  "setupTitle": "Would you like to setup FluffyMod?",
+  "setupBotConfirmLabel": "Yes, setup please"
 }
