@@ -30,58 +30,42 @@
     "help": {
       "title": "Hilfe",
       "description": "Holen Sie sich Hilfe zur Liste der Befehle.",
-      "usage": "/hilfe",
       "localeName": "hilfe",
       "localeDescription": "Holen Sie sich die Liste der Befehle."
     },
     "analyse": {
       "title": "Analysieren",
       "description": "Analysieren Sie einen Benutzer, um zu sehen, ob er ein Troll ist.",
-      "usage": "/analysieren @user",
       "localeName": "analysieren",
       "localeDescription": "Analysieren Sie das Profil eines verdächtigen Benutzers."
     },
     "ping": {
       "title": "Ping",
       "description": "Überprüfen Sie die Latenz des Bots.",
-      "usage": "/ping",
       "localeName": "ping",
       "localeDescription": "Überprü fen Sie die Latenz des Bots."
     },
     "set-logs": {
       "title": "Log-Kanal festlegen",
       "description": "Legen Sie den Log-Kanal für den Bot fest, wenn ein Benutzer dem Server beitritt, um benachrichtigt und sein Profil analysiert zu werden.",
-      "usages": [
-        "/logs-festlegen #kanal",
-        "/logs-festlegen #kanal prevent-members: true",
-        "/logs-festlegen #kanal prevent-members: false",
-        "/logs-festlegen #kanal prevent-members: true #public-channel"
-      ],
       "localeName": "logs-festlegen",
       "localeDescription": "Legen Sie den Log-Kanal für den Bot fest."
     },
     "rules": {
       "title": "Serverregeln festlegen",
       "description": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot.",
-      "usages": ["/regeln nsfw-filter", "/regeln word-filter"],
       "localeName": "regeln",
       "localeDescription": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot."
     },
     "detector-prompt": {
       "title": "Detector Prompt",
       "description": "Manage the detector prompt to detect unsafe contents in the server.",
-      "usages": [
-        "/detector-prompt set",
-        "/detector-prompt reset",
-        "/detector-prompt show"
-      ],
       "localeName": "detector-prompt",
       "localeDescription": "Manage the detector prompt to detect unsafe contents in the server."
     },
     "userinfo": {
       "title": "Benutzerinfo",
       "description": "Zeigen Sie Informationen über einen Benutzer an.",
-      "usage": "/benutzerinfo @user",
       "localeName": "benutzerinfo",
       "localeDescription": "Zeigen Sie Informationen über einen Benutzer an."
     }

@@ -24,12 +24,12 @@
   "notInvalidTitle": "Not suspicious.",
   "memberReport": "*Some words to say that $1 might be a troll. If any deranged messages, ping moderators.*",
   "botJoinTitle": "FluffyMod is there to help!",
-  "botJoinText": "Hello! I am FluffyMod, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help`.",
+  "botJoinText": "Hello! I am FluffyMod, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help` in your server`.",
   "noDM": "This command can only be used in a server.",
   "helpCommands": {
     "help": {
       "title": "Help",
-      "description": "Get help the list of commands.",
+      "description": "Get the list of commands.",
       "usage": "/help",
       "localeName": "help",
       "localeDescription": "Get the list of commands."

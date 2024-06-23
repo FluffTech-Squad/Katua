@@ -12,6 +12,7 @@ const langs = require("../utils/langs");
 const { getMemberThread } = require("../utils/openai");
 const { collections } = require("../utils/mongodb");
 const isPremium = require("../utils/isPremium");
+const { userEmbed } = require("../utils/embedFactory");
 
 // Analysing member profile and determine if it's a troll/anti-furry or not.
 
@@ -55,17 +56,25 @@ module.exports =
         })
         .toArray();
 
-      let embed = new EmbedBuilder()
+      let guilds = await member.client.guilds.fetch();
+
+      let commonGuildCounts = 0;
+
+      for (let [, guild] of guilds) {
+        let fetchedGuild = await guild.fetch();
+
+        let guildMember = await fetchedGuild.members.fetch(member.user.id);
+
+        if (guildMember) commonGuildCounts++;
+      }
+
+      let embed = userEmbed(member.user)
         .setTitle(sentences.suspicionTitle)
-        .setAuthor({
-          name: member.user.username,
-          iconURL: member.user.displayAvatarURL(),
-        })
         .setDescription(sentences.waitReport)
         .addFields([
           {
             name: sentences.commonGuildsLabel,
-            value: guilds.size.toString(),
+            value: commonGuildCounts.toString(),
             inline: true,
           },
           {
@@ -84,20 +93,11 @@ module.exports =
             inline: true,
           },
         ])
-        .setTimestamp(Date.now())
-        .setFooter({
-          text: `${
-            interaction.client.user.username
-          } ${new Date().getFullYear()} `,
-          iconURL: interaction.client.user.displayAvatarURL(),
-        })
-        .setThumbnail(member.user.displayAvatarURL())
-        .setColor("Grey")
-        .setImage(member.user.bannerURL() || null);
+        .setColor("Grey");
 
       let message = await log_channel.send({ embeds: [embed] });
 
-      if (!(await isPremium(message.guild))) {
+      if (!(await isPremium(member.guild))) {
         embed.setDescription(sentences.notPremiumText).setColor("Gold");
 
         message.edit({ embeds: [embed] });

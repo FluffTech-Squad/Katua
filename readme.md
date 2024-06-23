@@ -4,57 +4,54 @@
 
 ## Commands
 
-### help
+## `analyse`
 
-Get the list of commands.
+Analyse a suspicious user's profile.
 
-**Usage**: `/help`
+**Usages:**
+`/analyse <@user>`
 
-### analyse
+## `config`
 
-Analyse a user to see if they are a troll.
+Configure the bot for your guild.
 
-**Usage**: `/analyse @user`
+**Usages:**
+`/config logs log-channel <#channel>`
+`/config logs public-channel <#channel>`
+`/config logs enable <type>`
+`/config logs disable <type>`
+`/config filters enable <filter>`
+`/config filters disable <filter>`
 
-### ping
+## `detector-prompt`
 
-Check the bot's latency.
-
-**Usage**: `/ping`
-
-### set-log
-
-Set the log channel for the bot when a user joins the server to be notified and analyse their profile.
-
-**Usage**:
-`/set-logs #channel`
-`/set-logs #channel prevent-members: true`
-`/set-logs #channel prevent-members: false`
-`/set-logs #channel prevent-members: true #public-channel`
-
-### rules
-
-Enable or disable the server rules for the bot.
-
-**Usage**:
-`/rules nsfw-filter`
-`/rules word-filter`
-
-### detector-prompt
-
-_(Not available yet)_
 Manage the detector prompt to detect unsafe contents in the server.
 
-**Usage**:
+**Usages:**
 `/detector-prompt set`
 `/detector-prompt reset`
 `/detector-prompt show`
 
-### userinfo
+## `help`
+
+Get list of commands.
+
+**Usages:**
+`help`
+
+## `ping`
+
+Check the bot's latency.
+
+**Usages:**
+`ping`
+
+## `userinfo`
 
 Get information about a user.
 
-**Usage**: `/userinfo @user`
+**Usages:**
+`/userinfo <@user>`
 
 ## Features
 

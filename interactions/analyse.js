@@ -52,9 +52,17 @@ module.exports =
 
     // List the guilds the user is in where the bot is in
 
-    const guilds = interaction.client.guilds.cache.filter((guild) =>
-      guild.members.cache.has(user.id)
-    );
+    let guilds = await member.client.guilds.fetch();
+
+    let commonGuildCounts = 0;
+
+    for (let [, guild] of guilds) {
+      let fetchedGuild = await guild.fetch();
+
+      let guildMember = await fetchedGuild.members.fetch(member.user.id);
+
+      if (guildMember) commonGuildCounts++;
+    }
 
     // Generate explanation button interaction
 
@@ -103,7 +111,7 @@ module.exports =
       .addFields([
         {
           name: sentences.commonGuildsLabel,
-          value: guilds.size.toString(),
+          value: commonGuildCounts.toString(),
           inline: true,
         },
         {

@@ -9,7 +9,6 @@ const {
 
 const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
 const langs = require("../utils/langs.js");
-const isPremium = require("../utils/isPremium.js");
 const { collections } = require("../utils/mongodb.js");
 const rest = require("../utils/rest.js");
 
@@ -51,11 +50,18 @@ module.exports =
 
     let credits = await getCreditsLeft();
 
-    let guilds = await client.guilds.fetch();
+    await client.guilds.fetch();
+
+    let sortedGuilds = client.guilds.cache.sort((a, b) => {
+      let botA = a.members.me;
+      let botB = b.members.me;
+
+      return botA.joinedTimestamp - botB.joinedTimestamp;
+    });
 
     let guildsText = "Guilds: \n";
 
-    for (let [id, guild] of guilds) {
+    for (let [id, guild] of sortedGuilds) {
       guildsText += `- ${guild.name} (${id}) \n`;
     }
 
@@ -83,27 +89,8 @@ module.exports =
     async function updatePresence() {
       let guilds = await client.guilds.fetch();
 
-      let bans = await collections.bans.find({}).toArray();
+      let bans = await collections.bans.find().toArray();
       let banCount = bans.length;
-
-      // Fetch guilds having premium
-      let premiumGuildsCount = 0;
-
-      for (let [, guild] of guilds) {
-        if (await isPremium(guild)) {
-          premiumGuildsCount++;
-        }
-      }
-
-      // Determine which guild the bot joined lastly
-
-      let lastJoinedGuildDoc = (await collections.guilds.find().toArray()).at(
-        -1
-      );
-
-      let lastJoinedGuild = await client.guilds.fetch(
-        lastJoinedGuildDoc.guild_id
-      );
 
       let presences = [
         {
@@ -116,19 +103,6 @@ module.exports =
           name: `Global credits: $${credits.available} / $${credits.paidBalance}`,
           type: ActivityType.Custom,
           ms: 4000,
-        },
-        {
-          name: `Last invite: ${
-            lastJoinedGuild ? lastJoinedGuild.name : "None"
-          }. Enjoy!`,
-          type: ActivityType.Custom,
-          ms: 3000,
-        },
-        {
-          name: `${premiumGuildsCount} / ${guilds.size} premium guild${
-            guilds.size > 1 ? "s" : ""
-          }`,
-          type: ActivityType.Custom,
         },
         {
           name: `support: DM me!`,
@@ -170,14 +144,19 @@ module.exports =
       for (let [name, command] of commands) {
         let lang = guild.preferredLocale || "en-US";
         let lg = langs[lang] || langs["en-US"];
-        let c = command
-          .setNameLocalization(lang, lg.helpCommands[name].localeName)
-          .setDescriptionLocalization(
-            lang,
-            lg.helpCommands[name].localeDescription
-          );
 
-        cmds.push(c.toJSON());
+        if (!lg.helpCommands[name]) {
+          console.log(`Command ${name} doesn't have locales.`);
+        } else {
+          command = command
+            .setNameLocalization(lang, lg.helpCommands[name].localeName)
+            .setDescriptionLocalization(
+              lang,
+              lg.helpCommands[name].localeDescription
+            );
+        }
+
+        cmds.push(command.toJSON());
       }
 
       await rest.put(

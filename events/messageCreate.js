@@ -13,6 +13,7 @@ const isNSFW = require("../utils/isNSFW");
 
 const { EmbedBuilder, Message, ChannelType } = require("discord.js");
 const { collections } = require("../utils/mongodb.js");
+const { userEmbed } = require("../utils/embedFactory.js");
 
 /**
  * @param {Message} message
@@ -43,14 +44,9 @@ module.exports = async (message) => {
         (ch) => ch.name === message.author.id
       );
 
-      let embed = new EmbedBuilder()
-        .setAuthor({
-          name: message.author.username,
-          iconURL: message.author.displayAvatarURL(),
-        })
+      let embed = userEmbed(message.author)
         .setTitle("Message")
-        .setDescription(message.content)
-        .setColor("Blue");
+        .setDescription(message.content);
 
       if (!userChannel) {
         let embedFirstTime = new EmbedBuilder()
@@ -98,14 +94,9 @@ module.exports = async (message) => {
     );
 
     if (userChannel && userChannel.id === message.channel.id) {
-      let embed = new EmbedBuilder()
-        .setAuthor({
-          name: message.author.username,
-          iconURL: message.author.displayAvatarURL(),
-        })
+      let embed = userEmbed(message.author)
         .setTitle("Response")
-        .setDescription(message.content)
-        .setColor("Blue");
+        .setDescription(message.content);
 
       let userNeedingHelp = await message.client.users.fetch(userChannel.name);
 
@@ -154,7 +145,7 @@ module.exports = async (message) => {
         }
 
         if (isNsfw) {
-          let embed = new EmbedBuilder()
+          let embed = userEmbed(message.author)
             .setTitle(sentences.words.messageDeleted)
             .setColor("Red")
             .setDescription(
@@ -204,7 +195,7 @@ module.exports = async (message) => {
   thread = await findThread();
   valid = await isMemberValid(thread);
 
-  let embed = new EmbedBuilder()
+  let embed = userEmbed(message.author)
     .setTitle(sentences.words.messageDeleted)
     .setDescription(
       sentences.userSaid
