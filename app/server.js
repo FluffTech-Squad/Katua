@@ -1,4 +1,4 @@
-const { Client, GuildMember } = require("discord.js");
+const { Client, GuildMember, TextChannel } = require("discord.js");
 const express = require("express");
 const { collections, db } = require("../utils/mongodb");
 const { userEmbed } = require("../utils/embedFactory");
@@ -47,8 +47,6 @@ async function serverHandler(discordClient) {
       },
     });
 
-    console.log(response.data);
-
     let dbUser = await collections.users.findOne({ user_id: user });
 
     if (!dbUser) {
@@ -95,7 +93,34 @@ async function serverHandler(discordClient) {
       }.`
     );
 
-    member.send({ embeds: [embed] });
+    try {
+      await member.send({ embeds: [embed] });
+    } catch {}
+
+    /**
+     * @type {TextChannel}
+     */
+    let votesChannel = await discordClient.channels.fetch(
+      process.env.VOTE_CHANNEL_ID
+    );
+    votesChannel.send({
+      content: `${member.user} voted for ${bot}!`,
+      embeds: [
+        userEmbed(member.user)
+          .setTitle("Vote")
+          .setDescription(`Thanks for voting, <@${user}>`)
+          .addField(
+            "Gold Shards",
+            `They now have ${dbUser.gold_shards} gold shard${
+              dbUser.gold_shards > 1 ? "s" : ""
+            }.`
+          )
+          .addField(
+            "Premium",
+            `They can now give premium for ${premiumHoursToBeAbleToGive} hours.`
+          ),
+      ],
+    });
 
     res.status(200).send("OK");
   });
