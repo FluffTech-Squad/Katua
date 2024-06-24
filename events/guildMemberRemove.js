@@ -1,11 +1,7 @@
 // guildMemberRemove event
 
 const { PartialGuildMember } = require("discord.js");
-const {
-  openai,
-  getMemberThread,
-  isMemberValid,
-} = require("../utils/openai.js");
+const { openai, getUserThread, isMemberValid } = require("../utils/openai.js");
 const { collections } = require("../utils/mongodb.js");
 
 // Deleting member profile file.
@@ -18,9 +14,7 @@ module.exports =
   async (member) => {
     if (member.id === member.client.user.id) return;
 
-    let guild = member.guild;
-
-    let thread = await getMemberThread(guild.id, member.user.id);
+    let thread = await getUserThread(member.user.id);
 
     if (thread) {
       if (!(await isMemberValid(thread))) {

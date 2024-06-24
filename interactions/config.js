@@ -3,7 +3,6 @@
 const {
   ChatInputCommandInteraction,
   ChannelType,
-  EmbedBuilder,
   ButtonBuilder,
   ButtonStyle,
   ComponentType,

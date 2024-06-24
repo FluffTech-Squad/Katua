@@ -1,16 +1,6 @@
 // Event when bot joins a guild
 
-const {
-  Guild,
-  EmbedBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ActionRowBuilder,
-  Message,
-  ChannelType,
-  ChannelSelectMenuBuilder,
-  StringSelectMenuBuilder,
-} = require("discord.js");
+const { Guild, ActionRowBuilder } = require("discord.js");
 let langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium.js");
 const { collections } = require("../utils/mongodb.js");

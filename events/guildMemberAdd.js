@@ -9,10 +9,10 @@ const {
 
 const analyse = require("../utils/analyser");
 const langs = require("../utils/langs");
-const { getMemberThread } = require("../utils/openai");
+const { getUserThread } = require("../utils/openai");
 const { collections } = require("../utils/mongodb");
 const isPremium = require("../utils/isPremium");
-const { userEmbed } = require("../utils/embedFactory");
+const { userEmbed, guildEmbed } = require("../utils/embedFactory");
 
 // Analysing member profile and determine if it's a troll/anti-furry or not.
 
@@ -63,9 +63,14 @@ module.exports =
       for (let [, guild] of guilds) {
         let fetchedGuild = await guild.fetch();
 
-        let guildMember = await fetchedGuild.members.fetch(member.user.id);
+        try {
+          let guildMember = await fetchedGuild.members.fetch({
+            user: member.user,
+            force: true,
+          });
 
-        if (guildMember) commonGuildCounts++;
+          if (guildMember) commonGuildCounts++;
+        } catch (e) {}
       }
 
       let embed = userEmbed(member.user)
@@ -95,106 +100,147 @@ module.exports =
         ])
         .setColor("Grey");
 
-      let message = await log_channel.send({ embeds: [embed] });
+      try {
+        let message = await log_channel.send({ embeds: [embed] });
+        if (!(await isPremium(member.guild))) {
+          embed.setDescription(sentences.notPremiumText).setColor("Gold");
 
-      if (!(await isPremium(member.guild))) {
-        embed.setDescription(sentences.notPremiumText).setColor("Gold");
+          message.edit({ embeds: [embed] });
 
-        message.edit({ embeds: [embed] });
+          return;
+        }
 
-        return;
-      }
+        let result = (await analyse(member)).toLowerCase();
 
-      let result = (await analyse(member)).toLowerCase();
+        if (result === "neutral") {
+          embed
+            .setTitle(sentences.notInvalidTitle)
+            .setDescription(sentences.neutralText)
+            .setColor("Yellow");
 
-      if (result === "neutral") {
-        embed
-          .setTitle(sentences.notInvalidTitle)
-          .setDescription(sentences.neutralText)
-          .setColor("Yellow");
+          message.edit({ embeds: [embed] });
 
-        message.edit({ embeds: [embed] });
+          return;
+        }
 
-        return;
-      }
+        if (result === "valid") {
+          embed
+            .setTitle(sentences.notInvalidTitle)
+            .setDescription(sentences.validText)
+            .setColor("Green");
 
-      if (result === "valid") {
-        embed
-          .setTitle(sentences.notInvalidTitle)
-          .setDescription(sentences.validText)
-          .setColor("Green");
+          message.edit({ embeds: [embed] });
 
-        message.edit({ embeds: [embed] });
+          return;
+        }
 
-        return;
-      }
+        if (result !== "invalid") return;
 
-      if (result !== "invalid") return;
+        if (dbGuild.prevent_members) {
+          // Find for the first sendable text channel
 
-      if (dbGuild.prevent_members) {
-        // Find for the first sendable text channel
-
-        /**
-         * @type {Collection<string, BaseGuildTextChannel>}
-         */
-        let channels = (await guild.channels.fetch()).filter(
-          (channel) =>
-            channel.isTextBased() &&
-            channel.permissionsFor(botMember).has("SendMessages")
-        );
-
-        let firstChannel = channels.first();
-
-        let channel = guild.systemChannel || firstChannel;
-
-        if (dbGuild.inform_members_channel_id) {
-          let inform_channel = await guild.channels.fetch(
-            dbGuild.inform_members_channel_id
+          /**
+           * @type {Collection<string, BaseGuildTextChannel>}
+           */
+          let channels = (await guild.channels.fetch()).filter(
+            (channel) =>
+              channel.isTextBased() &&
+              channel.permissionsFor(botMember).has("SendMessages")
           );
 
-          if (inform_channel && inform_channel.isTextBased()) {
-            inform_channel.send({
+          let firstChannel = channels.first();
+
+          let channel = guild.systemChannel || firstChannel;
+
+          if (dbGuild.inform_members_channel_id) {
+            let inform_channel = await guild.channels.fetch(
+              dbGuild.inform_members_channel_id
+            );
+
+            if (inform_channel && inform_channel.isTextBased()) {
+              inform_channel.send({
+                content: sentences.memberReport.replace("$1", member.user),
+                allowedMentions: { users: [], parse: [] },
+              });
+            }
+          } else {
+            channel.send({
               content: sentences.memberReport.replace("$1", member.user),
               allowedMentions: { users: [], parse: [] },
             });
           }
-        } else {
-          channel.send({
-            content: sentences.memberReport.replace("$1", member.user),
-            allowedMentions: { users: [], parse: [] },
-          });
         }
-      }
 
-      embed.setColor("Red").setTitle(sentences.invalidTitle);
+        embed.setColor("Red").setTitle(sentences.invalidTitle);
 
-      message.edit({ embeds: [embed] });
+        message.edit({ embeds: [embed] });
 
-      let thread = await getMemberThread(guild.id, member.user.id);
+        let thread = await getUserThread(member.user.id);
 
-      if (thread) {
+        if (thread) {
+          try {
+            let explanation = await analyse.askExplanation(
+              thread,
+              lang,
+              "invalid"
+            );
+
+            embed.setDescription(explanation);
+
+            message.edit({
+              embeds: [embed],
+            });
+          } catch (error) {
+            console.error(error);
+
+            embed.setDescription(sentences.apiError);
+            message.edit({
+              embeds: [embed],
+            });
+          }
+        }
+      } catch (e) {
         try {
-          let explanation = await analyse.askExplanation(
-            thread,
-            lang,
-            "invalid"
+          let owner = await guild.fetchOwner();
+          let dmChannel = owner.dmChannel;
+
+          if (!owner.dmChannel) {
+            dmChannel = await owner.createDM();
+          }
+
+          let messages = await dmChannel.messages.fetchPinned();
+
+          let lastMessage = messages.first();
+
+          if (lastMessage && lastMessage.author.id === member.client.user.id) {
+            return;
+          }
+
+          let embed = guildEmbed(guild)
+            .setTitle(sentences.apiError)
+            .setDescription(
+              `I couldn't send a message in the log channel of your server ${guild.name}. Please make sure if the \`VIEW_CHANNEL\` and \`SEND_MESSAGES\` permissions are enabled for me in the log channel \`${log_channel.name}\`.`
+            )
+            .setColor("Red");
+
+          if (dmChannel) {
+            let msg = await dmChannel.send(embed);
+            await msg.pin();
+
+            console.log(
+              `Sent log error message to ${owner.user.username}, guild: ${guild.name}`
+            );
+          }
+        } catch (e) {
+          await collections.guilds.updateOne(
+            {
+              guild_id: guild.id,
+            },
+            { $unset: { log_channel_id: 1 } }
           );
-
-          embed.setDescription(explanation);
-
-          message.edit({
-            embeds: [embed],
-          });
-        } catch (error) {
-          console.error(error);
-
-          embed.setDescription(sentences.apiError);
-          message.edit({
-            embeds: [embed],
-          });
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   };

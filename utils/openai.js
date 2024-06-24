@@ -84,17 +84,17 @@ async function clearThreads() {
 }
 
 /**
- * @param {string} guild_id
  * @param {string} user_id
  */
 
-async function getMemberThread(guild_id, user_id) {
+async function getUserThread(user_id, assistant_id) {
   let threads = await getThreadList();
   for (let thread of threads) {
-    if (
-      thread.metadata.guild === guild_id &&
-      thread.metadata.user === user_id
-    ) {
+    if (thread.metadata.user === user_id) {
+      if (assistant_id && thread.metadata.assistant === assistant_id) {
+        return thread;
+      }
+
       return thread;
     }
   }
@@ -140,6 +140,6 @@ module.exports = {
   getCreditsLeft,
   getThreadList,
   clearThreads,
-  getMemberThread,
+  getUserThread,
   isMemberValid,
 };

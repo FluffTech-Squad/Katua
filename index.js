@@ -10,8 +10,6 @@
 // FluffyMod is a AI-powered moderator Discord Bot to analyse joining members' profile to make furry servers safer.
 // Created by: nekomancer0
 
-console.clear();
-
 const fs = require("fs");
 
 // Create a log file per date

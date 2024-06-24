@@ -47,6 +47,8 @@ async function serverHandler(discordClient) {
       },
     });
 
+    console.log(response.data);
+
     let dbUser = await collections.users.findOne({ user_id: user });
 
     if (!dbUser) {
@@ -67,16 +69,17 @@ async function serverHandler(discordClient) {
     let member = null;
     let guilds = await discordClient.guilds.fetch();
 
-    for (let guild of guilds.values()) {
+    for (let [, guild] of guilds) {
       if (member !== null) return;
 
       let fetchedGuild = await guild.fetch();
 
-      let gMember = await fetchedGuild.members.fetch(user);
-      if (gMember) {
-        member = gMember;
-        break;
-      }
+      try {
+        let gMember = await fetchedGuild.members.fetch(user);
+        if (gMember) {
+          member = gMember;
+        }
+      } catch (e) {}
     }
 
     if (!member) return res.status(200).send("OK");
@@ -91,6 +94,8 @@ async function serverHandler(discordClient) {
         dbUser.gold_shards > 1 ? "s" : ""
       }.`
     );
+
+    member.send({ embeds: [embed] });
 
     res.status(200).send("OK");
   });

@@ -1,5 +1,5 @@
 const { GuildMember, ActivityType } = require("discord.js");
-const { openai, getMemberThread } = require("./openai.js");
+const { openai, getUserThread } = require("./openai.js");
 let langs = require("./langs.js");
 const getBase64ImageURL = require("./getBase64ImageURL.js");
 
@@ -18,7 +18,7 @@ function analyser(member) {
       let guild = member.guild;
 
       try {
-        let thread = await getMemberThread(guild.id, member.user.id);
+        let thread = await getUserThread(member.user.id);
 
         if (!thread) {
           thread = await openai.threads.create({

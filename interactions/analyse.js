@@ -10,7 +10,7 @@ const {
 } = require("discord.js");
 
 const analyser = require("../utils/analyser");
-const { getMemberThread } = require("../utils/openai");
+const { getUserThread } = require("../utils/openai");
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
@@ -207,7 +207,7 @@ module.exports =
           });
 
           try {
-            let thread = await getMemberThread(interaction.guild.id, user.id);
+            let thread = await getUserThread(user.id);
 
             if (thread) {
               try {

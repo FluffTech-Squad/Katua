@@ -1,5 +1,5 @@
 const { GuildBan } = require("discord.js");
-const { getMemberThread, isMemberValid } = require("../utils/openai");
+const { getUserThread, isMemberValid } = require("../utils/openai");
 const { collections } = require("../utils/mongodb");
 
 /**
@@ -7,7 +7,7 @@ const { collections } = require("../utils/mongodb");
  * @param {GuildBan} ban
  */
 module.exports = async (ban) => {
-  let thread = await getMemberThread(ban.guild.id, ban.user.id);
+  let thread = await getUserThread(ban.user.id);
 
   if (thread && !(await isMemberValid(thread))) {
     collections.bans.insertOne({

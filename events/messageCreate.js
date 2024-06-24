@@ -1,11 +1,6 @@
 // messageCreate event
 
-const {
-  openai,
-  getThreadList,
-  getMemberThread,
-  isMemberValid,
-} = require("../utils/openai");
+const { openai, getUserThread, isMemberValid } = require("../utils/openai");
 const analyser = require("../utils/analyser");
 const langs = require("../utils/langs.js");
 const isPremium = require("../utils/isPremium");
@@ -14,6 +9,8 @@ const isNSFW = require("../utils/isNSFW");
 const { EmbedBuilder, Message, ChannelType } = require("discord.js");
 const { collections } = require("../utils/mongodb.js");
 const { userEmbed } = require("../utils/embedFactory.js");
+const { base64ToArrayBuffer } = require("../utils/getBase64ImageURL.js");
+const getBase64ImageURL = require("../utils/getBase64ImageURL.js");
 
 /**
  * @param {Message} message
@@ -46,7 +43,7 @@ module.exports = async (message) => {
 
       let embed = userEmbed(message.author)
         .setTitle("Message")
-        .setDescription(message.content);
+        .setDescription(message.content || "No content.");
 
       if (!userChannel) {
         let embedFirstTime = new EmbedBuilder()
@@ -69,11 +66,15 @@ module.exports = async (message) => {
           `${supportGuildOwner.user}, ${message.author} initiated a support ticket. ${userChannel} was created.`
         );
 
+        let base64files = message.attachments.map((a) =>
+          getBase64ImageURL(a.url)
+        );
+
         userChannel.send({
           embeds: [embed],
-          files: message.attachments.map((a) => ({
-            attachment: a,
-          })),
+          files: (await Promise.all(base64files)).map((a) =>
+            base64ToArrayBuffer(a)
+          ),
         });
       } else {
         userChannel.send({
@@ -182,11 +183,11 @@ module.exports = async (message) => {
    * @returns {Promise<import("openai/resources/beta/threads/threads.mjs").Thread>}
    */
   async function findThread() {
-    let thr = await getMemberThread(message.guild.id, message.author.id);
+    let thr = await getUserThread(message.author.id);
 
     if (!thr) {
       await analyser(message.member);
-      thr = await getMemberThread(message.guild.id, message.author.id);
+      thr = await getUserThread(message.author.id);
     }
 
     return thr;

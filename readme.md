@@ -1,57 +1,75 @@
-# FluffyMod | Anti-Troll Moderation Powered By AI
+# FluffyMod | Anti-Troll Moderation
 
-- Analyse joining users' profile to detect if it might be a troll or not. Triggering everytime someone joins your guild (you should config a log channel).
+**Warning: most of the essential features require premium, so, contact the owner by DMing the bot, you're server will get especially premium if valided.**
+
+- Don't be pessimist! If you vote for the bot, you get 1 or 2 gold shards, gold shards can give temporary access to the guild of your choice. 2 shards = 12 hours and 1 extra shards adds 6 hours, it's like Nitro but free! The Golden Festival will start July 15th 2024 (undetermined date), so gain the max of golden shards to give your _(favorite)_ guild the premium features it needs a max of time!
 
 ## Commands
 
-## `analyse`
+### `analyse`
 
 Analyse a suspicious user's profile.
+
+> This is a premium feature
 
 **Usages:**
 `/analyse <@user>`
 
-## `config`
+![demo](https://i.imgur.com/nDhBqon.png)
+
+### `config`
 
 Configure the bot for your guild.
 
 **Usages:**
+
+> Analysing joining members to send a report in the log-channel (and inform members for potential in public-channel) is a premium feature. However, the NSFW filter is free and enabled by default.
+
 `/config logs log-channel <#channel>`
 `/config logs public-channel <#channel>`
+
+> Enable or disable logging in the set log channel or the public channel.
+
 `/config logs enable <type>`
 `/config logs disable <type>`
-`/config filters enable <filter>`
-`/config filters disable <filter>`
 
-## `detector-prompt`
+> Enable or disable NSFW Filter or Word Filter.
+> `/config filters enable <filter>`
+> `/config filters disable <filter>`
+> Be aware of what are the current configuration of FluffyMod in your guild.
 
-Manage the detector prompt to detect unsafe contents in the server.
+`/config show`
 
-**Usages:**
-`/detector-prompt set`
-`/detector-prompt reset`
-`/detector-prompt show`
+_Soon_
+`/config detector-prompt set`
+`/config detector-prompt reset`
 
-## `help`
+### `help`
 
 Get list of commands.
 
 **Usages:**
 `help`
 
-## `ping`
+### `ping`
 
 Check the bot's latency.
 
 **Usages:**
 `ping`
 
-## `userinfo`
+### `userinfo`
 
 Get information about a user.
 
+> It gives the same informations about guilds in common, total of bans and kicks (interserver), account creation date... But doesn't require premium because it doesn't analyse the profile.
+
+> Eventually, you can request an analysis of the user in question, but it requires premium.
+
 **Usages:**
 `/userinfo <@user>`
+
+![demo](https://i.imgur.com/stPfph1.png)
 
 ## Features
 
@@ -59,7 +77,7 @@ Get information about a user.
 
 With the API enabled, troll detection is working.
 
-Setup logging with the `/set-logs` command before trying this out.
+> Setup the log channel before trying this out, otherwise it won't do anything. Do `/config logs log-channel <#channel>`
 
 - When a user joins, bot will send a message in your logs about this user, including if it seems to be safe/neutral or unsafe, if it detects the user as unsafe, the bot will write a report describing why this "special" user's profile is considered as unsafe. It will not ban or kick automatically.
 
