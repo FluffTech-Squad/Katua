@@ -1,6 +1,6 @@
 const { Client, GuildMember, TextChannel } = require("discord.js");
 const express = require("express");
-const { collections, db } = require("../utils/mongodb");
+const { collections } = require("../utils/mongodb");
 const { userEmbed } = require("../utils/embedFactory");
 const goldShardsToTime = require("../utils/goldShardsToTime");
 const app = express();
@@ -28,7 +28,6 @@ async function serverHandler(discordClient) {
       return res.status(401).send("Unauthorized");
     }
 
-    console.log("Received a vote.");
     let { bot, user, type, query, isWeekend } = req.body;
 
     /* Schema:
@@ -61,24 +60,28 @@ async function serverHandler(discordClient) {
       );
     }
 
+    console.log("Received a vote.");
+
     /**
      * @type {GuildMember}
      */
     let member = null;
     let guilds = await discordClient.guilds.fetch();
 
-    for (let [, guild] of guilds) {
-      if (member !== null) return;
+    // Find the user in all guilds and get the member object
 
+    for (let guild of guilds.values()) {
       let fetchedGuild = await guild.fetch();
-
-      try {
-        let gMember = await fetchedGuild.members.fetch(user);
-        if (gMember) {
-          member = gMember;
-        }
-      } catch (e) {}
+      let memberInGuild = await fetchedGuild.members
+        .fetch(user)
+        .catch(() => {});
+      if (memberInGuild) {
+        member = memberInGuild;
+        break;
+      }
     }
+
+    console.log(member);
 
     if (!member) return res.status(200).send("OK");
 
@@ -95,7 +98,10 @@ async function serverHandler(discordClient) {
 
     try {
       await member.send({ embeds: [embed] });
-    } catch {}
+      res.status(200).send("OK");
+    } catch {
+      res.status(200).send("OK");
+    }
 
     /**
      * @type {TextChannel}
@@ -121,13 +127,13 @@ async function serverHandler(discordClient) {
           ),
       ],
     });
-
-    res.status(200).send("OK");
   });
 
-  app.listen(process.env.PORT || 1027, () => {
-    console.log(`Server is running on port ${process.env.PORT || 1027}.`);
-  });
+  app
+    .listen(process.env.PORT || 1027, () => {
+      console.log(`Server is running on port ${process.env.PORT || 1027}.`);
+    })
+    .on("error", (e) => {});
 }
 
 module.exports = serverHandler;

@@ -23,6 +23,10 @@ let formattedDate = `${date.getFullYear()}-${
 let logsFolder = `${__dirname}/logs`;
 let logFilePath = `${logsFolder}/${formattedDate}.log`;
 
+if (!fs.existsSync(logsFolder)) {
+  fs.mkdirSync(logsFolder);
+}
+
 // Write the log file
 process.stdout.write = (function (write) {
   return function (string, encoding, fd) {
@@ -55,30 +59,22 @@ process.stderr.write = (function (write) {
 })(process.stderr.write);
 
 // Importing the discord.js module
-
-const Discord = require("discord.js");
-
-// Creating a new Discord client
-
-const client = new Discord.Client({
-  intents: [
-    "Guilds",
-    "GuildMessages",
-    "GuildMembers",
-    "MessageContent",
-    "GuildPresences",
-    "DirectMessages",
-  ],
-  partials: [Discord.Partials.Channel],
-});
-
-// Use dotenv to hide the token
-
 require("dotenv").config();
 require("./utils/mongodb.js");
-
 let token = require("./utils/token.js");
 
-client.on("ready", require("./events/ready.js"));
+require("./bot.js");
 
-client.login(token);
+// const { ShardingManager } = require("discord.js");
+
+// let args = process.argv.slice(2);
+
+// const manager = new ShardingManager("./bot.js", {
+//   token,
+//   mode: "process",
+//   shardArgs: args,
+// });
+
+// manager.on("shardCreate", (shard) => console.log(`Launched shard ${shard.id}`));
+
+// manager.spawn({ amount: 4 });

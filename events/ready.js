@@ -13,6 +13,10 @@ const { collections } = require("../utils/mongodb.js");
 const rest = require("../utils/rest.js");
 
 const serverHandler = require("../app/server.js");
+const { default: axios } = require("axios");
+
+let topggRoot = "https://top.gg/api";
+let topggToken = process.env.TOPGG_TOKEN;
 
 /**
  * @type {Map<string, SlashCommandBuilder>}
@@ -257,4 +261,39 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
         await updatePresence();
       }, 1000);
     });
+
+    async function updatesStats() {
+      let url = `${topggRoot}/bots/${client.user.id}/stats`;
+      let guilds = await client.guilds.fetch();
+
+      let guildsCount = guilds.size;
+
+      await axios
+        .post(
+          url,
+          {
+            server_count: guildsCount,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${topggToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          console.log(`Updated stats: ${res.data}`);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
+
+    let argv = process.argv.slice(2);
+
+    if (argv[0] === "--local") return;
+
+    updatesStats();
+    client.on("guildCreate", updatesStats);
+    client.on("guildDelete", updatesStats);
   };

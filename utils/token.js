@@ -3,7 +3,6 @@
 // Path: ../index.js
 // Process is run at process.cwd like node index.js
 let args = process.argv.slice(2);
-console.log(args);
 
 // the first argument defines the environment
 let token = "";

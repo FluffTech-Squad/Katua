@@ -142,13 +142,6 @@ module.exports =
         .setLabel("Next")
         .setStyle(ButtonStyle.Primary);
 
-      /**
-       * @type {Message | null}
-       */
-      let message = null;
-
-      await interaction.deferReply();
-
       let updateMessage = async () => {
         previousButton = previousButton.setDisabled(index === 0);
 
@@ -166,33 +159,59 @@ module.exports =
           );
         }
 
-        message = await interaction.editReply({
-          embeds: [embeds[index]],
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [previousButton, nextButton],
-            },
-          ],
-        });
+        if (interaction.replied) {
+          await interaction.editReply({
+            embeds: [embeds[index]],
+            components: [
+              {
+                type: ComponentType.ActionRow,
+                components: [previousButton, nextButton],
+              },
+            ],
+          });
+        } else {
+          await interaction.reply({
+            embeds: [embeds[index]],
+            components: [
+              {
+                type: ComponentType.ActionRow,
+                components: [previousButton, nextButton],
+              },
+            ],
+          });
+        }
 
-        let collector = message.createMessageComponentCollector({
-          filter: (i) => i.user.id === interaction.user.id,
-          dispose: false,
+        let fetchedMessage = await interaction.fetchReply();
+
+        let collector = fetchedMessage.createMessageComponentCollector({
+          filter: (i) => i.user.id === fetchedMessage.interaction.user.id,
+          componentType: ComponentType.Button,
+          time: 60000 * 3,
         });
 
         collector.on("collect", async (i) => {
-          i.deferReply();
-          i.deleteReply();
+          try {
+            let msg = await i.deferReply({
+              ephemeral: true,
+            });
+            await msg.delete();
 
-          if (i.customId === "previous") {
-            index--;
-            await updateMessage();
-          } else if (i.customId === "next") {
-            index++;
-            await updateMessage();
-          }
+            if (i.customId === "previous") {
+              if (index > 0) {
+                index--;
+                await updateMessage();
+              }
+            } else if (i.customId === "next") {
+              if (index < embeds.length - 1) {
+                index++;
+                await updateMessage();
+              }
+            }
+          } catch (e) {}
         });
+
+        collector.on("end", async () => {});
+        collector.on("ignore", async () => {});
       };
 
       await updateMessage();

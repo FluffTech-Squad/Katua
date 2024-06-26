@@ -1,6 +1,6 @@
 # FluffyMod | Anti-Troll Moderation
 
-**Warning: most of the essential features require premium, so, contact the owner by DMing the bot, you're server will get especially premium if valided.**
+**Warning: most of the essential features require premium, so, contact the owner by DMing the bot, you're server will get especially premium if validated.**
 
 - Don't be pessimist! If you vote for the bot, you get 1 or 2 gold shards, gold shards can give temporary access to the guild of your choice. 2 shards = 12 hours and 1 extra shards adds 6 hours, it's like Nitro but free! The Golden Festival will start July 15th 2024 (undetermined date), so gain the max of golden shards to give your _(favorite)_ guild the premium features it needs a max of time!
 
@@ -34,8 +34,10 @@ Configure the bot for your guild.
 `/config logs disable <type>`
 
 > Enable or disable NSFW Filter or Word Filter.
-> `/config filters enable <filter>`
-> `/config filters disable <filter>`
+
+`/config filters enable <filter>`
+`/config filters disable <filter>`
+
 > Be aware of what are the current configuration of FluffyMod in your guild.
 
 `/config show`
