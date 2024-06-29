@@ -13,6 +13,6 @@ jobs:
           api-key: ${{ secrets.API_KEY }}
           server-id: "1af54dce-f641-445f-94b3-b4c1deda4dcc"
           source: "/home/runner/work/FluffyMod/FluffyMod.git"
-          target: "/home/container"
+          target: "/home/container/"
           restart: true
           decompress-target: true
