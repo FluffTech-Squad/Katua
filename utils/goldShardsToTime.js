@@ -4,7 +4,6 @@ const goldShardsToTime = (goldShards) => {
   // 2 gold shards = 12 hours
 
   let time = 0;
-  let counter = 0;
 
   // 2 gold shards minimum, 1 extra shard = 6 hours
 

@@ -11,7 +11,11 @@ const client = new MongoClient(process.env.MONGODB_STRING, {
   },
 });
 
-(async () => {
+let db = client.db("fluffymod");
+
+module.exports.db = db;
+
+module.exports.connectDB = async () => {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
@@ -21,11 +25,7 @@ const client = new MongoClient(process.env.MONGODB_STRING, {
   } catch (e) {
     throw e;
   }
-})();
-
-let db = client.db("fluffymod");
-
-module.exports.db = db;
+};
 
 module.exports.collections = {
   guilds: db.collection("guilds"),

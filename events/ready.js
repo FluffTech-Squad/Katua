@@ -1,19 +1,20 @@
 const fs = require("fs");
+let socket = require("../utils/socket.js");
 
 const {
   Routes,
   Client,
   ActivityType,
   SlashCommandBuilder,
+  Guild,
 } = require("discord.js");
 
 const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
 const langs = require("../utils/langs.js");
-const { collections } = require("../utils/mongodb.js");
+const { collections, connectDB } = require("../utils/mongodb.js");
 const rest = require("../utils/rest.js");
-
-const serverHandler = require("../app/server.js");
 const { default: axios } = require("axios");
+const path = require("path");
 
 let topggRoot = "https://top.gg/api";
 let topggToken = process.env.TOPGG_TOKEN;
@@ -49,7 +50,6 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
-    await serverHandler(client);
     // await clearThreads();
 
     let credits = await getCreditsLeft();
@@ -142,33 +142,62 @@ module.exports =
       }
     }, presences[presenceIndex].ms || 6000);
 
-    async function updateCommands(guild) {
+    /**
+     *
+     * @param {Guild} guild
+     */
+    async function updateCommands(guild, startup = false) {
       let cmds = [];
+      let cmdCount = 0;
+      let cmdStringList = "";
+      let totalCmdsCount =
+        fs.readdirSync(path.join(process.cwd(), "interactions")).length - 1;
+
+      let deployText = `Deploying commands right now ${
+        startup === true
+          ? `in ${sortedGuilds.length - 1} guilds`
+          : `in ${guild.name} guild`
+      }...`;
+
+      console.log(deployText);
 
       for (let [name, command] of commands) {
-        let lang = guild.preferredLocale || "en-US";
-        let lg = langs[lang] || langs["en-US"];
+        try {
+          let lang = guild.preferredLocale || "en-US";
+          let lg = langs[lang] || langs["en-US"];
 
-        if (!lg.helpCommands[name]) {
-          console.log(`Command ${name} doesn't have locales.`);
-        } else {
-          command = command
-            .setNameLocalization(lang, lg.helpCommands[name].localeName)
-            .setDescriptionLocalization(
-              lang,
-              lg.helpCommands[name].localeDescription
-            );
-        }
+          if (!lg.helpCommands[name]) {
+            // console.log(`Command ${name} doesn't have locales.`);
+          } else {
+            command = command
+              .setNameLocalization(lang, lg.helpCommands[name].localeName)
+              .setDescriptionLocalization(
+                lang,
+                lg.helpCommands[name].localeDescription
+              );
+          }
 
-        cmds.push(command.toJSON());
+          cmdCount++;
+          cmdStringList += `${cmdCount}. /${command.name}, `;
+
+          cmds.push(command.toJSON());
+        } catch (e) {}
       }
 
-      await rest.put(
-        Routes.applicationGuildCommands(client.user.id, guild.id),
-        {
-          body: cmds,
-        }
-      );
+      try {
+        await rest.put(
+          Routes.applicationGuildCommands(client.user.id, guild.id),
+          {
+            body: cmds,
+          }
+        );
+
+        console.log(
+          `Deployed ${cmdCount} commands in ${guild.name} guild. (${cmdStringList})`
+        );
+      } catch (e) {
+        console.log("Error deploying commands.");
+      }
     }
 
     console.log(`_______________      _______________       ______  ___     _________
@@ -178,6 +207,13 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
 /_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
                                     /____/`);
     console.log(`Logged in as ${client.user.username}`);
+    await connectDB();
+    require("../app/server.js");
+
+    socket.emit("ready", () => {
+      console.log("Socket is ready.");
+    });
+
     console.log(guildsText);
     console.log(
       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
@@ -186,16 +222,7 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
     (async () => {
       try {
         let arrayCommands = Array.from(commands);
-
-        for (const [name, command] of arrayCommands) {
-          console.log(`Command load: /${name} command.`);
-        }
-
         let guilds = await client.guilds.fetch();
-
-        // await rest.put(Routes.applicationCommands(client.user.id), {
-        //   body: [],
-        // });
 
         for (let [id, guild] of guilds) {
           let fetchedGuild = await guild.fetch();

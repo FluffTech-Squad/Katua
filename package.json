@@ -12,11 +12,13 @@
   "dependencies": {
     "axios": "^1.7.2",
     "canvas": "^2.11.2",
+    "cors": "^2.8.5",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongodb": "^6.7.0",
     "nsfwjs": "^4.1.0",
-    "openai": "^4.51.0"
+    "openai": "^4.51.0",
+    "socket.io-client": "^4.7.5"
   }
 }

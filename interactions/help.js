@@ -141,11 +141,5 @@ module.exports = async (interaction) => {
     .setTitle(langData["helpCommands"]["help"].description)
     .setDescription(cmds.join("\n"));
 
-  let assetFolder = __dirname.replace("interactions", "assets");
-  if (!fs.existsSync(assetFolder))
-    fs.mkdirSync(assetFolder, { recursive: true });
-
-  fs.writeFileSync(`${assetFolder}/help.md`, cmds.join("\n"));
-
   interaction.reply({ embeds: [embed] });
 };

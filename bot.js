@@ -16,7 +16,6 @@ const client = new Client({
 });
 
 let token = require("./utils/token.js");
-
 client.on("ready", require("./events/ready.js"));
 
 client.login(token);

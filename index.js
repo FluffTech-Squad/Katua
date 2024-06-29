@@ -60,21 +60,4 @@ process.stderr.write = (function (write) {
 
 // Importing the discord.js module
 require("dotenv").config();
-require("./utils/mongodb.js");
-let token = require("./utils/token.js");
-
 require("./bot.js");
-
-// const { ShardingManager } = require("discord.js");
-
-// let args = process.argv.slice(2);
-
-// const manager = new ShardingManager("./bot.js", {
-//   token,
-//   mode: "process",
-//   shardArgs: args,
-// });
-
-// manager.on("shardCreate", (shard) => console.log(`Launched shard ${shard.id}`));
-
-// manager.spawn({ amount: 4 });
