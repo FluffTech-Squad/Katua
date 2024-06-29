@@ -4,8 +4,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Pterodactyl
     steps:
-      - name: Upload
       - uses: rexlmanu/pterodactyl-upload-action@v2.1
+      - name: Upload
         with:
           panel-host: ${{ secrets.PANEL_HOST }}
           api-key: ${{ secrets.API_KEY }}
