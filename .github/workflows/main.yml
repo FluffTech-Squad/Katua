@@ -14,3 +14,4 @@ jobs:
           server-id: "1af54dce-f641-445f-94b3-b4c1deda4dcc"
           source: "./"
           target: "./"
+          restart: true
