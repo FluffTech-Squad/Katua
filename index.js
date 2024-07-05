@@ -10,6 +10,6 @@ if (child_process.execSync("git status --porcelain").toString() !== "") {
   process.exit(1);
 }
 
-// child_process.execSync("git pull");
+child_process.execSync("git pull");
 
 child_process.execSync("node --require ./appsignal.cjs ./bot.js");
