@@ -1,90 +1,125 @@
-# FluffyMod | Anti-Troll Moderation
+# 🐾🏳️‍🌈 Katua: Your Niche Best Anti-Troll Moderator 🤖
 
-**Warning: most of the essential features require premium, so, contact the owner by DMing the bot, you're server will get especially premium if validated.**
+Katua is powered by AI to analyse user profiles, whether when they are joining your guild or with a manual command. Katua will determine if the user is safe, seems to be a troll or has a neutral profile, but only you, moderators and admins have the primal right to ban those users depending of their behavior, however, Katua will delete harmful messages (from users detected as unsafe) for safety.
 
-- Don't be pessimist! If you vote for the bot, you get 1 or 2 gold shards, gold shards can give temporary access to the guild of your choice. 2 shards = 12 hours and 1 extra shards adds 6 hours, it's like Nitro but free! The Golden Festival will start July 15th 2024 (undetermined date), so gain the max of golden shards to give your _(favorite)_ guild the premium features it needs a max of time!
+That's main's Katua feature. **AI-powered features are premium only, but if your server is a furry or a LGBT+ server, me, Nekomancer, won't hesitate to give you that gift and make you try out those features!**
 
-## Commands
+## Auto-Moderation
 
-### `analyse`
+With the API enabled, troll detection is working.
+↘️ _This means that you need Premium_
 
-Analyse a suspicious user's profile.
+<blockquote>Setup the log channel before trying this out, otherwise it won't do anything. Do <code>/config logs log-channel <#channel></code></blockquote><br>
 
-> This is a premium feature
+<ul>
+<li> When a user joins, bot will send a message in your logs about this user, including if it seems to be safe/neutral or unsafe, if it detects the user as unsafe, the bot will write a report describing why this "special" user's profile is considered as unsafe. It will not ban or kick automatically.</li>
 
-**Usages:**
-`/analyse <@user>`
+<li> When a user sends a message: detects if a user says inappropriate message (non-moderators), the message will be deleted automatically and sends a log about the content.</li>
 
-![demo](https://i.imgur.com/nDhBqon.png)
+<li> Katua can freely detect NSFW medias (only images at the moment), freely meaning that it doesn't need API requests. NSFW content will be deleted if it's a non-NSFW channel, and send a report (without showing the images ofc)</li>
 
-### `config`
+<li> Katua can provide in how much guilds a user has been banned/kicked (of course, Katua must be there) and also provides the guilds in common with Katua. Account Creation Date, and Join Date via ➡️ logging, <code>/userinfo @user</code> command and <code>/analyse</code> command.</li>
+</ul>
 
-Configure the bot for your guild.
+---
 
-**Usages:**
+## 🗝️ Golden Festival - 15th July 2024
 
-> Analysing joining members to send a report in the log-channel (and inform members for potential in public-channel) is a premium feature. However, the NSFW filter is free and enabled by default.
+**Voting for Katua will give you Gold Shards, this will give you the capacity of gifting premium to your favorite guild for a limited time. 2 Golden shards = 12 hours, 1 extra shard adds 6 hours (a vote on weekend counts as 2 votes). Farm gold shards and give your favorite guild premium for a maximum time FOR FREE**
 
-`/config logs log-channel <#channel>`
-`/config logs public-channel <#channel>`
+## 🧰 Features
 
-> Enable or disable logging in the set log channel or the public channel.
+### Basic commands
 
-`/config logs enable <type>`
-`/config logs disable <type>`
-
-> Enable or disable NSFW Filter or Word Filter.
-
-`/config filters enable <filter>`
-`/config filters disable <filter>`
-
-> Be aware of what are the current configuration of FluffyMod in your guild.
-
-`/config show`
-
-_Soon_
-`/config detector-prompt set`
-`/config detector-prompt reset`
-
-### `help`
+#### `help`
 
 Get list of commands.
 
 **Usages:**
 `help`
 
-### `ping`
+#### `ping`
+
+🐌 _Snail or Cheetah - that's the question_
 
 Check the bot's latency.
 
 **Usages:**
 `ping`
 
-### `userinfo`
+#### `userinfo`
 
 Get information about a user.
 
-> It gives the same informations about guilds in common, total of bans and kicks (interserver), account creation date... But doesn't require premium because it doesn't analyse the profile.
-
-> Eventually, you can request an analysis of the user in question, but it requires premium.
+<blockquote>It gives the same informations about guilds in common, total of bans and kicks (interserver), account creation date... But doesn't require premium because it doesn't analyse the profile.</blockquote>
+<br>
+<blockquote>Eventually, you can request an analysis of the user in question, but it requires premium.</blockquote>
 
 **Usages:**
 `/userinfo <@user>`
 
-![demo](https://i.imgur.com/stPfph1.png)
+_Illustration soon..._
 
-## Features
+#### `analyse`
 
-### Listening to events
+🧐 Analyse a suspicious user's profile.
 
-With the API enabled, troll detection is working.
+_Mmh, this user looks very sus, i'm gonna keep an eye on them..._
+_Omae wa mou- shindeiru_
 
-> Setup the log channel before trying this out, otherwise it won't do anything. Do `/config logs log-channel <#channel>`
+<blockquote>This is a premium feature</blockquote>
 
-- When a user joins, bot will send a message in your logs about this user, including if it seems to be safe/neutral or unsafe, if it detects the user as unsafe, the bot will write a report describing why this "special" user's profile is considered as unsafe. It will not ban or kick automatically.
+**Usages:**
+`/analyse <@user>`
 
-- When a user sends a message: detects if a user says inappropriate message (non-moderators), the message will be deleted automatically and sends a log about the content.
+_Illustration soon..._
 
-- FluffyMod can freely detect NSFW medias (only images at the moment), freely meaning that it doesn't need API requests. NSFW content will be deleted if it's a non-NSFW channel, and send a report (without showing the images ofc)
+### ⚙️🪛 Setup Katua
 
-- FluffyMod can provide in how much guilds a user has been banned/kicked (of course, FluffyMod must be there) and also provides the guilds in common with FluffyMod. Account Creation Date, and Join Date => via profile log, `/userinfo @user` command and `/analyse` command.
+Configure Katua for your guild.
+
+_Lemme save you from misfortune, I'll guide you._
+
+#### 🔔 Setup log channel(s)
+
+<blockquote>Analysing joining members to send a report in the log-channel (and inform members for potential in public-channel) is a premium feature. However, the NSFW filter is free and enabled by default.</blockquote><br>
+
+**Usages:**
+
+`/config logs log-channel <#channel>`
+`/config logs public-channel <#channel>`
+
+<blockquote>Enable or disable logging in the set log channel or the public channel.</blockquote>
+**Usages:**
+
+`/config logs enable <type>`
+`/config logs disable <type>`
+
+#### 🚯 Auto-Moderation Rules Configuration
+
+<blockquote>Enable or disable NSFW Filter or Word Filter.</blockquote><br>
+
+**Usages:**
+
+`/config filters enable <filter>`
+`/config filters disable <filter>`
+
+#### Verification airlock
+
+<blockquote>Setup your airlock channel to setup task such as giving the role when you react ✅ or do nothing by reacting with ✅ to the message the new member sent to get verified. All their messages will be deleted at the end.</blockquote><br>
+
+**Usages:**
+
+`/config verification-airlock set <channel> <role> (katua-result-channel)`
+`/config verification-airlock enable`
+`/config verification-airlock disable`
+
+#### Show actual config
+
+<blockquote>Be aware of what are the current configuration of Katua in your guild.</blockquote><br>
+
+**Usages:**
+
+`/config show`
+`/config show logging`
+`/config show filters`

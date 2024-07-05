@@ -10,7 +10,7 @@ module.exports =
   (interaction, now) => {
     let lang = interaction.guild ? interaction.guild.preferredLocale : "en-US";
 
-    interaction.reply({
+    interaction.editReply({
       content: langs[lang].latency.replace("$1", now - Date.now()),
     });
   };

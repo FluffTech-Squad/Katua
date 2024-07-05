@@ -21,19 +21,22 @@ module.exports =
     let sentences = langs[lang] || langs["en-US"];
 
     if (interaction.channel.type === ChannelType.DM)
-      return interaction.reply({ content: sentences.noDM, ephemeral: true });
+      return interaction.editReply({
+        content: sentences.noDM,
+        ephemeral: true,
+      });
 
     const user = interaction.options.getUser("user");
     const member = interaction.guild.members.cache.get(user.id);
 
     if (!user)
-      return interaction.reply({
+      return interaction.editReply({
         content: sentences.noUserAnalyse,
         ephemeral: true,
       });
 
     if (!member)
-      return interaction.reply({
+      return interaction.editReply({
         content: sentences.noMember,
         ephemeral: true,
       });
@@ -106,7 +109,7 @@ module.exports =
       .setColor("Grey")
       .setImage(member.user.bannerURL() || null);
 
-    let msg = await interaction.reply({
+    let msg = await interaction.editReply({
       embeds: [embed],
       components: [actionRow],
     });

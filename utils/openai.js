@@ -70,7 +70,8 @@ async function getThreadList() {
 
       resolve(response.data.data);
     } catch (e) {
-      reject(e);
+      console.log(e.data);
+      return [];
     }
   });
 }
@@ -119,7 +120,13 @@ function isMemberValid(thread) {
           msg.metadata.type &&
           msg.metadata.type === "analysis"
         ) {
-          if (msg.content[0].text.value === "valid") {
+          let content = msg.content[0];
+
+          if (content.type !== "text") break;
+
+          let isUserValid = JSON.parse(content.text.value);
+
+          if (isUserValid.status === "valid") {
             if (!ok) {
               isValid = true;
             }

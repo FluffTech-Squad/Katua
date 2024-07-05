@@ -103,9 +103,11 @@ module.exports =
       try {
         let message = await log_channel.send({ embeds: [embed] });
         if (!(await isPremium(member.guild))) {
-          embed.setDescription(sentences.notPremiumText).setColor("Gold");
+          embed = embed
+            .setDescription(sentences.notPremiumText)
+            .setColor("Gold");
 
-          message.edit({ embeds: [embed] });
+          await message.edit({ embeds: [embed] });
 
           return;
         }
@@ -113,30 +115,32 @@ module.exports =
         let result = (await analyse(member)).toLowerCase();
 
         if (result === "neutral") {
-          embed
+          embed = embed
             .setTitle(sentences.notInvalidTitle)
             .setDescription(sentences.neutralText)
             .setColor("Yellow");
 
-          message.edit({ embeds: [embed] });
+          await message.edit({ embeds: [embed] });
 
           return;
         }
 
         if (result === "valid") {
-          embed
+          embed = embed
             .setTitle(sentences.notInvalidTitle)
             .setDescription(sentences.validText)
             .setColor("Green");
 
-          message.edit({ embeds: [embed] });
+          await message.edit({ embeds: [embed] });
 
           return;
         }
 
         if (result !== "invalid") return;
 
-        if (dbGuild.prevent_members) {
+        let enabledAarray = dbGuild.enabled || [];
+
+        if (enabledAarray.includes("inform-members")) {
           // Find for the first sendable text channel
 
           /**
@@ -158,22 +162,22 @@ module.exports =
             );
 
             if (inform_channel && inform_channel.isTextBased()) {
-              inform_channel.send({
+              await inform_channel.send({
                 content: sentences.memberReport.replace("$1", member.user),
                 allowedMentions: { users: [], parse: [] },
               });
             }
           } else {
-            channel.send({
+            await channel.send({
               content: sentences.memberReport.replace("$1", member.user),
               allowedMentions: { users: [], parse: [] },
             });
           }
         }
 
-        embed.setColor("Red").setTitle(sentences.invalidTitle);
+        embed = embed.setColor("Red").setTitle(sentences.invalidTitle);
 
-        message.edit({ embeds: [embed] });
+        await message.edit({ embeds: [embed] });
 
         let thread = await getUserThread(member.user.id);
 
@@ -185,9 +189,9 @@ module.exports =
               "invalid"
             );
 
-            embed.setDescription(explanation);
+            embed = embed.setDescription(explanation);
 
-            message.edit({
+            await message.edit({
               embeds: [embed],
             });
           } catch (error) {

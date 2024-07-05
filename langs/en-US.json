@@ -23,8 +23,8 @@
   "invalidTitle": "Suspicious user detected",
   "notInvalidTitle": "Not suspicious.",
   "memberReport": "*Some words to say that $1 might be a troll. If any deranged messages, ping moderators.*",
-  "botJoinTitle": "FluffyMod is there to help!",
-  "botJoinText": "Hello! I am FluffyMod, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help` in your server`.",
+  "botJoinTitle": "Katua is there to help!",
+  "botJoinText": "Hello! I am Katua, a bot that helps you moderate your server. I can help you analyse users, detect trolls, and more. To get started, type `/help` in your server`.",
   "noDM": "This command can only be used in a server.",
   "helpCommands": {
     "help": {
@@ -109,6 +109,6 @@
   "nsfwMessage": "Message of $1 has been deleted in the channel $2 because it contains NSFW content.",
   "nsfwAuthorMessage": "Your message has been deleted in the channel $1 because it contains NSFW content. Please do not send NSFW content in this server. Thank you!",
   "premiumWhitelistJoin": "What a luck! Your server $1 has already been whitelisted for the premium features. Troll detection is activated in your server. Enjoy! 🎉",
-  "setupTitle": "Would you like to setup FluffyMod?",
+  "setupTitle": "Would you like to setup Katua?",
   "setupBotConfirmLabel": "Yes, setup please"
 }

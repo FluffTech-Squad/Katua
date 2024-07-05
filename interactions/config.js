@@ -23,7 +23,7 @@ module.exports =
    */
   async (interaction) => {
     if (interaction.channel.type !== ChannelType.GuildText)
-      return interaction.reply({
+      return interaction.editReply({
         content: "This command can only be used in a server.",
         ephemeral: true,
       });
@@ -60,16 +60,18 @@ module.exports =
           },
           {
             name: "Enabled",
-            value: guildData?.enabled.length
-              ? guildData.enabled.join(", ")
-              : "None",
+            value:
+              guildData.enabled && guildData.enabled.length
+                ? guildData.enabled.join(", ")
+                : "None",
             inline: true,
           },
           {
             name: "Disabled",
-            value: guildData?.disabled.length
-              ? guildData.disabled.join(", ")
-              : "None",
+            value:
+              guildData.disabled && guildData.disabled.length
+                ? guildData.disabled.join(", ")
+                : "None",
             inline: true,
           }
         );
@@ -90,36 +92,15 @@ module.exports =
           }
         );
 
-      let detectorPromptEmbed = guildEmbed(interaction.guild).setTitle(
-        "Actual Detector Prompt"
-      );
-
-      let desc =
-        "Here is the current prompt for the detector. You can change it by using the `/config detector-prompt` command.\n\n";
-
-      let assistant_id =
-        guildData.assistant_id || process.env.OPENAI_ASSISTANT_ID;
-
-      let assistant = await openai.assistants.retrieve(assistant_id);
-
-      desc += "```" + assistant.instructions + "```";
-
-      detectorPromptEmbed = detectorPromptEmbed.setDescription(desc);
-
       if (type) {
         if (type === "logging") {
-          await interaction.reply({
+          await interaction.editReply({
             embeds: [guildDataEmbed],
           });
           return;
         } else if (type === "filters") {
-          await interaction.reply({
+          await interaction.editReply({
             embeds: [guildRulesDataEmbed],
-          });
-          return;
-        } else if (type === "detector-prompt") {
-          await interaction.reply({
-            embeds: [detectorPromptEmbed],
           });
           return;
         }
@@ -129,7 +110,7 @@ module.exports =
 
       let index = 0;
 
-      let embeds = [guildDataEmbed, guildRulesDataEmbed, detectorPromptEmbed];
+      let embeds = [guildDataEmbed, guildRulesDataEmbed];
 
       let previousButton = new ButtonBuilder()
         .setCustomId("previous")
@@ -159,29 +140,17 @@ module.exports =
           );
         }
 
-        if (interaction.replied) {
-          await interaction.editReply({
-            embeds: [embeds[index]],
-            components: [
-              {
-                type: ComponentType.ActionRow,
-                components: [previousButton, nextButton],
-              },
-            ],
-          });
-        } else {
-          await interaction.reply({
-            embeds: [embeds[index]],
-            components: [
-              {
-                type: ComponentType.ActionRow,
-                components: [previousButton, nextButton],
-              },
-            ],
-          });
-        }
-
         let fetchedMessage = await interaction.fetchReply();
+
+        await fetchedMessage.edit({
+          embeds: [embeds[index]],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [previousButton, nextButton],
+            },
+          ],
+        });
 
         let collector = fetchedMessage.createMessageComponentCollector({
           filter: (i) => i.user.id === fetchedMessage.interaction.user.id,
@@ -230,7 +199,7 @@ module.exports =
           let botMember = guild.members.me;
 
           if (!channel.viewable) {
-            return interaction.reply({
+            return interaction.editReply({
               content:
                 "I can't view that channel. Please make sure I have the `VIEW_CHANNEL` permission in that channel.",
               ephemeral: true,
@@ -238,7 +207,7 @@ module.exports =
           }
 
           if (!channel.permissionsFor(botMember).has("SendMessages")) {
-            return interaction.reply({
+            return interaction.editReply({
               content:
                 "I can't send messages in that channel. Please make sure I have the `SEND_MESSAGES` permission in that channel.",
               ephemeral: true,
@@ -262,7 +231,7 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: Log channel has been set to <#${channel.id}>.`,
             ephemeral: true,
           });
@@ -274,7 +243,7 @@ module.exports =
 
         if (subcommand === "public-channel") {
           if (!isPremiumGuild)
-            return interaction.reply(
+            return interaction.editReply(
               "This feature is only available for premium servers."
             );
 
@@ -286,7 +255,7 @@ module.exports =
           let botMember = guild.members.me;
 
           if (!channel.viewable) {
-            return interaction.reply({
+            return interaction.editReply({
               content:
                 "I can't view that channel. Please make sure I have the `VIEW_CHANNEL` permission in that channel.",
               ephemeral: true,
@@ -294,7 +263,7 @@ module.exports =
           }
 
           if (!channel.permissionsFor(botMember).has("SendMessages")) {
-            return interaction.reply({
+            return interaction.editReply({
               content:
                 "I can't send messages in that channel. Please make sure I have the `SEND_MESSAGES` permission in that channel.",
               ephemeral: true,
@@ -318,7 +287,7 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: Members will be notified for potential trolls in <#${channel.id}>.`,
             ephemeral: true,
           });
@@ -348,7 +317,7 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: ${type} has been enabled.`,
             ephemeral: true,
           });
@@ -374,7 +343,7 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: ${type} has been disabled.`,
             ephemeral: true,
           });
@@ -400,7 +369,7 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: ${filter} filter has been enabled.`,
             ephemeral: true,
           });
@@ -423,8 +392,126 @@ module.exports =
             );
           }
 
-          await interaction.reply({
+          await interaction.editReply({
             content: `:white_check_mark: ${filter} filter has been disabled.`,
+            ephemeral: true,
+          });
+        }
+        break;
+
+      case "verification-airlock":
+        if (subcommand === "enable") {
+          let guildData = await guilds.findOne({ guild_id: guild.id });
+
+          if (!guildData) {
+            await guilds.insertOne({
+              guild_id: guild.id,
+              log_channel_id: null,
+              inform_members_channel_id: null,
+              disabled: [],
+              enabled: ["verification-airlock"],
+            });
+          } else {
+            await guilds.updateOne(
+              { guild_id: guild.id },
+              { $addToSet: { enabled: "verification-airlock" } }
+            );
+          }
+
+          await interaction.editReply({
+            content: `:white_check_mark: Verification airlock has been enabled.`,
+            ephemeral: true,
+          });
+        }
+
+        if (subcommand === "disable") {
+          let guildData = await guilds.findOne({ guild_id: guild.id });
+
+          if (!guildData) {
+            await guilds.insertOne({
+              guild_id: guild.id,
+              log_channel_id: null,
+              inform_members_channel_id: null,
+              disabled: ["verification-airlock"],
+              enabled: [],
+            });
+          } else {
+            await guilds.updateOne(
+              { guild_id: guild.id },
+              { $addToSet: { disabled: "verification-airlock" } }
+            );
+          }
+
+          await interaction.editReply({
+            content: `:white_check_mark: Verification airlock has been disabled.`,
+            ephemeral: true,
+          });
+        }
+
+        if (subcommand === "set") {
+          let airlockChannel = options.getChannel("channel", true, [
+            ChannelType.GuildText,
+          ]);
+
+          if (!airlockChannel.viewable) {
+            return interaction.editReply({
+              content:
+                "I can't view that channel. Please make sure I have the `VIEW_CHANNEL` permission in that channel.",
+              ephemeral: true,
+            });
+          }
+
+          let role = options.getRole("role", true);
+
+          let botMember = guild.members.me;
+
+          if (!botMember.permissions.has("ManageRoles")) {
+            return interaction.editReply({
+              content:
+                "I can't manage roles. Please make sure I have the `MANAGE_ROLES` permission in this server.",
+              ephemeral: true,
+            });
+          }
+
+          let katuaResultChannel = options.getChannel(
+            "katua-result-channel",
+            false,
+            [ChannelType.GuildText]
+          );
+
+          let guildData = await guilds.findOne({ guild_id: guild.id });
+
+          if (!guildData) {
+            await guilds.insertOne({
+              guild_id: guild.id,
+              log_channel_id: null,
+              inform_members_channel_id: null,
+              airlock_channel_id: airlockChannel.id,
+              katua_result_channel_id: katuaResultChannel
+                ? katuaResultChannel.id
+                : null,
+              airlock_role_id: role.id,
+              disabled: [],
+              enabled: ["verification-airlock"],
+            });
+          } else {
+            await guilds.updateOne(
+              { guild_id: guild.id },
+              {
+                $addToSet: { enabled: "verification-airlock" },
+                $set: {
+                  airlock_channel_id: airlockChannel.id,
+                  katua_result_channel_id: katuaResultChannel
+                    ? katuaResultChannel.id
+                    : null,
+                  airlock_role_id: role.id,
+                },
+              }
+            );
+          }
+
+          await interaction.editReply({
+            content: `:white_check_mark: Verification airlock has been set to <#${airlockChannel.id}>.`,
             ephemeral: true,
           });
         }

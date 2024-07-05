@@ -7,6 +7,7 @@ const {
   EmbedBuilder,
   ButtonStyle,
   ChannelType,
+  ComponentType,
 } = require("discord.js");
 
 const analyser = require("../utils/analyser");
@@ -14,6 +15,7 @@ const { getUserThread } = require("../utils/openai");
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
+const { userEmbed } = require("../utils/embedFactory.js");
 
 module.exports =
   /**
@@ -21,6 +23,8 @@ module.exports =
    * @param {ChatInputCommandInteraction} interaction
    */
   async (interaction, execute = false) => {
+    let members = await interaction.guild.members.fetch();
+
     let lang = interaction.guild.preferredLocale || "en-US";
     let sentences = langs[lang] || langs["en-US"];
 
@@ -28,23 +32,23 @@ module.exports =
       return interaction.reply({ content: sentences.noDM, ephemeral: true });
 
     const user = interaction.options.getUser("user");
-    const member = interaction.guild.members.cache.get(user.id);
+    const member = members.find((member) => member.user.id === user.id);
 
     if (!user)
-      return interaction[execute ? "editReply" : "reply"]({
+      return interaction.editReply({
         content: sentences.noUserAnalyse,
         ephemeral: true,
       });
 
     if (!member)
-      return interaction[execute ? "editReply" : "reply"]({
+      return interaction.editReply({
         content: sentences.noMember,
         ephemeral: true,
       });
 
     // Check if the user is a bot
     if (!execute && user.bot) {
-      return interaction.reply({
+      return interaction.editReply({
         content: sentences.cannotBots,
         ephemeral: true,
       });
@@ -52,14 +56,15 @@ module.exports =
 
     // List the guilds the user is in where the bot is in
 
-    let guilds = await member.client.guilds.fetch();
+    let guilds = await interaction.client.guilds.fetch();
 
     let commonGuildCounts = 0;
 
     for (let [, guild] of guilds) {
       let fetchedGuild = await guild.fetch();
+      let members = await fetchedGuild.members.fetch();
 
-      let guildMember = await fetchedGuild.members.fetch(member.user.id);
+      let guildMember = members.find((member) => member.user.id === user.id);
 
       if (guildMember) commonGuildCounts++;
     }
@@ -79,7 +84,7 @@ module.exports =
 
     let actionRow = new ActionRowBuilder().addComponents(explanationButton);
 
-    let message = await interaction[execute ? "editReply" : "reply"]({
+    let message = await interaction.editReply({
       content: sentences.apiStart,
       components: [actionRow],
     });
@@ -97,16 +102,12 @@ module.exports =
 
     let memberBans = await collections.bans
       .find({
-        user_id: member.user.id,
+        user_id: user.id,
       })
       .toArray();
 
-    let embed = new EmbedBuilder()
+    let embed = userEmbed(user)
       .setTitle(sentences.analysisTitle)
-      .setAuthor({
-        name: user.username,
-        iconURL: user.displayAvatarURL(),
-      })
       .setDescription(sentences.apiStart)
       .addFields([
         {
@@ -129,120 +130,100 @@ module.exports =
           value: memberBans.length.toString(),
         },
       ])
-      .setTimestamp(interaction.createdTimestamp)
-      .setFooter({
-        text: `${
-          interaction.client.user.username
-        } - ${new Date().getFullYear()} `,
-        iconURL: interaction.client.user.displayAvatarURL(),
-      })
-      .setThumbnail(user.displayAvatarURL())
       .setColor("Grey")
-      .setImage(member.user.bannerURL() || null);
+      .setImage(user.bannerURL() || null);
 
     try {
       let result = await analyser(member);
 
       switch (result.toLowerCase()) {
         case "valid":
-          embed.setColor("Green").setDescription(sentences.isValid);
-
-          explanationButton.setDisabled(false);
-          actionRow = new ActionRowBuilder().addComponents(explanationButton);
-
-          message.edit({
-            content: "",
-            components: [actionRow],
-            embeds: [embed],
-          });
-
+          embed = embed.setColor("Green").setDescription(sentences.isValid);
           break;
 
         case "neutral":
-          embed.setColor("Yellow").setDescription(sentences.isNeutral);
-
-          explanationButton.setDisabled(false);
-          actionRow = new ActionRowBuilder().addComponents(explanationButton);
-
-          message.edit({
-            content: "",
-            components: [actionRow],
-            embeds: [embed],
-          });
+          embed = embed.setColor("Yellow").setDescription(sentences.isNeutral);
 
           break;
 
         case "invalid":
-          embed.setColor("Red").setDescription(sentences.isInvalid);
+          embed = embed.setColor("Red").setDescription(sentences.isInvalid);
 
-          explanationButton.setDisabled(false);
-          actionRow = new ActionRowBuilder().addComponents(explanationButton);
-
-          message.edit({
-            content: "",
-            components: [actionRow],
-            embeds: [embed],
-          });
           break;
 
         default:
-          embed.setColor("Grey").setDescription(sentences.apiError);
-
-          message.edit({
-            content: "",
-            components: [],
-            embeds: [embed],
-          });
+          embed = embed.setColor("Grey").setDescription(sentences.apiError);
           break;
       }
 
-      // Ask for an explanation
+      if (
+        result.toLowerCase() === "valid" ||
+        result.toLowerCase() === "neutral" ||
+        result.toLowerCase() === "invalid"
+      ) {
+        explanationButton = explanationButton.setDisabled(false);
+        actionRow = new ActionRowBuilder().addComponents(explanationButton);
 
-      interaction.client.on("interactionCreate", async (interaction) => {
-        if (!interaction.isButton()) return;
+        let message = await interaction.editReply({
+          content: "",
+          components: [actionRow],
+          embeds: [embed],
+        });
 
-        if (interaction.customId === "explanation") {
-          let msg = await interaction.reply({
-            content: sentences.apiStart,
-          });
+        // Ask for an explanation
 
-          try {
-            let thread = await getUserThread(user.id);
+        let collector = message.createMessageComponentCollector({
+          filter: (i) => i.user.id === interaction.user.id,
+          time: 60000,
+          componentType: ComponentType.Button,
+        });
 
-            if (thread) {
-              try {
-                let expanation = await analyser.askExplanation(
-                  thread,
-                  lang,
-                  result.toLowerCase()
-                );
+        collector.on("collect", async (i) => {
+          await i.deferUpdate();
 
-                msg.edit({
-                  content: expanation,
-                });
-              } catch (error) {
-                console.error(error);
-
-                msg.edit({
-                  content: sentences.apiError,
-                });
-              }
-            }
-          } catch (error) {
-            console.error(error);
-
-            msg.edit({
-              content: sentences.apiError,
+          if (i.customId === "explanation") {
+            await i.editReply({
+              content: sentences.apiStart,
             });
+
+            try {
+              let thread = await getUserThread(user.id);
+
+              if (thread) {
+                try {
+                  let expanation = await analyser.askExplanation(
+                    thread,
+                    lang,
+                    result.toLowerCase()
+                  );
+
+                  i.editReply({
+                    content: expanation,
+                  });
+                } catch (error) {
+                  console.error(error);
+
+                  i.editReply({
+                    content: sentences.apiError,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(error);
+
+              i.editReply({
+                content: sentences.apiError,
+              });
+            }
           }
-        }
-      });
+        });
+      }
     } catch (error) {
       embed.setColor("Grey").setDescription(sentences.apiError);
 
       console.error(error);
 
-      message.edit({
+      interaction.editReply({
         content: "",
         components: [],
         embeds: [embed],

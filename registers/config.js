@@ -123,6 +123,49 @@ module.exports = new SlashCommandBuilder()
           )
       )
   )
+  .addSubcommandGroup((group) =>
+    group
+      .setName("verification-airlock")
+      .setDescription("Setup the verification airlock.")
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName("enable")
+          .setDescription("Enable the verification airlock.")
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName("disable")
+          .setDescription("Disable the verification airlock.")
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName("set")
+          .setDescription("Set the verification airlock channel.")
+          .addChannelOption((option) =>
+            option
+              .setName("channel")
+              .setDescription("The channel to set as the verification airlock.")
+              .setRequired(true)
+              .addChannelTypes(ChannelType.GuildText)
+          )
+          .addRoleOption((option) =>
+            option
+              .setName("role")
+              .setDescription("The role to set as the verified role.")
+              .setRequired(true)
+          )
+          .addChannelOption((option) =>
+            option
+              .setName("katua-result-channel")
+              .setDescription(
+                "The channel to set as the katua log channel when members sends the verification message."
+              )
+              .setRequired(false)
+              .addChannelTypes(ChannelType.GuildText)
+          )
+      )
+  )
+
   .addSubcommand((opt) =>
     opt
       .setName("show")

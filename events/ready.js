@@ -1,5 +1,4 @@
 const fs = require("fs");
-let socket = require("../utils/socket.js");
 
 const {
   Routes,
@@ -52,7 +51,7 @@ module.exports =
   async (client) => {
     // await clearThreads();
 
-    let credits = await getCreditsLeft();
+    // let credits = await getCreditsLeft();
 
     await client.guilds.fetch();
 
@@ -73,74 +72,66 @@ module.exports =
 
     // Update credits, 5 requests per min rate limit
 
-    setInterval(async () => {
-      let newCredits = await getCreditsLeft();
+    // setInterval(async () => {
+    //   let newCredits = await getCreditsLeft();
 
-      if (
-        !(
-          credits.available === newCredits.available &&
-          credits.paidBalance === credits.paidBalance
-        )
-      ) {
-        credits = newCredits;
-        console.log(
-          `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-        );
-      }
-    }, 70000);
+    //   if (
+    //     !(
+    //       credits.available === newCredits.available &&
+    //       credits.paidBalance === credits.paidBalance
+    //     )
+    //   ) {
+    //     credits = newCredits;
+    //     console.log(
+    //       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    //     );
+    //   }
+    // }, 70000);
 
     // Update Presence Function
-    async function updatePresence() {
-      let guilds = await client.guilds.fetch();
+    // async function updatePresence() {
+    //   let guilds = await client.guilds.fetch();
 
-      let bans = await collections.bans.find().toArray();
-      let banCount = bans.length;
+    //   let bans = await collections.bans.find().toArray();
+    //   let banCount = bans.length;
 
-      let presences = [
+    //   let presences = [
+    //     {
+    //       name: `/help | katua.xyz`,
+    //       type: ActivityType.Watching,
+    //       ms: 15000,
+    //     },
+    //   ];
+
+    //   client.user.setPresence({
+    //     status: "online",
+    //     activities: [presences[presenceIndex]],
+    //   });
+
+    //   return presences;
+    // }
+
+    client.user.setPresence({
+      status: "online",
+      activities: [
         {
-          name: `${guilds.size} guild${guilds.size > 1 ? "s" : ""} | /help`,
-          state: `${banCount} trolls removed with human confirmation`,
+          name: `/help | katua.xyz`,
           type: ActivityType.Watching,
-          ms: 15000,
         },
-        {
-          name: `Global credits: $${credits.available} / $${credits.paidBalance}`,
-          type: ActivityType.Custom,
-          ms: 4000,
-        },
-        {
-          name: `support: DM me!`,
-          state: `Issues? Suggestions?`,
-          type: ActivityType.Watching,
-          ms: 1000,
-        },
-        {
-          name: `support: DM me!`,
-          state: `Questions? Premium Request?`,
-          type: ActivityType.Watching,
-          ms: 1000,
-        },
-      ];
+      ],
+    });
 
-      client.user.setPresence({
-        status: "dnd",
-        activities: [presences[presenceIndex]],
-      });
+    // let presences = await updatePresence();
 
-      return presences;
-    }
+    // setInterval(async () => {
+    //   presences = await updatePresence();
 
-    let presences = await updatePresence();
-
-    setInterval(async () => {
-      presences = await updatePresence();
-
-      if (presences.length - 1 === presenceIndex) {
-        presenceIndex = 0;
-      } else {
-        presenceIndex++;
-      }
-    }, presences[presenceIndex].ms || 6000);
+    //   if (presences.length - 1 === presenceIndex) {
+    //     presenceIndex = 0;
+    //   } else {
+    //     presenceIndex++;
+    //   }
+    // }, presences[presenceIndex].ms || 6000);
 
     /**
      *
@@ -149,17 +140,9 @@ module.exports =
     async function updateCommands(guild, startup = false) {
       let cmds = [];
       let cmdCount = 0;
-      let cmdStringList = "";
-      let totalCmdsCount =
-        fs.readdirSync(path.join(process.cwd(), "interactions")).length - 1;
-
-      let deployText = `Deploying commands right now ${
-        startup === true
-          ? `in ${sortedGuilds.length - 1} guilds`
-          : `in ${guild.name} guild`
-      }...`;
-
-      console.log(deployText);
+      let totalCmdsCount = fs.readdirSync(
+        path.join(process.cwd(), "interactions")
+      ).length;
 
       for (let [name, command] of commands) {
         try {
@@ -178,7 +161,6 @@ module.exports =
           }
 
           cmdCount++;
-          cmdStringList += `${cmdCount}. /${command.name}, `;
 
           cmds.push(command.toJSON());
         } catch (e) {}
@@ -193,31 +175,24 @@ module.exports =
         );
 
         console.log(
-          `Deployed ${cmdCount} commands in ${guild.name} guild. (${cmdStringList})`
+          `Deployed ${cmdCount} / ${totalCmdsCount} commands in ${
+            guild.name
+          } guild (${guild.id}). (${cmds.map((c) => c.name).join(", ")})`
         );
       } catch (e) {
         console.log("Error deploying commands.");
       }
     }
 
-    console.log(`_______________      _______________       ______  ___     _________
-___  ____/__  /___  ____  __/__  __/____  ____   |/  /___________  /
-__  /_   __  /_  / / /_  /_ __  /_ __  / / /_  /|_/ /_  __ \\  __  / 
-_  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /  
-/_/      /_/  \\__,_/ /_/    /_/    _\\__, / /_/  /_/  \\____/\\__,_/   
-                                    /____/`);
+    console.log(`ASCII Art Brand Name Here`);
     console.log(`Logged in as ${client.user.username}`);
     await connectDB();
     require("../app/server.js");
 
-    socket.emit("ready", () => {
-      console.log("Socket is ready.");
-    });
-
     console.log(guildsText);
-    console.log(
-      `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    );
+    // console.log(
+    //   `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    // );
 
     (async () => {
       try {
@@ -309,7 +284,7 @@ _  __/   _  / / /_/ /_  __/ _  __/ _  /_/ /_  /  / / / /_/ / /_/ /
           }
         )
         .then((res) => {
-          console.log(`Updated stats: ${res.data}`);
+          console.log(`Updated stats: ${JSON.stringify(res.data)}`);
         })
         .catch((e) => {
           console.error(e);

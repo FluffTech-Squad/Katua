@@ -141,5 +141,5 @@ module.exports = async (interaction) => {
     .setTitle(langData["helpCommands"]["help"].description)
     .setDescription(cmds.join("\n"));
 
-  interaction.reply({ embeds: [embed] });
+  interaction.editReply({ embeds: [embed] });
 };

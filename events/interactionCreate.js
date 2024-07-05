@@ -47,6 +47,8 @@ module.exports =
         `${interaction.user.username} (${interaction.user.id}) ran ${interaction.commandName}; Guild: ${interaction.guild.name} (${interaction.guild.id})`
       );
 
+      await interaction.deferReply();
+
       await command(
         interaction,
         interaction.commandName === "ping" ? now : false

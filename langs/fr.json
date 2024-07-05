@@ -23,8 +23,8 @@
   "invalidTitle": "Utilisateur suspect détecté",
   "notInvalidTitle": "Pas suspect.",
   "memberReport": "*Quelques mots pour dire que $1 pourrait être un troll. Si des messages dérangés, mentionnez les modérateurs.*",
-  "botJoinTitle": "FluffyMod est là pour vous aider!",
-  "botJoinText": "Bonjour! Je suis FluffyMod, un bot qui vous aide à modérer votre serveur. Je peux vous aider à analyser les utilisateurs, détecter les trolls, et plus encore. Pour commencer, tapez `/help`.",
+  "botJoinTitle": "Katua est là pour vous aider!",
+  "botJoinText": "Bonjour! Je suis Katua, un bot qui vous aide à modérer votre serveur. Je peux vous aider à analyser les utilisateurs, détecter les trolls, et plus encore. Pour commencer, tapez `/help`.",
   "noDM": "Cette commande ne peut être utilisée que dans un serveur.",
   "helpCommands": {
     "help": {
@@ -109,6 +109,6 @@
   "nsfwMessage": "Le message de $1 a été supprimé dans le salon $2 car il contient du contenu NSFW.",
   "nsfwAuthorMessage": "Votre message a été supprimé dans le salon $1 car il contient du contenu NSFW. Veuillez ne pas envoyer de contenu NSFW dans ce serveur. Merci!",
   "premiumWhitelistJoin": "Quelle chance ! Votre serveur $1 a déjà été inscrit sur la liste blanche pour les fonctionnalités premium. La détection des trolls est activée sur votre serveur. Profitez-en ! 🎉",
-  "setupTitle": "Voulez vous configurer FluffyMod ?",
+  "setupTitle": "Voulez vous configurer Katua ?",
   "setupBotConfirmLabel": "Oui, configurer le bot"
 }

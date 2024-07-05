@@ -25,11 +25,9 @@ module.exports =
       .setDescription(sentences.botJoinText)
       .setColor("Green");
 
-    let dm = await owner.createDM();
-
     let isPremiumGuild = await isPremium(guild);
     if (isPremiumGuild) {
-      embed.setDescription(
+      embed = embed.setDescription(
         embed.data.description +
           "\n" +
           sentences.premiumWhitelistJoin.replace("$1", guild.name)
@@ -64,6 +62,8 @@ module.exports =
     let Payload = { embeds: [embed], components: [row] };
 
     try {
+      let dm = await owner.createDM();
+
       await dm.send(Payload);
     } catch (e) {
       console.log(
