@@ -3,17 +3,20 @@
 // Loading commands' functions
 
 const fs = require("fs");
-const langs = require("../utils/langs.js");
+const langs = require("../../utils/langs.js");
 const { Interaction } = require("discord.js");
+const path = require("path");
+
 let commands = new Map();
 
-let commandPath = __dirname.replace("events", "interactions");
+let commandPath = path.join(__dirname, "..", "..", "interactions");
+
 const commandFiles = fs
   .readdirSync(commandPath)
   .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
-  const command = require(`../interactions/${file}`);
+  const command = require(`../../interactions/${file}`);
   let name = file.split(".")[0];
 
   if (!command) {
@@ -33,7 +36,6 @@ module.exports =
 
     if (!interaction.isCommand()) return;
 
-    let now = Date.now();
     let command = commands.get(interaction.commandName);
 
     if (!command)
@@ -49,10 +51,7 @@ module.exports =
 
       await interaction.deferReply();
 
-      await command(
-        interaction,
-        interaction.commandName === "ping" ? now : false
-      );
+      await command(interaction);
     } catch (error) {
       console.error(error);
 

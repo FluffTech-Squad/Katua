@@ -10,11 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  console.log(req.path, req.method, req.body, req.headers);
-
+  // console.log(req.path, req.method, req.body, req.headers);
   // Block if it is not from my API server with a secret key
-
   // ...
+
   next();
 });
 

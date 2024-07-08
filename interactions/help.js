@@ -7,7 +7,6 @@ const {
 
 const langs = require("../utils/langs.js");
 const { userEmbed } = require("../utils/embedFactory.js");
-const fs = require("fs");
 
 /**
  *
@@ -32,7 +31,7 @@ module.exports = async (interaction) => {
     return `<${type}${s}>`;
   }
 
-  function aroundOptional(s) {
+  function aroundOptional(s, type = "") {
     return `(${type}${s})`;
   }
 
@@ -45,7 +44,7 @@ module.exports = async (interaction) => {
     let usagesText = "**Usages:**\n";
 
     if (options.length === 0) {
-      usagesText += `\`${command.name}\`\n`;
+      usagesText += `\`/${command.name}\`\n`;
     } else {
       for (let option of options) {
         if (option.type === ApplicationCommandOptionType.SubcommandGroup) {
@@ -62,6 +61,22 @@ module.exports = async (interaction) => {
                   usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <#${name}>\`\n`;
                 } else {
                   usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (#${name})\`\n`;
+                }
+              } else if (opt.type === ApplicationCommandOptionType.Role) {
+                let name = opt.name;
+
+                if (opt.required) {
+                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <@&${name}>\`\n`;
+                } else {
+                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (@&${name})\`\n`;
+                }
+              } else if (opt.type === ApplicationCommandOptionType.User) {
+                let name = opt.name;
+
+                if (opt.required) {
+                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <@${name}>\`\n`;
+                } else {
+                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (@${name})\`\n`;
                 }
               } else {
                 let name = opt.name;
@@ -140,6 +155,8 @@ module.exports = async (interaction) => {
   let embed = userEmbed(interaction.client.user)
     .setTitle(langData["helpCommands"]["help"].description)
     .setDescription(cmds.join("\n"));
+
+  console.log(cmds.join("\n"));
 
   interaction.editReply({ embeds: [embed] });
 };

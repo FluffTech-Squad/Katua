@@ -22,7 +22,7 @@ module.exports =
    *
    * @param {ChatInputCommandInteraction} interaction
    */
-  async (interaction, execute = false) => {
+  async (interaction) => {
     let members = await interaction.guild.members.fetch();
 
     let lang = interaction.guild.preferredLocale || "en-US";
@@ -47,7 +47,7 @@ module.exports =
       });
 
     // Check if the user is a bot
-    if (!execute && user.bot) {
+    if (user.bot) {
       return interaction.editReply({
         content: sentences.cannotBots,
         ephemeral: true,
@@ -179,7 +179,7 @@ module.exports =
         });
 
         collector.on("collect", async (i) => {
-          await i.deferUpdate();
+          await i.deferReply();
 
           if (i.customId === "explanation") {
             await i.editReply({

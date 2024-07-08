@@ -49,8 +49,6 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
-    // await clearThreads();
-
     // let credits = await getCreditsLeft();
 
     await client.guilds.fetch();
@@ -68,49 +66,6 @@ module.exports =
       guildsText += `- ${guild.name} (${id}) \n`;
     }
 
-    let presenceIndex = 0;
-
-    // Update credits, 5 requests per min rate limit
-
-    // setInterval(async () => {
-    //   let newCredits = await getCreditsLeft();
-
-    //   if (
-    //     !(
-    //       credits.available === newCredits.available &&
-    //       credits.paidBalance === credits.paidBalance
-    //     )
-    //   ) {
-    //     credits = newCredits;
-    //     console.log(
-    //       `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    //     );
-    //   }
-    // }, 70000);
-
-    // Update Presence Function
-    // async function updatePresence() {
-    //   let guilds = await client.guilds.fetch();
-
-    //   let bans = await collections.bans.find().toArray();
-    //   let banCount = bans.length;
-
-    //   let presences = [
-    //     {
-    //       name: `/help | katua.xyz`,
-    //       type: ActivityType.Watching,
-    //       ms: 15000,
-    //     },
-    //   ];
-
-    //   client.user.setPresence({
-    //     status: "online",
-    //     activities: [presences[presenceIndex]],
-    //   });
-
-    //   return presences;
-    // }
-
     client.user.setPresence({
       status: "online",
       activities: [
@@ -120,18 +75,6 @@ module.exports =
         },
       ],
     });
-
-    // let presences = await updatePresence();
-
-    // setInterval(async () => {
-    //   presences = await updatePresence();
-
-    //   if (presences.length - 1 === presenceIndex) {
-    //     presenceIndex = 0;
-    //   } else {
-    //     presenceIndex++;
-    //   }
-    // }, presences[presenceIndex].ms || 6000);
 
     /**
      *
@@ -232,6 +175,45 @@ module.exports =
       client.on(name, event);
     }
 
+    const eventFolders = fs
+      .readdirSync(__dirname)
+      .filter((folder) => fs.lstatSync(`${__dirname}/${folder}`).isDirectory());
+
+    for (const folder of eventFolders) {
+      let eventName = folder;
+      let instanceCount = 0;
+
+      let eventInstanceFiles = fs
+        .readdirSync(`${__dirname}/${folder}`)
+        .filter((file) => file.endsWith(".js"));
+
+      let events = [];
+
+      for (const file of eventInstanceFiles) {
+        const event = require(`./${folder}/${file}`);
+
+        instanceCount++;
+
+        events.push({ exec: event, name: file.replace(".js", "") });
+      }
+
+      if (events.find((e) => e.name === "main")) {
+        let mainEvent = events.find((e) => e.name === "main");
+
+        client.on(eventName, mainEvent.exec);
+      }
+
+      events = events.filter((e) => e.name !== "main");
+
+      for (const event of events) {
+        client.on(eventName, event.exec);
+      }
+
+      console.log(
+        `Event ${eventName} loaded with ${instanceCount} different instances.`
+      );
+    }
+
     client.on("guildUpdate", async (oldGuild, newGuild) => {
       // Check if the guild locale changed
 
@@ -244,24 +226,6 @@ module.exports =
     client.on("guildCreate", async (guild) => {
       // Update the slash commands locale name and description
       await updateCommands(guild);
-
-      // Set a presence to say thank you the user (guild) for adding the bot
-
-      guilds = await client.guilds.fetch();
-
-      guild.client.user.setPresence({
-        status: "online",
-        activities: [
-          {
-            name: `Thank you for adding me to ${guild.name}!`,
-            type: ActivityType.Custom,
-          },
-        ],
-      });
-
-      setTimeout(async () => {
-        await updatePresence();
-      }, 1000);
     });
 
     async function updatesStats() {

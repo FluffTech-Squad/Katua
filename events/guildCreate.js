@@ -40,11 +40,8 @@ module.exports =
 
     let systemChannel = guild.systemChannel;
 
-    // Setup config for the guild
-
     await collections.guilds.insertOne({
       guild_id: guild.id,
-      assistant: process.env.OPENAI_ASSISTANT_ID,
       prevent_members: isPremiumGuild ? true : false,
       inform_members_channel_id: systemChannel ? systemChannel.id : null,
     });

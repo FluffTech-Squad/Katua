@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
-  .setName("ping")
-  .setDescription("Check the bot's latency.");
+  .setName("tickets")
+  .setDescription("Setup the ticket system.");

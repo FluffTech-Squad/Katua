@@ -1,10 +1,16 @@
-# 🐾🏳️‍🌈 Katua: Your Niche Best Anti-Troll Moderator 🤖
+# 🐾🏳️‍🌈 Katua: Your Niche Best Discord Bot 🤖
+
+Katua Katua is a multi-porpose Discord Bot, mainly moderation to make safeplaces, such as furry or LGBTQ+, funnier and safer!
+
+Join Katua Bot House: https://katua.xyz/
+
+**Katua is actually a moderation Discord Bot, but more feature will be added in the future and make it multi-purpose!**
+
+## Auto-Moderation
 
 Katua is powered by AI to analyse user profiles, whether when they are joining your guild or with a manual command. Katua will determine if the user is safe, seems to be a troll or has a neutral profile, but only you, moderators and admins have the primal right to ban those users depending of their behavior, however, Katua will delete harmful messages (from users detected as unsafe) for safety.
 
 That's main's Katua feature. **AI-powered features are premium only, but if your server is a furry or a LGBT+ server, me, Nekomancer, won't hesitate to give you that gift and make you try out those features!**
-
-## Auto-Moderation
 
 With the API enabled, troll detection is working.
 ↘️ _This means that you need Premium_
@@ -38,15 +44,6 @@ Get list of commands.
 **Usages:**
 `help`
 
-#### `ping`
-
-🐌 _Snail or Cheetah - that's the question_
-
-Check the bot's latency.
-
-**Usages:**
-`ping`
-
 #### `userinfo`
 
 Get information about a user.
@@ -59,6 +56,20 @@ Get information about a user.
 `/userinfo <@user>`
 
 _Illustration soon..._
+
+#### `lock`
+
+Lock a channel. Members will not be able to send messages until unlocked.
+
+**Usages:**
+`/lock`
+
+#### `unlock`
+
+Unlock a locked channel. Members will be able to send messages again.
+
+**Usages:**
+`/unlock`
 
 #### `analyse`
 
@@ -74,6 +85,19 @@ _Omae wa mou- shindeiru_
 
 _Illustration soon..._
 
+### 📩 Ticketing
+
+A simple ticketing system, setup step by step.
+
+**Usages:**
+`/tickets`
+
+![https://i.imgur.com/PXyPYHu.png](https://i.imgur.com/PXyPYHu.png)
+![https://i.imgur.com/pgK4i5T.png](https://i.imgur.com/pgK4i5T.png)
+![https://i.imgur.com/QXiTVGZ.png](https://i.imgur.com/QXiTVGZ.png)
+![https://i.imgur.com/VXPDRAN.png](https://i.imgur.com/VXPDRAN.png)
+![https://i.imgur.com/BmSWLiV.png](https://i.imgur.com/BmSWLiV.png)
+
 ### ⚙️🪛 Setup Katua
 
 Configure Katua for your guild.
@@ -86,14 +110,14 @@ _Lemme save you from misfortune, I'll guide you._
 
 **Usages:**
 
-`/config logs log-channel <#channel>`
-`/config logs public-channel <#channel>`
+`/logs log-channel <#channel>`
+`/logs public-channel <#channel>`
 
 <blockquote>Enable or disable logging in the set log channel or the public channel.</blockquote>
 **Usages:**
 
-`/config logs enable <type>`
-`/config logs disable <type>`
+`/logs enable <type>`
+`/logs disable <type>`
 
 #### 🚯 Auto-Moderation Rules Configuration
 
@@ -101,8 +125,10 @@ _Lemme save you from misfortune, I'll guide you._
 
 **Usages:**
 
-`/config filters enable <filter>`
-`/config filters disable <filter>`
+`/filters enable <filter>`
+`/filters disable <filter>`
+
+_Warning: this automod feature might be useless, because Discord's Default Guild Automod is way better, thus, might be deleted due to Katua effectivenessless._
 
 #### Verification airlock
 
@@ -110,9 +136,13 @@ _Lemme save you from misfortune, I'll guide you._
 
 **Usages:**
 
-`/config verification-airlock set <channel> <role> (katua-result-channel)`
-`/config verification-airlock enable`
-`/config verification-airlock disable`
+`/verification-airlock channel <#channel>`
+`/verification-airlock role <type> <@role>`
+`/verification-airlock role "One role" <@role>`
+`/verification-airlock role "Add role" <@role>`
+`/verification-airlock role "Remove role" <@role>`
+`/verification-airlock enable`
+`/verification-airlock disable`
 
 #### Show actual config
 
@@ -120,6 +150,7 @@ _Lemme save you from misfortune, I'll guide you._
 
 **Usages:**
 
-`/config show`
-`/config show logging`
-`/config show filters`
+`/show-config`
+`/show-config logging`
+`/show-config filters`
+`/show-config verification-airlock`

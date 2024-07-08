@@ -120,7 +120,7 @@ module.exports =
       if (i.customId === "analysis") {
         // Run analysis command interaction
 
-        i.reply({ content: sentences.apiStart, ephemeral: true });
+        i.deferReply({ fetchReply: true });
 
         await require("./analyse.js")(interaction, true);
 
