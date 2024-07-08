@@ -5,7 +5,6 @@ const {
   Client,
   ActivityType,
   SlashCommandBuilder,
-  Guild,
 } = require("discord.js");
 
 const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
@@ -76,86 +75,10 @@ module.exports =
       ],
     });
 
-    /**
-     *
-     * @param {Guild} guild
-     */
-    async function updateCommands(guild, startup = false) {
-      let cmds = [];
-      let cmdCount = 0;
-      let totalCmdsCount = fs.readdirSync(
-        path.join(process.cwd(), "interactions")
-      ).length;
-
-      for (let [name, command] of commands) {
-        try {
-          let lang = guild.preferredLocale || "en-US";
-          let lg = langs[lang] || langs["en-US"];
-
-          if (!lg.helpCommands[name]) {
-            // console.log(`Command ${name} doesn't have locales.`);
-          } else {
-            command = command
-              .setNameLocalization(lang, lg.helpCommands[name].localeName)
-              .setDescriptionLocalization(
-                lang,
-                lg.helpCommands[name].localeDescription
-              );
-          }
-
-          cmdCount++;
-
-          cmds.push(command.toJSON());
-        } catch (e) {}
-      }
-
-      try {
-        await rest.put(
-          Routes.applicationGuildCommands(client.user.id, guild.id),
-          {
-            body: cmds,
-          }
-        );
-
-        console.log(
-          `Deployed ${cmdCount} / ${totalCmdsCount} commands in ${
-            guild.name
-          } guild (${guild.id}). (${cmds.map((c) => c.name).join(", ")})`
-        );
-      } catch (e) {
-        console.log("Error deploying commands.");
-      }
-    }
-
     console.log(`ASCII Art Brand Name Here`);
     console.log(`Logged in as ${client.user.username}`);
     await connectDB();
     require("../app/server.js");
-
-    console.log(guildsText);
-    // console.log(
-    //   `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    // );
-
-    (async () => {
-      try {
-        let arrayCommands = Array.from(commands);
-        let guilds = await client.guilds.fetch();
-
-        for (let [id, guild] of guilds) {
-          let fetchedGuild = await guild.fetch();
-          await updateCommands(fetchedGuild);
-        }
-
-        if (arrayCommands.length === 0) {
-          console.log("No slash commands to load.");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-
-    const fs = require("fs");
 
     // Load events
 
@@ -214,19 +137,25 @@ module.exports =
       );
     }
 
-    client.on("guildUpdate", async (oldGuild, newGuild) => {
-      // Check if the guild locale changed
+    try {
+      let data = await rest.put(
+        Routes.applicationCommands(client.application.id),
+        {
+          body: Array.from(commands.values()).map((c) => c.toJSON()),
+        }
+      );
 
-      if (oldGuild.preferredLocale !== newGuild.preferredLocale) {
-        // Update the slash commands locale name and description
-        await updateCommands(newGuild);
-      }
-    });
+      console.log(`Refreshed ${data.length} slash commands.`);
+    } catch (e) {
+      console.log("Error deploying commands.");
+    }
 
-    client.on("guildCreate", async (guild) => {
-      // Update the slash commands locale name and description
-      await updateCommands(guild);
-    });
+    console.log(guildsText);
+    // console.log(
+    //   `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+    // );
+
+    // await updateCommands();
 
     async function updatesStats() {
       let url = `${topggRoot}/bots/${client.user.id}/stats`;
