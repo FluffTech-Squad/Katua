@@ -42,6 +42,7 @@ With the API enabled, troll detection is working.
 Get list of commands.
 
 **Usages:**
+
 `help`
 
 #### `userinfo`
@@ -53,6 +54,7 @@ Get information about a user.
 <blockquote>Eventually, you can request an analysis of the user in question, but it requires premium.</blockquote>
 
 **Usages:**
+
 `/userinfo <@user>`
 
 _Illustration soon..._
@@ -62,6 +64,7 @@ _Illustration soon..._
 Lock a channel. Members will not be able to send messages until unlocked.
 
 **Usages:**
+
 `/lock`
 
 #### `unlock`
@@ -69,6 +72,7 @@ Lock a channel. Members will not be able to send messages until unlocked.
 Unlock a locked channel. Members will be able to send messages again.
 
 **Usages:**
+
 `/unlock`
 
 #### `analyse`
@@ -81,6 +85,7 @@ _Omae wa mou- shindeiru_
 <blockquote>This is a premium feature</blockquote>
 
 **Usages:**
+
 `/analyse <@user>`
 
 _Illustration soon..._
@@ -90,6 +95,7 @@ _Illustration soon..._
 A simple ticketing system, setup step by step.
 
 **Usages:**
+
 `/tickets`
 
 ### ⚙️🪛 Setup Katua
@@ -105,12 +111,15 @@ _Lemme save you from misfortune, I'll guide you._
 **Usages:**
 
 `/logs log-channel <#channel>`
+
 `/logs public-channel <#channel>`
 
 <blockquote>Enable or disable logging in the set log channel or the public channel.</blockquote>
+
 **Usages:**
 
 `/logs enable <"logging" | "inform members">`
+
 `/logs disable <"logging" | "inform members">`
 
 #### 🚯 Auto-Moderation Rules Configuration
@@ -120,6 +129,7 @@ _Lemme save you from misfortune, I'll guide you._
 **Usages:**
 
 `/filters enable <"NSFW Filter" | "Inappropriate Language Filter">`
+
 `/filters disable <"NSFW Filter" | "Inappropriate Language Filter">`
 
 _Warning: this automod feature might be useless, because Discord's Default Guild Automod is way better, thus, might be deleted due to Katua effectivenessless._
@@ -131,9 +141,13 @@ _Warning: this automod feature might be useless, because Discord's Default Guild
 **Usages:**
 
 `/verification-airlock channel <#channel>`
+
 `/verification-airlock role <type> <@role>`
+
 `/verification-airlock role <"One role" | "Add role" | "Remove role"> <@role>`
+
 `/verification-airlock enable`
+
 `/verification-airlock disable`
 
 #### Show actual config
@@ -143,7 +157,11 @@ _Warning: this automod feature might be useless, because Discord's Default Guild
 **Usages:**
 
 `/show-config`
+
 `/show-config ("logging" | "filters" | "verification-airlock" | "ticketing")`
+
 `/show-config logging`
+
 `/show-config filters`
+
 `/show-config verification-airlock`
