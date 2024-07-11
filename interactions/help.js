@@ -3,6 +3,11 @@
 const {
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
+  StringSelectMenuBuilder,
+  ActionRowBuilder,
+  ComponentType,
+  EmbedBuilder,
+  ApplicationCommandOptionBase,
 } = require("discord.js");
 
 const langs = require("../utils/langs.js");
@@ -21,11 +26,40 @@ module.exports = async (interaction) => {
 
   let langData = langs[lang];
 
-  let cmds = [];
+  let metadata = require("../registers/metadata.json");
+  let categories = metadata.categories;
 
-  // Get the command list; ../registers folder
+  /**
+   * @type {Object.<string, string>}
+   */
+  let cmdsCatkeys = metadata.commands;
 
-  let commandList = await guild.commands.fetch();
+  /**
+   * @type {Object.<string, {name: string, value: string, inline: boolean}[]>}
+   */
+  let x = {};
+
+  for (let category of categories) {
+    x[category.name] = [];
+  }
+
+  let commandList = await guild.client.application.commands.fetch();
+
+  /**
+   *
+   * @param {import("discord.js").ApplicationCommandChoicesOption | ApplicationCommandOptionBase} option
+   */
+  function parseChoices(option) {
+    let choices = option.choices;
+    if (!choices) return option.name;
+
+    /**
+     * @type {string[]}
+     */
+    let names = choices.map((c) => `"${c.name}"`);
+
+    return names.join(" | ");
+  }
 
   function aroundRequired(s, type = "") {
     return `<${type}${s}>`;
@@ -35,12 +69,34 @@ module.exports = async (interaction) => {
     return `(${type}${s})`;
   }
 
+  /**
+   *
+   * @param {number} type
+   */
+  function getTypeText(type) {
+    if (type === ApplicationCommandOptionType.Channel) {
+      return "#";
+    }
+
+    if (type === ApplicationCommandOptionType.User) {
+      return "@";
+    }
+
+    if (type === ApplicationCommandOptionType.Role) {
+      return "@&";
+    }
+
+    return "";
+  }
+
+  // let i2 = 0;
+
   for (let [, command] of commandList) {
-    let title = `## \`${command.name}\`\n`;
-    let description = `${command.description}\n\n`;
+    let categoryName = cmdsCatkeys[command.name];
 
     // Show usages
     let options = command.options;
+
     let usagesText = "**Usages:**\n";
 
     if (options.length === 0) {
@@ -54,39 +110,15 @@ module.exports = async (interaction) => {
             let opts = subcommand.options || [];
 
             for (let opt of opts) {
-              if (opt.type === ApplicationCommandOptionType.Channel) {
-                let name = opt.name;
+              let optType = getTypeText(opt.type);
 
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <#${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (#${name})\`\n`;
-                }
-              } else if (opt.type === ApplicationCommandOptionType.Role) {
-                let name = opt.name;
+              let str = `${
+                opt.required
+                  ? aroundRequired(parseChoices(opt), optType)
+                  : aroundOptional(parseChoices(opt), optType)
+              }`;
 
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <@&${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (@&${name})\`\n`;
-                }
-              } else if (opt.type === ApplicationCommandOptionType.User) {
-                let name = opt.name;
-
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <@${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (@${name})\`\n`;
-                }
-              } else {
-                let name = opt.name;
-
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} <${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} ${subcommand.name} (${name})\`\n`;
-                }
-              }
+              usagesText += `\`/${command.name} ${option.name} ${subcommand.name} ${str}\`\n`;
             }
           }
         } else if (option.type === ApplicationCommandOptionType.Subcommand) {
@@ -96,67 +128,139 @@ module.exports = async (interaction) => {
             usagesText += `\`/${command.name} ${option.name}\`\n`;
           } else {
             for (let opt of opts) {
-              if (opt.type === ApplicationCommandOptionType.Channel) {
-                let name = opt.name;
+              let optType = getTypeText(opt.type);
 
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} <#${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} (#${name})\`\n`;
-                }
-              } else {
-                let name = opt.name;
+              let str = `${
+                opt.required
+                  ? aroundRequired(parseChoices(opt), optType)
+                  : aroundOptional(parseChoices(opt), optType)
+              }`;
 
-                if (opt.required) {
-                  usagesText += `\`/${command.name} ${option.name} <${name}>\`\n`;
-                } else {
-                  usagesText += `\`/${command.name} ${option.name} (${name})\`\n`;
-                }
-              }
+              usagesText += `\`/${command.name} ${option.name} ${str}\`\n`;
             }
           }
-        } else if (option.type === ApplicationCommandOptionType.Channel) {
-          usagesText += `\`/${command.name} ${
+        } else {
+          let optType = getTypeText(option.type);
+
+          let str = `${
             option.required
-              ? aroundRequired(option.name, "#")
-              : aroundOptional(option.name, "#")
-          }\`\n`;
-        } else if (option.type === ApplicationCommandOptionType.User) {
-          usagesText += `\`/${command.name} ${
-            option.required
-              ? aroundRequired(option.name, "@")
-              : aroundOptional(option.name, "@")
-          }\`\n`;
-        } else if (option.type === ApplicationCommandOptionType.Role) {
-          usagesText += `\`/${command.name} ${
-            option.required
-              ? aroundRequired(option.name, "@")
-              : aroundOptional(option.name, "@")
-          }\`\n`;
-        } else if (option.type === ApplicationCommandOptionType.String) {
-          usagesText += `\`/${command.name} ${
-            option.required
-              ? aroundRequired(option.name, "")
-              : aroundOptional(option.name, "")
-          }\`\n`;
-        } else if (option.type === ApplicationCommandOptionType.Integer) {
-          usagesText += `\`/${command.name} ${
-            option.required
-              ? aroundRequired(option.name, "")
-              : aroundOptional(option.name, "")
-          }\`\n`;
+              ? aroundRequired(parseChoices(option), optType)
+              : aroundOptional(parseChoices(option), optType)
+          }`;
+
+          usagesText += `\`/${command.name} ${str}\`\n`;
         }
       }
     }
 
-    cmds.push(`${title}${description}${usagesText}`);
+    // let doHaveLotOfUsages = usagesText.split("\n").length >= 2;
+
+    x[categoryName].push({
+      name: command.name,
+      value: `${command.description}\n${usagesText}`,
+      inline: false,
+    });
+
+    // i2 = i2 ? 0 : 1;
   }
 
   let embed = userEmbed(interaction.client.user)
     .setTitle(langData["helpCommands"]["help"].description)
-    .setDescription(cmds.join("\n"));
+    .setDescription("Select a category to view the commands.");
 
-  console.log(cmds.join("\n"));
+  let homeEmbed = embed;
 
-  interaction.editReply({ embeds: [embed] });
+  let selectMenu = new StringSelectMenuBuilder()
+    .setCustomId("help_category_select")
+    .addOptions(
+      {
+        label: "Home",
+        value: "home",
+        emoji: "🏠",
+      },
+      ...categories.map((category) => {
+        return {
+          label: category.display,
+          value: category.name,
+          emoji: category.emoji,
+        };
+      })
+    );
+
+  let row = new ActionRowBuilder().addComponents(selectMenu);
+
+  let message = await interaction.editReply({
+    embeds: [embed],
+    components: [row],
+  });
+
+  /**
+   * @type {{category: string, embed:EmbedBuilder}[]}
+   */
+  let categoryEmbeds = [];
+
+  for (let category of categories) {
+    let cmds = x[category.name];
+    if (cmds.length === 0) break;
+
+    let embed = userEmbed(interaction.client.user)
+      .setTitle(category.emoji + " " + category.display)
+      .addFields(...cmds);
+
+    categoryEmbeds.push({
+      category: category.name,
+      embed,
+    });
+  }
+
+  let collector = message.createMessageComponentCollector({
+    componentType: ComponentType.StringSelect,
+    filter: (i) => i.user.id === interaction.user.id,
+    time: 60000,
+  });
+
+  collector.on("collect", async (i) => {
+    await i.deferReply();
+    await i.deleteReply();
+
+    let category = i.values[0];
+
+    if (category === "home") {
+      await interaction.editReply({
+        embeds: [homeEmbed],
+        components: [row],
+      });
+
+      return;
+    }
+
+    let data = categoryEmbeds.find((c) => c.category === category);
+
+    console.log(data);
+
+    if (data) {
+      await interaction.editReply({
+        fetchReply: true,
+        embeds: [data.embed],
+        components: [row],
+      });
+    } else {
+      let category = i.values[0];
+
+      let categoryData = categories.find((c) => c.name === category);
+
+      let title = `${categoryData.emoji} ${categoryData.display}`;
+
+      let embed = userEmbed(interaction.client.user)
+        .setTitle(title)
+        .setDescription(
+          "No commands found in this category. Work in progress."
+        );
+
+      await interaction.editReply({
+        embeds: [embed],
+        components: [row],
+      });
+    }
+  });
 };

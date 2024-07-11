@@ -16,7 +16,7 @@ module.exports =
     if (!memberPermissions.has("ManageChannels")) {
       let msg = await interaction.editReply({
         content:
-          "> :x: You do not have the required permissions to lock this channel.",
+          "> :x: You do not have the required permissions to lock this channel. You need `Manage Channels` permission.",
       });
 
       return setTimeout(() => {
@@ -31,11 +31,13 @@ module.exports =
     if (!botMember.permissions.has("ManageChannels")) {
       let msg = await interaction.editReply({
         content:
-          "> :x: I do not have the required permissions to lock this channel.",
+          "> :x: I do not have the required permissions to lock this channel. I need `Manage Channels` permission.",
       });
 
       return setTimeout(() => {
-        msg.delete();
+        try {
+          msg.delete();
+        } catch {}
       }, 5000);
     }
 

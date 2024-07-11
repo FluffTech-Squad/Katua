@@ -4,7 +4,10 @@ const {
   GuildMember,
   Guild,
   ClientUser,
+  AttachmentBuilder,
 } = require("discord.js");
+const generateBanner = require("./generateBanner");
+const uploadFile = require("./uploadFile");
 
 /**
  *
@@ -32,7 +35,7 @@ let userEmbed = function (user) {
  */
 
 let guildEmbed = function (guild) {
-  return new EmbedBuilder()
+  let embed = new EmbedBuilder()
     .setAuthor({
       name: guild.name,
       iconURL: guild.iconURL(),
@@ -44,6 +47,8 @@ let guildEmbed = function (guild) {
     })
     .setColor("Blue")
     .setImage(guild.bannerURL() || null);
+
+  return embed;
 };
 
 async function guildEmbeds(guild) {}

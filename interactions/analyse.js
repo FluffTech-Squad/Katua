@@ -15,7 +15,8 @@ const { getUserThread } = require("../utils/openai");
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
-const { userEmbed } = require("../utils/embedFactory.js");
+const { userEmbed, guildEmbed } = require("../utils/embedFactory.js");
+const isPremium = require("../utils/isPremium.js");
 
 module.exports =
   /**
@@ -29,10 +30,32 @@ module.exports =
     let sentences = langs[lang] || langs["en-US"];
 
     if (interaction.channel.type === ChannelType.DM)
-      return interaction.reply({ content: sentences.noDM, ephemeral: true });
+      return interaction.editReply({
+        content: sentences.noDM,
+        ephemeral: true,
+      });
 
     const user = interaction.options.getUser("user");
     const member = members.find((member) => member.user.id === user.id);
+
+    if (!(await isPremium(interaction.guild))) {
+      let embed = guildEmbed(interaction.guild)
+        .setTitle("Premium Required")
+        .setDescription("This feature is only available for premium servers.")
+        .setColor("Gold")
+        .setFooter({
+          text: "Upgrade to premium to unlock this feature.",
+          iconURL: interaction.client.user.displayAvatarURL(),
+        });
+
+      let msg = await interaction.editReply({ embeds: [embed] });
+
+      setTimeout(() => {
+        msg.delete();
+      }, 5000);
+
+      return;
+    }
 
     if (!user)
       return interaction.editReply({
@@ -84,7 +107,7 @@ module.exports =
 
     let actionRow = new ActionRowBuilder().addComponents(explanationButton);
 
-    let message = await interaction.editReply({
+    await interaction.editReply({
       content: sentences.apiStart,
       components: [actionRow],
     });
@@ -221,7 +244,7 @@ module.exports =
     } catch (error) {
       embed.setColor("Grey").setDescription(sentences.apiError);
 
-      console.error(error);
+      console.log(error);
 
       interaction.editReply({
         content: "",

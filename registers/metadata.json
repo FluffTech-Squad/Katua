@@ -1,0 +1,42 @@
+{
+  "categories": [
+    {
+      "name": "admin",
+      "display": "Admin",
+      "emoji": "🔒"
+    },
+    {
+      "name": "config",
+      "display": "Server Config",
+      "emoji": "🔧"
+    },
+    {
+      "name": "basic",
+      "display": "Basic",
+      "emoji": "🔍"
+    },
+    {
+      "name": "fun",
+      "display": "Fun",
+      "emoji": "🎉"
+    },
+    {
+      "name": "levels",
+      "display": "Levels",
+      "emoji": "📈"
+    }
+  ],
+  "commands": {
+    "analyse": "admin",
+    "filters": "config",
+    "help": "basic",
+    "lock": "admin",
+    "logs": "config",
+    "show-config": "config",
+    "tickets": "config",
+    "unlock": "admin",
+    "userinfo": "basic",
+    "verification-airlock": "config",
+    "theme": "config"
+  }
+}

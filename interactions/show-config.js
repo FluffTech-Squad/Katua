@@ -6,15 +6,13 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
-  Message,
 } = require("discord.js");
 
-const isPremium = require("../utils/isPremium.js");
 const { collections } = require("../utils/mongodb.js");
-const langs = require("../utils/langs.js");
 const { guildEmbed } = require("../utils/embedFactory.js");
-const { openai } = require("../utils/openai.js");
-let { guilds, guildRules } = collections;
+const generateBanner = require("../utils/generateBanner.js");
+const uploadFile = require("../utils/uploadFile.js");
+let { guilds, guildRules, guildAssets } = collections;
 
 module.exports =
   /**
@@ -23,6 +21,22 @@ module.exports =
    */
   async (interaction) => {
     const { options, guild } = interaction;
+
+    // check if member is a moderator or admin
+
+    let memberPermissions = interaction.memberPermissions;
+
+    if (!memberPermissions.has("ManageGuild")) {
+      let msg = await interaction.editReply({
+        content: "> :x: Members are not allowed to use this command.",
+      });
+
+      return setTimeout(() => {
+        try {
+          msg.delete();
+        } catch {}
+      }, 5000);
+    }
 
     let type = options.getString("type");
 
@@ -117,6 +131,76 @@ module.exports =
           inline: true,
         }
       );
+
+    if (!guild.bannerURL()) {
+      let guildAssetsData = await guildAssets.findOne({
+        guild_id: guild.id,
+      });
+
+      if (guildAssetsData && guildAssetsData.config_banner) {
+        guildDataEmbed = guildDataEmbed.setImage(guildAssetsData.config_banner);
+      } else {
+        let banner = await generateBanner(guild.name, `Config`);
+        let url = await uploadFile(banner.base64);
+        guildDataEmbed = guildDataEmbed.setImage(url);
+
+        await guildAssets.updateOne(
+          {
+            guild_id: guild.id,
+          },
+          {
+            $set: {
+              config_banner: url,
+            },
+          },
+          {
+            upsert: true,
+          }
+        );
+      }
+
+      if (guildAssetsData && guildAssetsData.rules_banner) {
+        guildRulesDataEmbed = guildRulesDataEmbed.setImage(
+          guildAssetsData.rules_banner
+        );
+      } else {
+        let banner = await generateBanner(guild.name, "Filters");
+        let url = await uploadFile(banner.base64);
+        guildRulesDataEmbed = guildRulesDataEmbed.setImage(url);
+
+        await guildAssets.updateOne(
+          {
+            guild_id: guild.id,
+          },
+          {
+            $set: {
+              rules_banner: url,
+            },
+          }
+        );
+      }
+
+      if (guildAssetsData && guildAssetsData.airlock_banner) {
+        guildVerificationAirlockDataEmbed =
+          guildVerificationAirlockDataEmbed.setImage(guildData.airlock_banner);
+      } else {
+        let banner = await generateBanner(guild.name, "Verification Airlock");
+        let url = await uploadFile(banner.base64);
+        guildVerificationAirlockDataEmbed =
+          guildVerificationAirlockDataEmbed.setImage(url);
+
+        await guildAssets.updateOne(
+          {
+            guild_id: guild.id,
+          },
+          {
+            $set: {
+              airlock_banner: url,
+            },
+          }
+        );
+      }
+    }
 
     if (type) {
       if (type === "logging") {

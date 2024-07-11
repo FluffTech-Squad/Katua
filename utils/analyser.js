@@ -39,7 +39,7 @@ function analyser(member) {
               // Verify if the user didn't change the profile picture or username
 
               let changed = false;
-              let { username, avatar_url } = message.metadata;
+              let { username, avatar_url, custom_status } = message.metadata;
 
               if (username && avatar_url) {
                 if (username !== member.user.username) changed = true;
@@ -58,12 +58,31 @@ function analyser(member) {
                 );
 
                 if (base64Avatar !== base64AvatarMessage) changed = true;
+              }
 
-                if (!changed) {
-                  let result = JSON.parse(message.content[0].text.value).status;
-                  resolve(result);
-                  return;
-                }
+              let userCustomStatus = member.presence.activities.find(
+                (activity) => activity.type === ActivityType.Custom
+              );
+
+              if (userCustomStatus && custom_status) {
+                if (custom_status !== userCustomStatus.state) changed = true;
+              }
+
+              if (userCustomStatus && !custom_status) changed = true;
+
+              // Delete the thread if it was changed
+
+              if (changed) {
+                await openai.threads.del(thread.id);
+
+                thread = await openai.threads.create({
+                  metadata: { guild: guild.id, user: member.user.id },
+                });
+              } else {
+                let result = JSON.parse(message.content[0].text.value).status;
+                resolve(result);
+
+                return;
               }
             }
           }
@@ -79,14 +98,12 @@ function analyser(member) {
             : "offline"
         }"\n`;
 
-        let firstActivity = member.presence
-          ? member.presence.activities[0]
-          : undefined;
+        let customActivity = member.presence.activities.find(
+          (a) => a.type === ActivityType.Custom
+        );
 
         content += `custom_presence: ${
-          firstActivity && firstActivity.type === ActivityType.Custom
-            ? `"${firstActivity.state}"`
-            : "No custom status"
+          customActivity ? `"${customActivity.state}"` : "No custom status"
         }\n`;
 
         content += `avatar_url: in attachments\n`;
@@ -130,6 +147,7 @@ function analyser(member) {
             username: member.user.username,
             user_id: member.user.id,
             avatar_url: member.user.displayAvatarURL(),
+            custom_status: customActivity ? customActivity.state : "",
           },
         });
 
@@ -176,6 +194,7 @@ function analyser(member) {
                     username: member.user.username,
                     user_id: member.user.id,
                     avatar_url: member.user.displayAvatarURL(),
+                    custom_status: customActivity ? customActivity.state : "",
                   },
                 }
               );
@@ -224,7 +243,7 @@ function askExplanation(thread, lang, state) {
     }
 
     let run = await openai.threads.runs.createAndPoll(thread.id, {
-      assistant_id: process.env.OPENAI_ASSISTANTV2_ID,
+      assistant_id: process.env.OPENAI_ASSISTANT_ID,
       metadata: { type: "explanation" },
       response_format: { type: "json_object" },
       tool_choice: {
@@ -233,7 +252,7 @@ function askExplanation(thread, lang, state) {
           name: "explain_result_why",
         },
       },
-      additional_instructions: "json:",
+      additional_instructions: `explain briefly here in language: ${lang} why the user is ${state}. Don't make additional comments. json:`,
     });
 
     if (run.status === "requires_action") {
@@ -243,7 +262,7 @@ function askExplanation(thread, lang, state) {
         {
           tool_outputs: [
             {
-              output: `{explanation: "explanation text here in language: ${lang} why the user is ${state}"}`,
+              output: `{explanation: "Explanation"}`,
               tool_call_id:
                 run.required_action.submit_tool_outputs.tool_calls[0].id,
             },

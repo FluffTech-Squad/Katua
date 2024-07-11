@@ -10,9 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@rmp135/imgur": "^0.6.0",
     "axios": "^1.7.2",
     "canvas": "^2.11.2",
-    "cors": "^2.8.5",
     "dayjs": "^1.11.11",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",

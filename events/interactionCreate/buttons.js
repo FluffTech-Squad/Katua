@@ -48,10 +48,14 @@ module.exports =
 
       ticketChannel.permissionOverwrites.edit(interaction.user, {
         ViewChannel: true,
+        AttachFiles: true,
+        EmbedLinks: true,
       });
 
       ticketChannel.permissionOverwrites.edit(interaction.guild.members.me, {
         ViewChannel: true,
+        AttachFiles: true,
+        EmbedLinks: true,
       });
 
       let embed = userEmbed(interaction.user)
@@ -113,6 +117,8 @@ module.exports =
         await buttonInteraction.deleteReply();
 
         let username = interaction.channel.name.split("-")[1];
+
+        await msg.delete();
 
         // generate a transcript of the ticket
 

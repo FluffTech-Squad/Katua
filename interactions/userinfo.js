@@ -11,6 +11,7 @@ const {
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
+const isPremium = require("../utils/isPremium.js");
 
 module.exports =
   /**
@@ -51,6 +52,13 @@ module.exports =
       .setLabel(sentences.analysisTitle)
       .setStyle(ButtonStyle.Primary)
       .setCustomId("analysis");
+
+    let isPremiumGuild = await isPremium(interaction.guild);
+
+    if (!isPremiumGuild) {
+      analysisButton.setDisabled(true);
+      analysisButton.setLabel(`${sentences.analysisTitle} (Premium)`);
+    }
 
     let actionRow = new ActionRowBuilder().addComponents(analysisButton);
 
@@ -109,7 +117,7 @@ module.exports =
       .setColor("Grey")
       .setImage(member.user.bannerURL() || null);
 
-    let msg = await interaction.editReply({
+    await interaction.editReply({
       embeds: [embed],
       components: [actionRow],
     });
@@ -120,11 +128,13 @@ module.exports =
       if (i.customId === "analysis") {
         // Run analysis command interaction
 
-        i.deferReply({ fetchReply: true });
+        try {
+          await i.deferReply();
+          await i.editReply({ content: "If it's taking time, don't mind!" });
+          await i.deleteReply();
+        } catch {}
 
-        await require("./analyse.js")(interaction, true);
-
-        i.deleteReply();
+        await require("./analyse.js")(interaction);
       }
     });
   };

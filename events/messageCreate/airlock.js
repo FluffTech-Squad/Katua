@@ -12,7 +12,11 @@ module.exports = async (message) => {
     guild_id: message.guild.id,
   });
 
-  if (guildData.enabled && guildData.enabled.includes("verification-airlock")) {
+  if (
+    guildData &&
+    guildData.enabled &&
+    guildData.enabled.includes("verification-airlock")
+  ) {
     if (guildData.airlock_channel_id) {
       let airlockChannel = await message.guild.channels.fetch(
         guildData.airlock_channel_id

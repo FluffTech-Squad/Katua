@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
   .setName("filters")
@@ -44,4 +44,5 @@ module.exports = new SlashCommandBuilder()
           )
           .setRequired(true)
       )
-  );
+  )
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages);

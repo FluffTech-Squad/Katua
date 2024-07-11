@@ -102,6 +102,7 @@ module.exports =
 
       try {
         let message = await log_channel.send({ embeds: [embed] });
+
         if (!(await isPremium(member.guild))) {
           embed = embed
             .setDescription(sentences.notPremiumText)
@@ -146,10 +147,12 @@ module.exports =
           /**
            * @type {Collection<string, BaseGuildTextChannel>}
            */
-          let channels = (await guild.channels.fetch()).filter(
+          let channels = await guild.channels.fetch();
+
+          channels = channels.filter(
             (channel) =>
               channel.isTextBased() &&
-              channel.permissionsFor(botMember).has("SendMessages")
+              channel.permissionsFor(botMember, true).has("SendMessages", true)
           );
 
           let firstChannel = channels.first();
@@ -164,13 +167,13 @@ module.exports =
             if (inform_channel && inform_channel.isTextBased()) {
               await inform_channel.send({
                 content: sentences.memberReport.replace("$1", member.user),
-                allowedMentions: { users: [], parse: [] },
+                allowedMentions: { users: [], parse: [], repliedUser: false },
               });
             }
           } else {
             await channel.send({
               content: sentences.memberReport.replace("$1", member.user),
-              allowedMentions: { users: [], parse: [] },
+              allowedMentions: { users: [], parse: [], repliedUser: false },
             });
           }
         }
@@ -195,53 +198,37 @@ module.exports =
               embeds: [embed],
             });
           } catch (error) {
-            console.error(error);
+            console.log(error);
 
-            embed.setDescription(sentences.apiError);
-            message.edit({
+            embed = embed.setDescription(sentences.apiError);
+            await message.edit({
               embeds: [embed],
             });
           }
         }
       } catch (e) {
+        console.log(e);
         try {
           let owner = await guild.fetchOwner();
-          let dmChannel = owner.dmChannel;
 
-          if (!owner.dmChannel) {
-            dmChannel = await owner.createDM();
-          }
-
-          let messages = await dmChannel.messages.fetchPinned();
-
-          let lastMessage = messages.first();
-
-          if (lastMessage && lastMessage.author.id === member.client.user.id) {
-            return;
-          }
+          let errorChannel = await guild.channels.fetch(
+            process.env.ERRORS_CHANNEL_ID
+          );
 
           let embed = guildEmbed(guild)
             .setTitle(sentences.apiError)
             .setDescription(
-              `I couldn't send a message in the log channel of your server ${guild.name}. Please make sure if the \`VIEW_CHANNEL\` and \`SEND_MESSAGES\` permissions are enabled for me in the log channel \`${log_channel.name}\`.`
+              `I couldn't send a message in the log channel of the server ${guild.name}. Please make sure if the \`VIEW_CHANNEL\` and \`SEND_MESSAGES\` permissions are enabled for me in the log channel \`${log_channel.name}\`.`
             )
             .setColor("Red");
 
-          if (dmChannel) {
-            let msg = await dmChannel.send(embed);
-            await msg.pin();
+          errorChannel.send({ embeds: [embed] });
 
-            console.log(
-              `Sent log error message to ${owner.user.username}, guild: ${guild.name}`
-            );
-          }
-        } catch (e) {
-          await collections.guilds.updateOne(
-            {
-              guild_id: guild.id,
-            },
-            { $unset: { log_channel_id: 1 } }
+          console.log(
+            `Sent log error message, ${owner.user.username}, guild: ${guild.name}`
           );
+        } catch (e) {
+          console.log(e);
         }
       }
     } catch (e) {

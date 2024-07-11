@@ -9,7 +9,7 @@ const { collections } = require("./mongodb");
 async function isPremium(guild) {
   let row = await collections.premiumGuilds.findOne({ guild_id: guild.id });
 
-  return !!row;
+  return row ? true : false;
 }
 
 module.exports = isPremium;

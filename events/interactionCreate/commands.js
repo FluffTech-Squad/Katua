@@ -55,7 +55,7 @@ module.exports =
     } catch (error) {
       console.error(error);
 
-      interaction.reply({
+      await interaction.editReply({
         content: langs[lang].interactionError,
         ephemeral: true,
       });

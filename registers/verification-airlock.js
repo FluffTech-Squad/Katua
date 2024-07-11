@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, ChannelType } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  ChannelType,
+  PermissionFlagsBits,
+} = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
   .setName("verification-airlock")
@@ -57,4 +61,5 @@ module.exports = new SlashCommandBuilder()
           .setDescription("The role to set as the verification airlock.")
           .setRequired(true)
       )
-  );
+  )
+  .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers);

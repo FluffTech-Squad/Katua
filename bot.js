@@ -1,4 +1,4 @@
-const { Client, Partials } = require("discord.js");
+const { Client, Partials, EntitlementType } = require("discord.js");
 require("dotenv").config();
 
 // Creating a new Discord client
@@ -70,5 +70,9 @@ const client = new Client({
 
 let token = require("./utils/token.js");
 client.on("ready", require("./events/ready.js"));
+
+client.on("entitlementCreate", (entitlement) => {
+  console.log(entitlement);
+});
 
 client.login(token);

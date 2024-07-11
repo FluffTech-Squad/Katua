@@ -15,7 +15,7 @@ That's main's Katua feature. **AI-powered features are premium only, but if your
 With the API enabled, troll detection is working.
 ↘️ _This means that you need Premium_
 
-<blockquote>Setup the log channel before trying this out, otherwise it won't do anything. Do <code>/config logs log-channel <#channel></code></blockquote><br>
+<blockquote>Setup the log channel before trying this out, otherwise it won't do anything. Do <code>/logs log-channel <#channel></code></blockquote><br>
 
 <ul>
 <li> When a user joins, bot will send a message in your logs about this user, including if it seems to be safe/neutral or unsafe, if it detects the user as unsafe, the bot will write a report describing why this "special" user's profile is considered as unsafe. It will not ban or kick automatically.</li>
@@ -92,12 +92,6 @@ A simple ticketing system, setup step by step.
 **Usages:**
 `/tickets`
 
-![https://i.imgur.com/PXyPYHu.png](https://i.imgur.com/PXyPYHu.png)
-![https://i.imgur.com/pgK4i5T.png](https://i.imgur.com/pgK4i5T.png)
-![https://i.imgur.com/QXiTVGZ.png](https://i.imgur.com/QXiTVGZ.png)
-![https://i.imgur.com/VXPDRAN.png](https://i.imgur.com/VXPDRAN.png)
-![https://i.imgur.com/BmSWLiV.png](https://i.imgur.com/BmSWLiV.png)
-
 ### ⚙️🪛 Setup Katua
 
 Configure Katua for your guild.
@@ -116,8 +110,8 @@ _Lemme save you from misfortune, I'll guide you._
 <blockquote>Enable or disable logging in the set log channel or the public channel.</blockquote>
 **Usages:**
 
-`/logs enable <type>`
-`/logs disable <type>`
+`/logs enable <"logging" | "inform members">`
+`/logs disable <"logging" | "inform members">`
 
 #### 🚯 Auto-Moderation Rules Configuration
 
@@ -125,8 +119,8 @@ _Lemme save you from misfortune, I'll guide you._
 
 **Usages:**
 
-`/filters enable <filter>`
-`/filters disable <filter>`
+`/filters enable <"NSFW Filter" | "Inappropriate Language Filter">`
+`/filters disable <"NSFW Filter" | "Inappropriate Language Filter">`
 
 _Warning: this automod feature might be useless, because Discord's Default Guild Automod is way better, thus, might be deleted due to Katua effectivenessless._
 
@@ -138,9 +132,7 @@ _Warning: this automod feature might be useless, because Discord's Default Guild
 
 `/verification-airlock channel <#channel>`
 `/verification-airlock role <type> <@role>`
-`/verification-airlock role "One role" <@role>`
-`/verification-airlock role "Add role" <@role>`
-`/verification-airlock role "Remove role" <@role>`
+`/verification-airlock role <"One role" | "Add role" | "Remove role"> <@role>`
 `/verification-airlock enable`
 `/verification-airlock disable`
 
@@ -151,6 +143,7 @@ _Warning: this automod feature might be useless, because Discord's Default Guild
 **Usages:**
 
 `/show-config`
+`/show-config ("logging" | "filters" | "verification-airlock" | "ticketing")`
 `/show-config logging`
 `/show-config filters`
 `/show-config verification-airlock`

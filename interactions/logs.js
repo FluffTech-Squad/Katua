@@ -14,7 +14,7 @@ module.exports =
     const { options, guild } = interaction;
     let subcommand = options.getSubcommand(true);
 
-    let isPremiumGuild = await isPremium(guild.id);
+    let isPremiumGuild = await isPremium(guild);
 
     if (!isPremiumGuild) {
       let embed = guildEmbed(guild)
@@ -26,7 +26,7 @@ module.exports =
           iconURL: interaction.client.user.displayAvatarURL(),
         });
 
-      let msg = interaction.editReply({ embeds: [embed] });
+      let msg = await interaction.editReply({ embeds: [embed] });
 
       setTimeout(() => {
         msg.delete();

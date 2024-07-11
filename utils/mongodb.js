@@ -34,4 +34,6 @@ module.exports.collections = {
   premiumGuilds: db.collection("premium_guilds"),
   bans: db.collection("bans"),
   ticketing: db.collection("ticketing"),
+  guildTheme: db.collection("guild_themes"),
+  guildAssets: db.collection("guild_assets"),
 };
