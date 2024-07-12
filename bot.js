@@ -71,8 +71,21 @@ const client = new Client({
 let token = require("./utils/token.js");
 client.on("ready", require("./events/ready.js"));
 
-client.on("entitlementCreate", (entitlement) => {
+client.on("entitlementCreate", async (entitlement) => {
   console.log(entitlement);
+
+  if (!entitlement.guildId) return;
+  if (entitlement.isGuildSubscription()) return;
+
+  // Entitlement must be a consumable
+
+  if (entitlement.type !== EntitlementType.Purchase) return;
+
+  if (entitlement.id === "1259985665475612702") {
+    // 1 Month Katua Premium Features, Consumable
+
+    let user = await entitlement.fetchUser();
+  }
 });
 
 client.login(token);

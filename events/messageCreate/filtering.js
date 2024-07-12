@@ -11,6 +11,7 @@ const analyser = require("../../utils/analyser");
  */
 module.exports = async (message) => {
   if (message.author.bot) return;
+  if (!message.guild) return;
 
   let rulesData = await collections.guildRules.findOne({
     guild_id: message.guild.id,
@@ -28,6 +29,15 @@ module.exports = async (message) => {
 
   let lang = message.guild.preferredLocale || "en-US";
   let sentences = langs[lang];
+
+  let memberPermissions = message.member.permissions;
+
+  if (
+    memberPermissions.has("ManageMessages", true) ||
+    memberPermissions.has("ManageGuild", true) ||
+    memberPermissions.has("Administrator", true)
+  )
+    return;
 
   if (rulesData && rulesData["nsfw-filter"]) {
     if (!message.channel.nsfw) {
@@ -56,10 +66,21 @@ module.exports = async (message) => {
             value: i > 1 ? `${i}` : `${i}`,
           });
 
-        if (logChannel) logChannel.send({ embeds: [embed] });
+        if (logChannel) {
+          logChannel.send({
+            embeds: [embed],
+            files: attachments.map((a) => {
+              return {
+                spoiler: true,
+                data: a.attachment,
+              };
+            }),
+          });
+        }
 
         try {
           await message.author.send(sentences.nsfwAuthorMessage);
+          await message.reply(sentences.nsfwAuthorMessage);
         } catch {}
 
         message.delete();
@@ -68,13 +89,6 @@ module.exports = async (message) => {
   }
 
   if (rulesData && rulesData["word-filter"]) {
-    if (
-      message.member.permissions.has("ManageMessages") ||
-      message.member.permissions.has("ManageGuild") ||
-      message.member.permissions.has("Administrator")
-    )
-      return;
-
     let lastTwoMessages = await message.channel.messages.fetch({ limit: 2 });
 
     await analyser(message.member);

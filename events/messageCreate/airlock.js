@@ -7,6 +7,7 @@ const { guildEmbed } = require("../../utils/embedFactory");
  */
 module.exports = async (message) => {
   if (message.author.bot) return;
+  if (!message.guild) return;
 
   let guildData = await collections.guilds.findOne({
     guild_id: message.guild.id,

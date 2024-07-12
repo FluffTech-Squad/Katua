@@ -35,11 +35,11 @@ module.exports = new SlashCommandBuilder()
           .addChoices(
             {
               name: "NSFW Filter",
-              value: "nsfw",
+              value: "nsfw-filter",
             },
             {
               name: "Inappropriate Language Filter",
-              value: "inappropriate-language",
+              value: "word-filter",
             }
           )
           .setRequired(true)

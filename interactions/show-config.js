@@ -182,7 +182,9 @@ module.exports =
 
       if (guildAssetsData && guildAssetsData.airlock_banner) {
         guildVerificationAirlockDataEmbed =
-          guildVerificationAirlockDataEmbed.setImage(guildData.airlock_banner);
+          guildVerificationAirlockDataEmbed.setImage(
+            guildAssetsData.airlock_banner
+          );
       } else {
         let banner = await generateBanner(guild.name, "Verification Airlock");
         let url = await uploadFile(banner.base64);
