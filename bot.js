@@ -1,6 +1,6 @@
-const { Client, Partials, EntitlementType } = require("discord.js");
+const { Client, Partials, EntitlementType, SKUType } = require("discord.js");
 require("dotenv").config();
-
+const { userEmbed } = require("./utils/embedFactory.js");
 // Creating a new Discord client
 // Code to run the bot
 // Docs: readme.md
@@ -72,19 +72,26 @@ let token = require("./utils/token.js");
 client.on("ready", require("./events/ready.js"));
 
 client.on("entitlementCreate", async (entitlement) => {
-  console.log(entitlement);
+  let skus = await entitlement.client.application.fetchSKUs();
 
-  if (!entitlement.guildId) return;
-  if (entitlement.isGuildSubscription()) return;
+  let sku = skus.get(entitlement.skuId);
 
-  // Entitlement must be a consumable
+  console.log(sku, entitlement);
 
-  if (entitlement.type !== EntitlementType.Purchase) return;
+  let user = await entitlement.fetchUser();
 
-  if (entitlement.id === "1259985665475612702") {
-    // 1 Month Katua Premium Features, Consumable
+  let embed = userEmbed(user)
+    .setTitle("Purchase")
+    .setDescription(
+      "Purchases are actually work in progress. If you want your grants now, join our Discord Server at katua.xyz and contact the owner."
+    );
 
-    let user = await entitlement.fetchUser();
+  try {
+    await user.send({
+      embeds: [embed],
+    });
+  } catch (e) {
+    console.log(e);
   }
 });
 
