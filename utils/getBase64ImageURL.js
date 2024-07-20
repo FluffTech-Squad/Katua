@@ -6,21 +6,30 @@ const { createCanvas, loadImage } = require("canvas");
  * @returns {Promise<string>}
  */
 async function getBase64ImageURL(url) {
-  let img = await loadImage(url);
-  var canvas = createCanvas(img.width, img.height);
+  try {
+    let img = await loadImage(url);
 
-  var ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0);
-  var dataURL = canvas.toDataURL("image/png");
+    var canvas = createCanvas(img.width, img.height);
 
-  return dataURL.split(",")[1];
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL.split(",")[1];
+  } catch {
+    return "hwz";
+  }
 }
 
 function base64ToArrayBuffer(base64) {
-  var binaryString = atob(base64);
-  var bytes = new Uint8Array(binaryString.length);
+  try {
+    var binaryString = atob(base64);
+    var bytes = new Uint8Array(binaryString.length);
 
-  return Buffer.from(bytes, "base64");
+    return Buffer.from(bytes, "base64");
+  } catch {
+    return Buffer.from("abf", "utf-8");
+  }
 }
 
 getBase64ImageURL.base64ToArrayBuffer = base64ToArrayBuffer;

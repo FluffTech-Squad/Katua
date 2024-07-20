@@ -7,8 +7,9 @@ require("dotenv").config();
 /**
  *
  * @param {GuildMember} member
+ * @param {string} guild_theme
  */
-function analyser(member) {
+function analyser(member, guild_theme) {
   return new Promise(
     /**
      *
@@ -96,20 +97,23 @@ function analyser(member) {
 
         content += `username: ${member.user.username}\n`;
         content += `display_name: "${member.user.displayName}"\n`;
-        content += `status: "${
-          member.presence && member.presence.status
-            ? member.presence.status
-            : "offline"
-        }"\n`;
 
-        let customActivity = member.presence
-          ? member.presence.activities.find(
-              (a) => a.type === ActivityType.Custom
-            )
-          : "offline";
+        /**
+         * @type {string}
+         */
+        let customActivity = member.presence;
+
+        if (customActivity) {
+          let c = member.presence.activities.find(
+            (a) => a.type === ActivityType.Custom
+          );
+
+          if (c) customActivity = c ? c.state : "offline";
+          else customActivity = "No custom status";
+        }
 
         content += `custom_presence: ${
-          customActivity ? `"${customActivity.state}"` : "No custom status"
+          customActivity ? `"${customActivity}"` : "No custom status"
         }\n`;
 
         content += `avatar_url: in attachments\n`;
@@ -131,7 +135,7 @@ function analyser(member) {
 
         content += `creation_date: ${day}/${month}/${year}\n`;
 
-        let guild_subject = "furry";
+        let guild_subject = guild_theme || "furry";
 
         await openai.threads.messages.create(thread.id, {
           role: "user",
@@ -144,7 +148,6 @@ function analyser(member) {
               type: "image_url",
               image_url: {
                 url: member.user.displayAvatarURL(),
-                detail: "low",
               },
             },
           ],
@@ -153,13 +156,13 @@ function analyser(member) {
             username: member.user.username,
             user_id: member.user.id,
             avatar_url: member.user.displayAvatarURL(),
-            custom_status: customActivity ? customActivity.state : "",
+            custom_status: customActivity || "No custom status",
           },
         });
 
         let run = await openai.threads.runs.createAndPoll(thread.id, {
           assistant_id: process.env.OPENAI_ASSISTANT_ID,
-          additional_instructions: `The actual guild subject is "${guild_subject}". json:`,
+          additional_instructions: `The actual server subject is/are "${guild_subject}". json:`,
           response_format: { type: "json_object" },
           tool_choice: {
             type: "function",
@@ -200,7 +203,7 @@ function analyser(member) {
                     username: member.user.username,
                     user_id: member.user.id,
                     avatar_url: member.user.displayAvatarURL(),
-                    custom_status: customActivity ? customActivity.state : "",
+                    custom_status: customActivity || "No custom status",
                   },
                 }
               );
@@ -209,7 +212,7 @@ function analyser(member) {
               resolve(result);
             }
           } else {
-            reject(new Error(run.status));
+            reject(new Error(run));
           }
         }
       } catch (e) {
@@ -258,7 +261,7 @@ function askExplanation(thread, lang, state) {
           name: "explain_result_why",
         },
       },
-      additional_instructions: `explain briefly here in language: ${lang} why the user is ${state}. Don't make additional comments. json:`,
+      additional_instructions: `explain in two sentences here in language: ${lang} why the user is ${state}. Don't make additional comments. json:`,
     });
 
     if (run.status === "requires_action") {

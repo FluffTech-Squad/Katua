@@ -156,8 +156,17 @@ module.exports =
       .setColor("Grey")
       .setImage(user.bannerURL() || null);
 
+    let guildThemeData = await collections.guildTheme.findOne({
+      guild_id: interaction.guildId,
+    });
+
     try {
-      let result = await analyser(member);
+      let result = await analyser(
+        member,
+        guildThemeData && guildThemeData.themes && guildThemeData.themes.length
+          ? guildThemeData.themes.join(", ")
+          : "furry"
+      );
 
       switch (result.toLowerCase()) {
         case "valid":

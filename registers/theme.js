@@ -27,6 +27,10 @@ module.exports = new SlashCommandBuilder()
             {
               name: "Safe Place",
               value: "safe-place",
+            },
+            {
+              name: "Semi Safe Place",
+              value: "semi-safe-place",
             }
           )
           .setRequired(true)

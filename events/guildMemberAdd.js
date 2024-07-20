@@ -113,7 +113,16 @@ module.exports =
           return;
         }
 
-        let result = (await analyse(member)).toLowerCase();
+        let result = (
+          await analyser(
+            member,
+            guildThemeData &&
+              guildThemeData.themes &&
+              guildThemeData.themes.length
+              ? guildThemeData.themes.join(", ")
+              : "furry"
+          )
+        ).toLowerCase();
 
         if (result === "neutral") {
           embed = embed
