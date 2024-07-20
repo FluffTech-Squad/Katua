@@ -19,7 +19,7 @@
     "express": "^4.19.2",
     "mongodb": "^6.7.0",
     "nsfwjs": "^4.1.0",
-    "openai": "^4.51.0",
+    "openai": "^4.52.7",
     "socket.io-client": "^4.7.5"
   }
 }

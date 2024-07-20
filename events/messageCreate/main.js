@@ -18,8 +18,6 @@ module.exports = async (message) => {
 
     await collections.guilds.insertOne({
       guild_id: message.guild.id,
-      prevent_members: (await isPremium(message.guild)) ? true : false,
-      inform_members_channel_id: systemChannel ? systemChannel.id : null,
     });
   }
 
@@ -28,10 +26,8 @@ module.exports = async (message) => {
   if (!guildRulesData) {
     await collections.guildRules.insertOne({
       guild_id: message.guild.id,
-      rules: {
-        "nsfw-filter": true,
-        "word-filter": (await isPremium(message.guild)) ? true : false,
-      },
+      "nsfw-filter": true,
+      "word-filter": (await isPremium(message.guild)) ? true : false,
     });
   }
 };

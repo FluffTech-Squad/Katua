@@ -25,28 +25,37 @@ async function getCreditsLeft() {
     let startDate = "2024-06-01";
 
     let end_date = `${year}-${month + 1}-01`;
-    let rootCredits = `https://api.openai.com/dashboard/billing/credit_grants?end_date=${end_date}&start_date=${startDate}&project_id=${process.env.OPENAI_PROJECT_ID}`;
+    let root = `https://api.openai.com/v1/dashboard/billing/credit_grants?start_date=${startDate}&end_date=${end_date}`;
 
-    let response = await axios.get(rootCredits, {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_SESS}`,
-      },
-    });
+    try {
+      let response = await axios.get(root, {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_SESS}`,
+        },
+        params: {
+          date: end_date,
+        },
+      });
 
-    let data = response.data;
-    let grants = data.grants.data;
-    let lastGrant = grants.at(-1);
+      let data = response.data;
+      let grants = data.grants.data;
+      let lastGrant = grants.at(-1);
 
-    let paidBalance = lastGrant.grant_amount;
-    let available = lastGrant.grant_amount - lastGrant.used_amount;
+      let paidBalance = lastGrant.grant_amount;
+      let available = lastGrant.grant_amount - lastGrant.used_amount;
 
-    // Turns them into doubles digits
-    // Example: $1 to $1.00
+      // Turns them into doubles digits
+      // Example: $1 to $1.00
 
-    paidBalance = paidBalance.toFixed(2);
-    available = available.toFixed(2);
+      paidBalance = paidBalance.toFixed(2);
+      available = available.toFixed(2);
 
-    resolve({ available, paidBalance });
+      resolve({ available, paidBalance });
+    } catch (e) {
+      console.log(e.response);
+      console.log("Couldn't load credits");
+      resolve(null);
+    }
   });
 }
 

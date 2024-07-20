@@ -32,6 +32,8 @@ module.exports =
    * @param {Interaction} interaction
    */
   async (interaction) => {
+    if (!interaction.guild) return;
+
     let lang = interaction.guild ? interaction.guild.preferredLocale : "en-US";
 
     if (!interaction.isCommand()) return;

@@ -60,9 +60,13 @@ function analyser(member) {
                 if (base64Avatar !== base64AvatarMessage) changed = true;
               }
 
-              let userCustomStatus = member.presence.activities.find(
-                (activity) => activity.type === ActivityType.Custom
-              );
+              let userCustomStatus = member.presence
+                ? member.presence.activities.find(
+                    (activity) => activity.type === ActivityType.Custom
+                  )
+                : "No custom status";
+
+              // a
 
               if (userCustomStatus && custom_status) {
                 if (custom_status !== userCustomStatus.state) changed = true;
@@ -98,9 +102,11 @@ function analyser(member) {
             : "offline"
         }"\n`;
 
-        let customActivity = member.presence.activities.find(
-          (a) => a.type === ActivityType.Custom
-        );
+        let customActivity = member.presence
+          ? member.presence.activities.find(
+              (a) => a.type === ActivityType.Custom
+            )
+          : "offline";
 
         content += `custom_presence: ${
           customActivity ? `"${customActivity.state}"` : "No custom status"
@@ -152,7 +158,7 @@ function analyser(member) {
         });
 
         let run = await openai.threads.runs.createAndPoll(thread.id, {
-          assistant_id: process.env.OPENAI_ASSISTANTV2_ID,
+          assistant_id: process.env.OPENAI_ASSISTANT_ID,
           additional_instructions: `The actual guild subject is "${guild_subject}". json:`,
           response_format: { type: "json_object" },
           tool_choice: {
@@ -320,7 +326,7 @@ async function airlockMessageAnalysis(thread, message) {
   });
 
   let run = await openai.threads.runs.createAndPoll(thread.id, {
-    assistant_id: process.env.OPENAI_ASSISTANTV2_ID,
+    assistant_id: process.env.OPENAI_ASSISTANT_ID,
     response_format: { type: "json_object" },
     tool_choice: {
       type: "function",

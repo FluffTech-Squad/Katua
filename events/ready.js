@@ -48,7 +48,7 @@ module.exports =
    * @param {Client} client
    */
   async (client) => {
-    // let credits = await getCreditsLeft();
+    let credits = await getCreditsLeft();
 
     await client.guilds.fetch();
 
@@ -65,15 +65,45 @@ module.exports =
       guildsText += `- ${guild.name} (${id}) \n`;
     }
 
-    client.user.setPresence({
-      status: "online",
-      activities: [
-        {
-          name: `/help | katua.xyz`,
-          type: ActivityType.Watching,
-        },
-      ],
-    });
+    /**
+     * @type {import("discord.js").PresenceData[]}
+     */
+    let presences = [
+      {
+        status: "online",
+        activities: [
+          {
+            name: `/help | katua.xyz`,
+            type: ActivityType.Watching,
+          },
+        ],
+        cd: 15 * 1000,
+      },
+      {
+        status: "online",
+        activities: [
+          {
+            name: `/help | ${
+              credits
+                ? `$${credits.available} / $${credits.paidBalance}`
+                : "Credits usage"
+            }`,
+            type: ActivityType.Watching,
+          },
+        ],
+        cd: 3000,
+      },
+    ];
+
+    let i = 0;
+
+    client.user.setPresence(presences[i]);
+
+    setInterval(() => {
+      i = i ? 0 : 1;
+
+      client.user.setPresence(presences[i]);
+    }, presences[i].cd);
 
     console.log(`ASCII Art Brand Name Here`);
     console.log(`Logged in as ${client.user.username}`);
@@ -151,11 +181,12 @@ module.exports =
     }
 
     console.log(guildsText);
-    // console.log(
-    //   `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
-    // );
 
-    // await updateCommands();
+    if (credits) {
+      console.log(
+        `API Grants - Balance: $${credits.available} / $${credits.paidBalance}`
+      );
+    }
 
     async function updatesStats() {
       let url = `${topggRoot}/bots/${client.user.id}/stats`;
