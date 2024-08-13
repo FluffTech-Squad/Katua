@@ -75,8 +75,6 @@ Unlock a locked channel. Members will be able to send messages again.
 _Mmh, this user looks very sus, i'm gonna keep an eye on them..._
 _Omae wa mou- shindeiru_
 
-<blockquote>This is a premium feature</blockquote>
-
 **Usages:**
 
 `/analyse <@user>`
@@ -99,7 +97,7 @@ _Lemme save you from misfortune, I'll guide you._
 
 #### 🔔 Setup log channel(s)
 
-<blockquote>Analysing joining members to send a report in the log-channel (and inform members for potential in public-channel) is a premium feature. However, the NSFW filter is free and enabled by default.</blockquote><br>
+<blockquote>Analysing joining members to send a report in the log-channel (and inform members for potential in public-channel). </blockquote><br>
 
 **Usages:**
 
