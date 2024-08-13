@@ -36,4 +36,5 @@ module.exports.collections = {
   ticketing: db.collection("ticketing"),
   guildTheme: db.collection("guild_themes"),
   guildAssets: db.collection("guild_assets"),
+  cmdActivities: db.collection("cmd_activities"),
 };

@@ -38,25 +38,6 @@ module.exports =
     const user = interaction.options.getUser("user");
     const member = members.find((member) => member.user.id === user.id);
 
-    if (!(await isPremium(interaction.guild))) {
-      let embed = guildEmbed(interaction.guild)
-        .setTitle("Premium Required")
-        .setDescription("This feature is only available for premium servers.")
-        .setColor("Gold")
-        .setFooter({
-          text: "Upgrade to premium to unlock this feature.",
-          iconURL: interaction.client.user.displayAvatarURL(),
-        });
-
-      let msg = await interaction.editReply({ embeds: [embed] });
-
-      setTimeout(() => {
-        msg.delete();
-      }, 5000);
-
-      return;
-    }
-
     if (!user)
       return interaction.editReply({
         content: sentences.noUserAnalyse,

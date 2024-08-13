@@ -4,8 +4,18 @@
 
 const fs = require("fs");
 const langs = require("../../utils/langs.js");
-const { Interaction } = require("discord.js");
+const {
+  Interaction,
+  EmbedBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+} = require("discord.js");
 const path = require("path");
+const isPremium = require("../../utils/isPremium.js");
+const {
+  collections: { cmdActivities },
+} = require("../../utils/mongodb.js");
 
 let commands = new Map();
 
@@ -54,6 +64,34 @@ module.exports =
       await interaction.deferReply();
 
       await command(interaction);
+
+      if (!isPremium(interaction.guild) && interaction.replied) {
+        let reply = await interaction.fetchReply();
+        let embeds = reply.embeds || [];
+        let components = reply.components || [];
+
+        let kofiLinkBtn = new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setLabel("Donate")
+          .setURL("https://ko-fi.com/nekomancer0");
+
+        let notEnoughCreditsEmbed = new EmbedBuilder()
+          .setTitle("Credits soon all spent")
+          .setDescription(
+            "The credits used for the AI API are about to be all spent. Wait next month or help us by donating $1, $2, or more on ko-fi!"
+          )
+          .setColor("Gold");
+
+        interaction.editReply({
+          embeds: [...embeds, notEnoughCreditsEmbed],
+          components: [...components, new ActionRowBuilder(kofiLinkBtn)],
+        });
+      }
+
+      await cmdActivities.insertOne({
+        timestamp: Date.now(),
+        name: interaction.commandName,
+      });
     } catch (error) {
       console.error(error);
 

@@ -1,9 +1,6 @@
 const { Message } = require("discord.js");
 const { collections } = require("../../utils/mongodb");
-const { guildEmbed } = require("../../utils/embedFactory");
 const dayjs = require("dayjs");
-const { Job } = require("node-schedule");
-const { CronJob } = require("cron");
 const givePremium = require("../../utils/givePremium");
 
 let { premiumGuilds } = collections;

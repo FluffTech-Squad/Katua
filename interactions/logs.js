@@ -14,27 +14,6 @@ module.exports =
     const { options, guild } = interaction;
     let subcommand = options.getSubcommand(true);
 
-    let isPremiumGuild = await isPremium(guild);
-
-    if (!isPremiumGuild) {
-      let embed = guildEmbed(guild)
-        .setTitle("Premium Required")
-        .setDescription("This feature is only available for premium servers.")
-        .setColor("Gold")
-        .setFooter({
-          text: "Upgrade to premium to unlock this feature.",
-          iconURL: interaction.client.user.displayAvatarURL(),
-        });
-
-      let msg = await interaction.editReply({ embeds: [embed] });
-
-      setTimeout(() => {
-        msg.delete();
-      }, 5000);
-
-      return;
-    }
-
     if (subcommand === "log-channel") {
       /**
        * @type {import("discord.js").TextChannel}

@@ -1,6 +1,6 @@
 # 🐾🏳️‍🌈 Katua: Your Niche Best Discord Bot 🤖
 
-Katua Katua is a multi-porpose Discord Bot, mainly moderation to make safeplaces, such as furry or LGBTQ+, funnier and safer!
+Katua is a multi-porpose Discord Bot, mainly moderation to make safeplaces, such as furry or LGBTQ+, funnier and safer!
 
 Join Katua Bot House: https://katua.xyz/
 
@@ -10,10 +10,7 @@ Join Katua Bot House: https://katua.xyz/
 
 Katua is powered by AI to analyse user profiles, whether when they are joining your guild or with a manual command. Katua will determine if the user is safe, seems to be a troll or has a neutral profile, but only you, moderators and admins have the primal right to ban those users depending of their behavior, however, Katua will delete harmful messages (from users detected as unsafe) for safety.
 
-That's main's Katua feature. **AI-powered features are premium only, but if your server is a furry or a LGBT+ server, me, Nekomancer, won't hesitate to give you that gift and make you try out those features!**
-
-With the API enabled, troll detection is working.
-↘️ _This means that you need Premium_
+That's main's Katua feature.
 
 <blockquote>Setup the log channel before trying this out, otherwise it won't do anything. Do <code>/logs log-channel <#channel></code></blockquote><br>
 
@@ -28,10 +25,6 @@ With the API enabled, troll detection is working.
 </ul>
 
 ---
-
-## 🗝️ Golden Festival - 15th July 2024
-
-**Voting for Katua will give you Gold Shards, this will give you the capacity of gifting premium to your favorite guild for a limited time. 2 Golden shards = 12 hours, 1 extra shard adds 6 hours (a vote on weekend counts as 2 votes). Farm gold shards and give your favorite guild premium for a maximum time FOR FREE**
 
 ## 🧰 Features
 

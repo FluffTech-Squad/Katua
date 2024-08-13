@@ -15,29 +15,8 @@ module.exports =
 
     let subcommand = options.getSubcommand(true);
 
-    let isPremiumGuild = await isPremium(guild.id);
-
     if (subcommand === "enable") {
       let filter = options.getString("filter", true);
-
-      if (filter === "word-filter" && !isPremiumGuild) {
-        let embed = guildEmbed(guild)
-          .setTitle("Premium Required")
-          .setDescription("This feature is only available for premium servers.")
-          .setColor("Gold")
-          .setFooter({
-            text: "Upgrade to premium to unlock this feature.",
-            iconURL: interaction.client.user.displayAvatarURL(),
-          });
-
-        let msg = interaction.editReply({ embeds: [embed] });
-
-        setTimeout(() => {
-          msg.delete();
-        }, 5000);
-
-        return;
-      }
 
       await guildRules.updateOne(
         { guild_id: guild.id },

@@ -106,15 +106,9 @@ module.exports =
       try {
         let message = await log_channel.send({ embeds: [embed] });
 
-        if (!(await isPremium(member.guild))) {
-          embed = embed
-            .setDescription(sentences.notPremiumText)
-            .setColor("Gold");
-
-          await message.edit({ embeds: [embed] });
-
-          return;
-        }
+        let guildThemeData = await collections.guildTheme.find({
+          guild_id: guild.id,
+        });
 
         let result = (
           await analyser(
@@ -149,73 +143,75 @@ module.exports =
           return;
         }
 
-        if (result !== "invalid") return;
+        if (result === "invalid") {
+          let enabledAarray = dbGuild.enabled || [];
 
-        let enabledAarray = dbGuild.enabled || [];
+          if (enabledAarray.includes("inform-members")) {
+            // Find for the first sendable text channel
 
-        if (enabledAarray.includes("inform-members")) {
-          // Find for the first sendable text channel
+            /**
+             * @type {Collection<string, BaseGuildTextChannel>}
+             */
+            let channels = await guild.channels.fetch();
 
-          /**
-           * @type {Collection<string, BaseGuildTextChannel>}
-           */
-          let channels = await guild.channels.fetch();
-
-          channels = channels.filter(
-            (channel) =>
-              channel.isTextBased() &&
-              channel.permissionsFor(botMember, true).has("SendMessages", true)
-          );
-
-          let firstChannel = channels.first();
-
-          let channel = guild.systemChannel || firstChannel;
-
-          if (dbGuild.inform_members_channel_id) {
-            let inform_channel = await guild.channels.fetch(
-              dbGuild.inform_members_channel_id
+            channels = channels.filter(
+              (channel) =>
+                channel.isTextBased() &&
+                channel
+                  .permissionsFor(botMember, true)
+                  .has("SendMessages", true)
             );
 
-            if (inform_channel && inform_channel.isTextBased()) {
-              await inform_channel.send({
+            let firstChannel = channels.first();
+
+            let channel = guild.systemChannel || firstChannel;
+
+            if (dbGuild.inform_members_channel_id) {
+              let inform_channel = await guild.channels.fetch(
+                dbGuild.inform_members_channel_id
+              );
+
+              if (inform_channel && inform_channel.isTextBased()) {
+                await inform_channel.send({
+                  content: sentences.memberReport.replace("$1", member.user),
+                  allowedMentions: { users: [], parse: [], repliedUser: false },
+                });
+              }
+            } else {
+              await channel.send({
                 content: sentences.memberReport.replace("$1", member.user),
                 allowedMentions: { users: [], parse: [], repliedUser: false },
               });
             }
-          } else {
-            await channel.send({
-              content: sentences.memberReport.replace("$1", member.user),
-              allowedMentions: { users: [], parse: [], repliedUser: false },
-            });
           }
-        }
 
-        embed = embed.setColor("Red").setTitle(sentences.invalidTitle);
+          embed = embed.setColor("Red").setTitle(sentences.invalidTitle);
 
-        await message.edit({ embeds: [embed] });
+          await message.edit({ embeds: [embed] });
 
-        let thread = await getUserThread(member.user.id);
+          let thread = await getUserThread(member.user.id);
 
-        if (thread) {
-          try {
-            let explanation = await analyse.askExplanation(
-              thread,
-              lang,
-              "invalid"
-            );
+          if (thread) {
+            try {
+              let explanation = await analyse.askExplanation(
+                thread,
+                lang,
+                "invalid"
+              );
 
-            embed = embed.setDescription(explanation);
+              embed = embed.setDescription(explanation);
 
-            await message.edit({
-              embeds: [embed],
-            });
-          } catch (error) {
-            console.log(error);
+              await message.edit({
+                embeds: [embed],
+              });
+            } catch (error) {
+              console.log(error);
 
-            embed = embed.setDescription(sentences.apiError);
-            await message.edit({
-              embeds: [embed],
-            });
+              embed = embed.setDescription(sentences.apiError);
+              await message.edit({
+                embeds: [embed],
+              });
+            }
           }
         }
       } catch (e) {

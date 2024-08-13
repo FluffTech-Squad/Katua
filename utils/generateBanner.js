@@ -1,5 +1,7 @@
 const { loadImage, createCanvas, registerFont } = require("canvas");
 const getBase64ImageURL = require("./getBase64ImageURL");
+// const fs = require("fs");
+// const path = require("path");
 
 let generateBanner = async (...text) => {
   registerFont(`${process.cwd()}/assets/Kanit-SemiBold.ttf`, {
@@ -47,5 +49,13 @@ let generateBanner = async (...text) => {
     canvas,
   };
 };
+
+// (async () => {
+//   let data = await generateBanner("Katua Bot House", "Partenariat");
+//   let stream = fs.createWriteStream(
+//     path.join(__dirname, "..", "assets", "partenariat.png")
+//   );
+//   let canvasStream = data.canvas.createPNGStream().pipe(stream);
+// })();
 
 module.exports = generateBanner;

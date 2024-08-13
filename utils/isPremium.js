@@ -1,15 +1,22 @@
 // Detect if a guild has premium or not
 
 const { Guild } = require("discord.js");
-const { collections } = require("./mongodb");
+const { getCreditsLeft } = require("./openai");
+// const { collections } = require("./mongodb");
 
 /**
  * @param {Guild} guild
  */
 async function isPremium(guild) {
-  let row = await collections.premiumGuilds.findOne({ guild_id: guild.id });
+  // let row = await collections.premiumGuilds.findOne({ guild_id: guild.id });
 
-  return row ? true : false;
+  let creditsLeft = await getCreditsLeft();
+
+  if (creditsLeft.available <= 1.5) {
+    return false;
+  }
+
+  return true;
 }
 
 module.exports = isPremium;

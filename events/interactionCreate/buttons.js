@@ -118,7 +118,7 @@ module.exports =
 
         let username = interaction.channel.name.split("-")[1];
 
-        await msg.delete();
+        // await msg.delete();
 
         // generate a transcript of the ticket
 

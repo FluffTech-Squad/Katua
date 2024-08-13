@@ -57,7 +57,7 @@ module.exports =
 
     if (!isPremiumGuild) {
       analysisButton.setDisabled(true);
-      analysisButton.setLabel(`${sentences.analysisTitle} (Premium)`);
+      analysisButton.setLabel(`${sentences.analysisTitle} (Not enough $$$)`);
     }
 
     let actionRow = new ActionRowBuilder().addComponents(analysisButton);

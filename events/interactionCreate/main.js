@@ -1,6 +1,5 @@
 const { Interaction } = require("discord.js");
 const { collections } = require("../../utils/mongodb");
-const isPremium = require("../../utils/isPremium");
 
 /**
  *
@@ -29,7 +28,7 @@ module.exports = async (interaction) => {
     await collections.guildRules.insertOne({
       guild_id: interaction.guild.id,
       "nsfw-filter": true,
-      "word-filter": (await isPremium(interaction.guild)) ? true : false,
+      "word-filter": true,
     });
   }
 };

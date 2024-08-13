@@ -155,13 +155,13 @@ module.exports = async (interaction) => {
 
     // let doHaveLotOfUsages = usagesText.split("\n").length >= 2;
 
-    x[categoryName].push({
-      name: command.name,
-      value: `${command.description}\n${usagesText}`,
-      inline: false,
-    });
-
-    // i2 = i2 ? 0 : 1;
+    try {
+      x[categoryName].push({
+        name: command.name,
+        value: `${command.description}\n${usagesText}`,
+        inline: false,
+      });
+    } catch (e) {}
   }
 
   let embed = userEmbed(interaction.client.user)
