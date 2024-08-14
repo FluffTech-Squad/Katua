@@ -261,7 +261,7 @@ function askExplanation(thread, lang, state) {
           name: "explain_result_why",
         },
       },
-      additional_instructions: `explain in two sentences here in language: ${lang} why the user is ${state}. Don't make additional comments. json:`,
+      instructions: `explain in two sentences here in language: ${lang} why the user is ${state} in json {"explanation": "Explanation"}. Don't make additional comments. json:`,
     });
 
     if (run.status === "requires_action") {

@@ -118,32 +118,37 @@ async function getUserThread(user_id, assistant_id) {
  */
 function isMemberValid(thread) {
   return new Promise(async (resolve, reject) => {
-    let messages = await openai.threads.messages.list(thread.id);
-    let ok = false;
-    let isValid = false;
+    try {
+      let messages = await openai.threads.messages.list(thread.id);
+      let ok = false;
+      let isValid = false;
 
-    for (let msg of messages.data) {
-      if (msg.role === "assistant") {
-        if (
-          msg.metadata &&
-          msg.metadata.type &&
-          msg.metadata.type === "analysis"
-        ) {
-          let content = msg.content[0];
+      for (let msg of messages.data) {
+        if (msg.role === "assistant") {
+          if (
+            msg.metadata &&
+            msg.metadata.type &&
+            msg.metadata.type === "analysis"
+          ) {
+            let content = msg.content[0];
 
-          if (content.type !== "text") break;
+            if (content.type !== "text") break;
 
-          let isUserValid = JSON.parse(content.text.value);
+            let isUserValid = JSON.parse(content.text.value);
 
-          if (isUserValid.status === "valid") {
-            if (!ok) {
-              isValid = true;
+            if (isUserValid.status === "valid") {
+              if (!ok) {
+                isValid = true;
+              }
+
+              ok = true;
             }
-
-            ok = true;
           }
         }
       }
+    } catch (e) {
+      reject();
+      return true;
     }
 
     resolve(isValid);

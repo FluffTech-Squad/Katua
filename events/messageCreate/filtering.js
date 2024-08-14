@@ -13,6 +13,8 @@ module.exports = async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
 
+  let channels = await message.guild.channels.fetch();
+
   let rulesData = await collections.guildRules.findOne({
     guild_id: message.guild.id,
   });
@@ -24,12 +26,19 @@ module.exports = async (message) => {
   if (!guildData.log_channel_id) return;
 
   try {
-    let logChannel = await message.guild.channels.fetch(
-      guildData.log_channel_id
-    );
-    if (!logChannel) return;
-    if (!(logChannel instanceof BaseGuildTextChannel)) return;
+    let logChannel = channels.get(guildData.log_channel_id);
 
+    if (
+      !logChannel &&
+      ((rulesData && rulesData["nsfw-filter"]) ||
+        (rulesData && rulesData["word-filter"]))
+    ) {
+      console.log(
+        "Tried to send logs in a channel that isn't found",
+        `${message.guild.name} (${message.guild.id})`
+      );
+      return;
+    }
     let lang = message.guild.preferredLocale || "en-US";
     let sentences = langs[lang];
 
