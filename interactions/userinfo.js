@@ -128,12 +128,6 @@ module.exports =
       if (i.customId === "analysis") {
         // Run analysis command interaction
 
-        try {
-          await i.deferReply();
-          await i.editReply({ content: "If it's taking time, don't mind!" });
-          await i.deleteReply();
-        } catch {}
-
         await require("./analyse.js")(interaction);
       }
     });

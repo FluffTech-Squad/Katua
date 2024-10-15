@@ -15,8 +15,7 @@ const { getUserThread } = require("../utils/openai");
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
-const { userEmbed, guildEmbed } = require("../utils/embedFactory.js");
-const isPremium = require("../utils/isPremium.js");
+const { userEmbed } = require("../utils/embedFactory.js");
 
 module.exports =
   /**
@@ -142,12 +141,18 @@ module.exports =
     });
 
     try {
+      let msg = await interaction.channel.send({
+        content: `It might take time...`,
+      });
+
       let result = await analyser(
         member,
         guildThemeData && guildThemeData.themes && guildThemeData.themes.length
           ? guildThemeData.themes.join(", ")
           : "furry"
       );
+
+      await msg.delete();
 
       switch (result.toLowerCase()) {
         case "valid":
