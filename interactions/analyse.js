@@ -4,7 +4,6 @@ const {
   ChatInputCommandInteraction,
   ActionRowBuilder,
   ButtonBuilder,
-  EmbedBuilder,
   ButtonStyle,
   ChannelType,
   ComponentType,
@@ -16,6 +15,7 @@ const { getUserThread } = require("../utils/openai");
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
 const { userEmbed } = require("../utils/embedFactory.js");
+const isPremium = require("../utils/isPremium.js");
 
 module.exports =
   /**
@@ -23,6 +23,20 @@ module.exports =
    * @param {ChatInputCommandInteraction} interaction
    */
   async (interaction) => {
+    let isPremiumGuild = await isPremium(interaction.guild);
+
+    if (!isPremiumGuild) {
+      interaction.editReply({
+        content: `${sentences.analysisTitle} (Not enough $$$)`,
+      });
+
+      return;
+    }
+
+    let msg = await interaction.channel.send({
+      content: `It might take time...`,
+    });
+
     let members = await interaction.guild.members.fetch();
 
     let lang = interaction.guild.preferredLocale || "en-US";
@@ -57,21 +71,6 @@ module.exports =
       });
     }
 
-    // List the guilds the user is in where the bot is in
-
-    let guilds = await interaction.client.guilds.fetch();
-
-    let commonGuildCounts = 0;
-
-    for (let [, guild] of guilds) {
-      let fetchedGuild = await guild.fetch();
-      let members = await fetchedGuild.members.fetch();
-
-      let guildMember = members.find((member) => member.user.id === user.id);
-
-      if (guildMember) commonGuildCounts++;
-    }
-
     // Generate explanation button interaction
 
     let explanationButton = new ButtonBuilder()
@@ -102,6 +101,21 @@ module.exports =
     let createdAtDay = createdAt.getDate();
     let createdAtMonth = createdAt.getMonth() + 1;
     let createdAtYear = createdAt.getFullYear();
+
+    // List the guilds the user is in where the bot is in
+
+    let guilds = await interaction.client.guilds.fetch();
+
+    let commonGuildCounts = 0;
+
+    for (let [, guild] of guilds) {
+      let fetchedGuild = await guild.fetch();
+      let members = await fetchedGuild.members.fetch();
+
+      let guildMember = members.find((member) => member.user.id === user.id);
+
+      if (guildMember) commonGuildCounts++;
+    }
 
     let memberBans = await collections.bans
       .find({
@@ -141,9 +155,7 @@ module.exports =
     });
 
     try {
-      let msg = await interaction.channel.send({
-        content: `It might take time...`,
-      });
+      console.log(guildThemeData);
 
       let result = await analyser(
         member,
@@ -151,6 +163,8 @@ module.exports =
           ? guildThemeData.themes.join(", ")
           : "furry"
       );
+
+      console.log(result);
 
       await msg.delete();
 

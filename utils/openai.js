@@ -101,10 +101,6 @@ async function getUserThread(user_id, assistant_id) {
   let threads = await getThreadList();
   for (let thread of threads) {
     if (thread.metadata.user === user_id) {
-      if (assistant_id && thread.metadata.assistant === assistant_id) {
-        return thread;
-      }
-
       return thread;
     }
   }
@@ -118,10 +114,11 @@ async function getUserThread(user_id, assistant_id) {
  */
 function isMemberValid(thread) {
   return new Promise(async (resolve, reject) => {
+    let isValid = false;
+
     try {
       let messages = await openai.threads.messages.list(thread.id);
       let ok = false;
-      let isValid = false;
 
       for (let msg of messages.data) {
         if (msg.role === "assistant") {

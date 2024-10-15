@@ -1,8 +1,6 @@
 const { ChatInputCommandInteraction } = require("discord.js");
 
-const isPremium = require("../utils/isPremium.js");
 const { collections } = require("../utils/mongodb.js");
-const { guildEmbed } = require("../utils/embedFactory.js");
 let { guilds } = collections;
 
 module.exports =

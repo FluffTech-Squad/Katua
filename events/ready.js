@@ -7,12 +7,10 @@ const {
   SlashCommandBuilder,
 } = require("discord.js");
 
-const { getCreditsLeft, clearThreads } = require("../utils/openai.js");
-const langs = require("../utils/langs.js");
-const { collections, connectDB } = require("../utils/mongodb.js");
+const { getCreditsLeft } = require("../utils/openai.js");
+const { connectDB } = require("../utils/mongodb.js");
 const rest = require("../utils/rest.js");
 const { default: axios } = require("axios");
-const path = require("path");
 
 let topggRoot = "https://top.gg/api";
 let topggToken = process.env.TOPGG_TOKEN;

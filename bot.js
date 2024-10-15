@@ -1,4 +1,6 @@
-const { Client, Partials, EntitlementType, SKUType } = require("discord.js");
+debugger;
+
+const { Client, Partials } = require("discord.js");
 require("dotenv").config();
 const { userEmbed } = require("./utils/embedFactory.js");
 // Creating a new Discord client

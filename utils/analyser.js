@@ -1,7 +1,7 @@
 const { GuildMember, ActivityType, Message } = require("discord.js");
 const { openai, getUserThread } = require("./openai.js");
-let langs = require("./langs.js");
 const getBase64ImageURL = require("./getBase64ImageURL.js");
+const { default: axios } = require("axios");
 require("dotenv").config();
 
 /**
@@ -19,8 +19,15 @@ function analyser(member, guild_theme) {
     async (resolve, reject) => {
       let guild = member.guild;
 
+      let actualAvatar = member
+        .displayAvatarURL({ forceStatic: true })
+        .replace(".webp", ".png");
+
       try {
-        let thread = await getUserThread(member.user.id);
+        let thread = await getUserThread(
+          member.user.id,
+          process.env.OPENAI_ASSISTANT_ID
+        );
 
         if (!thread) {
           thread = await openai.threads.create({
@@ -30,35 +37,36 @@ function analyser(member, guild_theme) {
           let messages = await openai.threads.messages.list(thread.id);
 
           for (let message of messages.data) {
+            console.log(message.metadata);
             if (
               message.metadata &&
               message.metadata.type &&
               message.metadata.type === "analysis"
             ) {
-              if (message.content[0].type !== "text") break;
+              console.log(message.content[0].type);
+              if (message.content[0].type != "text") break;
 
               // Verify if the user didn't change the profile picture or username
 
               let changed = false;
               let { username, avatar_url, custom_status } = message.metadata;
-
+              console.log(avatar_url);
               if (username && avatar_url) {
-                if (username !== member.user.username) changed = true;
-                let actualAvatar = member.user
-                  .displayAvatarURL()
-                  .replace(".webp", ".png");
+                try {
+                  let r = await axios.get(avatar_url);
+                } catch {
+                  await openai.threads.messages.del(thread.id, message.id);
+                }
 
-                if (avatar_url.replace(".webp", ".png") !== actualAvatar)
+                if (username != member.user.username) changed = true;
+
+                if (avatar_url.replace(".webp", ".png") != actualAvatar)
                   changed = true;
 
-                let base64Avatar = await getBase64ImageURL(
-                  avatar_url.replace(".webp", ".png")
-                );
-                let base64AvatarMessage = await getBase64ImageURL(
-                  actualAvatar.replace(".webp", ".png")
-                );
+                let base64Avatar = await getBase64ImageURL(avatar_url);
+                let base64AvatarMessage = await getBase64ImageURL(actualAvatar);
 
-                if (base64Avatar !== base64AvatarMessage) changed = true;
+                if (base64Avatar != base64AvatarMessage) changed = true;
               }
 
               let userCustomStatus = member.presence
@@ -67,10 +75,8 @@ function analyser(member, guild_theme) {
                   )
                 : "No custom status";
 
-              // a
-
               if (userCustomStatus && custom_status) {
-                if (custom_status !== userCustomStatus.state) changed = true;
+                if (custom_status != userCustomStatus.state) changed = true;
               }
 
               if (userCustomStatus && !custom_status) changed = true;
@@ -137,7 +143,7 @@ function analyser(member, guild_theme) {
 
         let guild_subject = guild_theme || "furry";
 
-        await openai.threads.messages.create(thread.id, {
+        let msg = await openai.threads.messages.create(thread.id, {
           role: "user",
           content: [
             {
@@ -147,7 +153,7 @@ function analyser(member, guild_theme) {
             {
               type: "image_url",
               image_url: {
-                url: member.user.displayAvatarURL(),
+                url: actualAvatar,
               },
             },
           ],
@@ -155,7 +161,7 @@ function analyser(member, guild_theme) {
             type: "user_info",
             username: member.user.username,
             user_id: member.user.id,
-            avatar_url: member.user.displayAvatarURL(),
+            avatar_url: actualAvatar,
             custom_status: customActivity || "No custom status",
           },
         });
@@ -171,6 +177,9 @@ function analyser(member, guild_theme) {
             },
           },
         });
+
+        if (run.status === "failed") {
+        }
 
         if (run.status === "requires_action") {
           let run2 = await openai.threads.runs.submitToolOutputsAndPoll(
@@ -202,11 +211,13 @@ function analyser(member, guild_theme) {
                     type: "analysis",
                     username: member.user.username,
                     user_id: member.user.id,
-                    avatar_url: member.user.displayAvatarURL(),
+                    avatar_url: actualAvatar,
                     custom_status: customActivity || "No custom status",
                   },
                 }
               );
+
+              console.log(content.text.value);
 
               let result = JSON.parse(content.text.value).status;
               resolve(result);
@@ -217,6 +228,7 @@ function analyser(member, guild_theme) {
         }
       } catch (e) {
         console.error(e);
+        reject(new Error(e));
       }
     }
   );
