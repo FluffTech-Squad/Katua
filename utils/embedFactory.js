@@ -4,10 +4,7 @@ const {
   GuildMember,
   Guild,
   ClientUser,
-  AttachmentBuilder,
 } = require("discord.js");
-const generateBanner = require("./generateBanner");
-const uploadFile = require("./uploadFile");
 
 /**
  *

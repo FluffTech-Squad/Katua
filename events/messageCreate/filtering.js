@@ -1,6 +1,6 @@
-const { Message, ChannelType, BaseGuildTextChannel } = require("discord.js");
+const { Message } = require("discord.js");
 const { collections } = require("../../utils/mongodb");
-const { guildEmbed, userEmbed } = require("../../utils/embedFactory");
+const { userEmbed } = require("../../utils/embedFactory");
 const isNSFW = require("../../utils/isNSFW");
 const langs = require("../../utils/langs");
 const { getUserThread, isMemberValid, openai } = require("../../utils/openai");

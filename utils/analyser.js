@@ -29,11 +29,7 @@ function analyser(member, guild_theme) {
           process.env.OPENAI_ASSISTANT_ID
         );
 
-        if (!thread) {
-          thread = await openai.threads.create({
-            metadata: { guild: guild.id, user: member.user.id },
-          });
-        } else {
+        async function createThread() {
           let messages = await openai.threads.messages.list(thread.id);
 
           for (let message of messages.data) {
@@ -43,14 +39,13 @@ function analyser(member, guild_theme) {
               message.metadata.type &&
               message.metadata.type === "analysis"
             ) {
-              console.log(message.content[0].type);
               if (message.content[0].type != "text") break;
 
               // Verify if the user didn't change the profile picture or username
 
               let changed = false;
               let { username, avatar_url, custom_status } = message.metadata;
-              console.log(avatar_url);
+
               if (username && avatar_url) {
                 try {
                   let r = await axios.get(avatar_url);
@@ -99,6 +94,16 @@ function analyser(member, guild_theme) {
           }
         }
 
+        if (!thread) {
+          thread = await openai.threads.create({
+            metadata: { guild: guild.id, user: member.user.id },
+          });
+
+          await createThread();
+        } else {
+          await createThread();
+        }
+
         let content = "";
 
         content += `username: ${member.user.username}\n`;
@@ -143,7 +148,7 @@ function analyser(member, guild_theme) {
 
         let guild_subject = guild_theme || "furry";
 
-        let msg = await openai.threads.messages.create(thread.id, {
+        await openai.threads.messages.create(thread.id, {
           role: "user",
           content: [
             {
@@ -179,7 +184,10 @@ function analyser(member, guild_theme) {
         });
 
         if (run.status === "failed") {
+          console.log("failed");
         }
+
+        console.log(run.status);
 
         if (run.status === "requires_action") {
           let run2 = await openai.threads.runs.submitToolOutputsAndPoll(
@@ -196,38 +204,45 @@ function analyser(member, guild_theme) {
             }
           );
 
-          if (run2.status === "completed") {
-            let messages = await openai.threads.messages.list(run2.thread_id);
-            let lastMessage = messages.data[0];
+          if (run2.status === "requires_action") {
+            run2 = await openai.threads.runs.poll(run2.thread_id, run2.id);
 
-            let content = lastMessage.content[0];
+            console.log(run2.status);
 
-            if (content.type === "text") {
-              await openai.threads.messages.update(
-                run2.thread_id,
-                lastMessage.id,
-                {
-                  metadata: {
-                    type: "analysis",
-                    username: member.user.username,
-                    user_id: member.user.id,
-                    avatar_url: actualAvatar,
-                    custom_status: customActivity || "No custom status",
-                  },
-                }
-              );
+            if (run2.status === "completed") {
+              let messages = await openai.threads.messages.list(run2.thread_id);
+              let lastMessage = messages.data[0];
 
-              console.log(content.text.value);
+              let content = lastMessage.content[0];
 
-              let result = JSON.parse(content.text.value).status;
-              resolve(result);
+              if (content.type === "text") {
+                await openai.threads.messages.update(
+                  run2.thread_id,
+                  lastMessage.id,
+                  {
+                    metadata: {
+                      type: "analysis",
+                      username: member.user.username,
+                      user_id: member.user.id,
+                      avatar_url: actualAvatar,
+                      custom_status: customActivity || "No custom status",
+                    },
+                  }
+                );
+
+                let result = JSON.parse(content.text.value).status;
+                resolve(result);
+              }
+            } else {
+              await openai.threads.runs.cancel(run2.thread_id, run2.id);
+              await openai.threads.runs.cancel(run.thread_id, run.id);
+              reject(new Error(run2));
             }
-          } else {
-            reject(new Error(run));
           }
+
+          console.log(run2.status);
         }
       } catch (e) {
-        console.error(e);
         reject(new Error(e));
       }
     }

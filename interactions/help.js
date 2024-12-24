@@ -236,8 +236,6 @@ module.exports = async (interaction) => {
 
     let data = categoryEmbeds.find((c) => c.category === category);
 
-    console.log(data);
-
     if (data) {
       await interaction.editReply({
         fetchReply: true,

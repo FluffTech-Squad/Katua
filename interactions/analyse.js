@@ -15,7 +15,6 @@ const { getUserThread } = require("../utils/openai");
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
 const { userEmbed } = require("../utils/embedFactory.js");
-const isPremium = require("../utils/isPremium.js");
 
 module.exports =
   /**
@@ -23,16 +22,6 @@ module.exports =
    * @param {ChatInputCommandInteraction} interaction
    */
   async (interaction) => {
-    let isPremiumGuild = await isPremium(interaction.guild);
-
-    if (!isPremiumGuild) {
-      interaction.editReply({
-        content: `${sentences.analysisTitle} (Not enough $$$)`,
-      });
-
-      return;
-    }
-
     let msg = await interaction.channel.send({
       content: `It might take time...`,
     });
@@ -155,8 +144,6 @@ module.exports =
     });
 
     try {
-      console.log(guildThemeData);
-
       let result = await analyser(
         member,
         guildThemeData && guildThemeData.themes && guildThemeData.themes.length
@@ -164,7 +151,7 @@ module.exports =
           : "furry"
       );
 
-      console.log(result);
+      console.log(result, "a");
 
       await msg.delete();
 
@@ -254,6 +241,8 @@ module.exports =
       embed.setColor("Grey").setDescription(sentences.apiError);
 
       console.log(error);
+
+      await module.exports(interaction);
 
       interaction.editReply({
         content: "",

@@ -67,17 +67,6 @@
       "localeName": "règles",
       "localeDescription": "Activer ou désactiver des règles du serveur pour le bot."
     },
-    "detector-prompt": {
-      "title": "Prompt du détecteur",
-      "description": "Définir le message de prompt pour le détecteur de trolls.",
-      "usage": [
-        "/prompt-détecteur set",
-        "/prompt-détecteur reset",
-        "/prompt-détecteur show"
-      ],
-      "localeName": "prompt-détecteur",
-      "localeDescription": "Définir le message de prompt pour le détecteur de trolls."
-    },
     "userinfo": {
       "title": "Informations sur l'utilisateur",
       "description": "Obtenir des informations sur un utilisateur.",

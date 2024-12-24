@@ -2,7 +2,6 @@
 
 const {
   ChatInputCommandInteraction,
-  ChannelSelectMenuBuilder,
   ChannelType,
   ComponentType,
   ButtonBuilder,
@@ -121,8 +120,6 @@ module.exports =
       });
 
       btnCollector.on("collect", async (btnInteraction) => {
-        channelCollector.stop();
-
         await btnInteraction.deferReply();
         await btnInteraction.deleteReply();
 
@@ -138,6 +135,7 @@ module.exports =
 
         btnCollector.stop();
 
+        channelCollector.stop();
         await listenPanelChannel();
       });
     }
@@ -161,27 +159,6 @@ module.exports =
         maxProcessed: 1,
         time: 60000,
         filter: (i) => i.author.id === interaction.user.id,
-      });
-
-      messageCollector.on("collect", async (message) => {
-        btnCollector.stop();
-
-        let panelChannel = message.mentions.channels.first();
-
-        if (!panelChannel) {
-          messageCollector.stop();
-
-          await listenPanelChannel();
-          message.delete();
-          return;
-        }
-
-        message.delete();
-        panelChannelId = panelChannel.id;
-
-        await listenLogsChannel();
-
-        messageCollector.stop();
       });
 
       let btnCollector = message.createMessageComponentCollector({
@@ -212,6 +189,26 @@ module.exports =
 
         btnCollector.stop();
       });
+
+      messageCollector.on("collect", async (message) => {
+        let panelChannel = message.mentions.channels.first();
+
+        if (!panelChannel) {
+          messageCollector.stop();
+
+          await listenPanelChannel();
+          message.delete();
+          return;
+        }
+
+        message.delete();
+        panelChannelId = panelChannel.id;
+
+        await listenLogsChannel();
+
+        messageCollector.stop();
+        btnCollector.stop();
+      });
     }
 
     async function listenLogsChannel() {
@@ -226,34 +223,6 @@ module.exports =
         content:
           "> Mention a channel below for the ticket logs. Or click on the button to create a new channel.",
         components: [row],
-      });
-
-      let messageCollector = interaction.channel.createMessageCollector({
-        max: 1,
-        maxProcessed: 1,
-        time: 60000,
-        filter: (i) => i.author.id === interaction.user.id,
-      });
-
-      messageCollector.on("collect", async (message) => {
-        btnCollector.stop();
-
-        let logsChannel = message.mentions.channels.first();
-
-        if (!logsChannel) {
-          messageCollector.stop();
-
-          await listenLogsChannel();
-          message.delete();
-          return;
-        }
-
-        message.delete();
-        logsChannelId = logsChannel.id;
-
-        await listenLogsChannel();
-
-        messageCollector.stop();
       });
 
       let btnCollector = message.createMessageComponentCollector({
@@ -278,6 +247,33 @@ module.exports =
         await finish();
 
         btnCollector.stop();
+      });
+
+      let messageCollector = interaction.channel.createMessageCollector({
+        max: 1,
+        maxProcessed: 1,
+        time: 60000,
+        filter: (i) => i.author.id === interaction.user.id,
+      });
+
+      messageCollector.on("collect", async (message) => {
+        let logsChannel = message.mentions.channels.first();
+
+        if (!logsChannel) {
+          messageCollector.stop();
+
+          await listenLogsChannel();
+          message.delete();
+          return;
+        }
+
+        message.delete();
+        logsChannelId = logsChannel.id;
+
+        await listenLogsChannel();
+
+        btnCollector.stop();
+        messageCollector.stop();
       });
     }
 

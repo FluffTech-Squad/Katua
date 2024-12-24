@@ -158,6 +158,19 @@ module.exports =
             },
           ],
         });
+
+        let user = await interaction.guild.members.fetch(interaction.user.id);
+
+        await user.send({
+          content: `Transcript for ${username}`,
+          files: [
+            {
+              attachment: Buffer.from(transcript),
+              name: `${username}-transcript.txt`,
+            },
+          ],
+        });
+
         await ticketChannel.delete();
       });
     }

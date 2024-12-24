@@ -1,6 +1,6 @@
 // Event when bot joins a guild
 
-const { Guild, ActionRowBuilder } = require("discord.js");
+const { Guild } = require("discord.js");
 let langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
 const { guildEmbed } = require("../utils/embedFactory.js");

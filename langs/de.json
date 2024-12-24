@@ -57,12 +57,6 @@
       "localeName": "regeln",
       "localeDescription": "Aktivieren oder deaktivieren Sie die Serverregeln für den Bot."
     },
-    "detector-prompt": {
-      "title": "Detector Prompt",
-      "description": "Manage the detector prompt to detect unsafe contents in the server.",
-      "localeName": "detector-prompt",
-      "localeDescription": "Manage the detector prompt to detect unsafe contents in the server."
-    },
     "userinfo": {
       "title": "Benutzerinfo",
       "description": "Zeigen Sie Informationen über einen Benutzer an.",

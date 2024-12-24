@@ -1,17 +1,10 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 
 require("dotenv").config();
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(process.env.MONGODB_STRING, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-let db = client.db("fluffymod");
+const client = new MongoClient(process.env.MONGODB_STRING);
+let db = client.db("katua");
 
 module.exports.db = db;
 
@@ -20,7 +13,7 @@ module.exports.connectDB = async () => {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("fluffymod").command({ ping: 1 });
+    await client.db("katua").command({ ping: 1 });
     console.log("Connected to database (MongoDB)");
   } catch (e) {
     throw e;

@@ -67,17 +67,6 @@
       "localeName": "rules",
       "localeDescription": "Enable or disable the server rules for the bot."
     },
-    "detector-prompt": {
-      "title": "Detector Prompt",
-      "description": "Manage the detector prompt to detect unsafe contents in the server.",
-      "usages": [
-        "/detector-prompt set",
-        "/detector-prompt reset",
-        "/detector-prompt show"
-      ],
-      "localeName": "detector-prompt",
-      "localeDescription": "Manage the detector prompt to detect unsafe contents in the server."
-    },
     "userinfo": {
       "title": "User Info",
       "description": "Get information about a user.",

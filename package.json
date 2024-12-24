@@ -4,7 +4,8 @@
   "description": "- Analyse joining users' profile to detect if it might be a troll or not. Triggering everytime someone joins your guild (you should config a log channel).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +22,5 @@
     "mongodb": "^6.7.0",
     "nsfwjs": "^4.1.0",
     "openai": "^4.52.7"
-  },
-  "devDependencies": {
-    "prisma": "^5.17.0"
   }
 }

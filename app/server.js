@@ -2,10 +2,6 @@
 const express = require("express");
 const app = express();
 
-// const { collections } = require("../utils/mongodb");
-// const { userEmbed } = require("../utils/embedFactory");
-// const goldShardsToTime = require("../utils/goldShardsToTime");
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,7 +1,6 @@
 // Event when the bot leaves a guild
 
 const { Guild } = require("discord.js");
-const isPremium = require("../utils/isPremium");
 const { collections } = require("../utils/mongodb");
 
 module.exports =

@@ -11,7 +11,6 @@ const {
 
 const langs = require("../utils/langs.js");
 const { collections } = require("../utils/mongodb.js");
-const isPremium = require("../utils/isPremium.js");
 
 module.exports =
   /**
@@ -52,13 +51,6 @@ module.exports =
       .setLabel(sentences.analysisTitle)
       .setStyle(ButtonStyle.Primary)
       .setCustomId("analysis");
-
-    let isPremiumGuild = await isPremium(interaction.guild);
-
-    if (!isPremiumGuild) {
-      analysisButton.setDisabled(true);
-      analysisButton.setLabel(`${sentences.analysisTitle} (Not enough $$$)`);
-    }
 
     let actionRow = new ActionRowBuilder().addComponents(analysisButton);
 

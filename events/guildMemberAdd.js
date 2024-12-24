@@ -1,19 +1,11 @@
 // guildMemberAdd event
 
-const {
-  GuildMember,
-  EmbedBuilder,
-  BaseGuildTextChannel,
-  Collection,
-  ButtonBuilder,
-  ButtonStyle,
-} = require("discord.js");
+const { GuildMember, BaseGuildTextChannel, Collection } = require("discord.js");
 
 const analyse = require("../utils/analyser");
 const langs = require("../utils/langs");
 const { getUserThread } = require("../utils/openai");
 const { collections } = require("../utils/mongodb");
-const isPremium = require("../utils/isPremium");
 const { userEmbed, guildEmbed } = require("../utils/embedFactory");
 const analyser = require("../utils/analyser");
 
